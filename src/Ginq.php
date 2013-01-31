@@ -14,7 +14,7 @@
  * @package    Ginq
  */
 
-require_once("Ginq/Lookup.php");
+require_once dirname(__FILE__) . "/Ginq/Lookup.php";
 
 /**
  * Ginq
@@ -112,7 +112,9 @@ class Ginq implements IteratorAggregate
 
     public function where($predicate)
     {
-        return self::from(self::_gen_where($this->iter, self::_parse_predicate($predicate)));
+        return self::from(self::_gen_where(
+            $this->iter, self::_parse_predicate($predicate))
+        );
     }
 
     protected static function _gen_where($xs, $predicate)
@@ -219,7 +221,7 @@ class Ginq implements IteratorAggregate
     {
         return self::from(self::_gen_zip(
             $this->iter,
-            self::from($rhs)->getIterator(),
+            self::from($rhs),
             self::_parse_selector($selector)));
     }
 
@@ -327,7 +329,8 @@ class Ginq implements IteratorAggregate
         }
     }
 
-    public function groupBy($keySelector, $elementSelector = null) {
+    public function groupBy($keySelector, $elementSelector = null)
+    {
         if (is_null($elementSelector)) {
             $elementSelector = function($x) { return $x; };
         }
@@ -336,16 +339,28 @@ class Ginq implements IteratorAggregate
         ));
     }
 
-    protected static function _gen_groupBy($xs, $keySelector, $elementSelector) {
+    protected static function _gen_groupBy($xs, $keySelector, $elementSelector)
+    {
         foreach (Lookup::from($xs, $keySelector) as $xs) {
             yield self::from($xs)->select($elementSelector);
         }
     }
 
-    public static function concat($lhs, $rhs) {
+    public function concat($rhs)
+    {
+        return Ginq::from(Ginq::_gen_concat(
+            $this->iter, Ginq::from($rhs)
+        ));
     }
 
-    protected function toLookup($keySelector) {
+    protected function _gen_concat($xs, $ys)
+    {
+        foreach ($xs as $x) {
+            yield $x;
+        }
+        foreach ($ys as $y) {
+            yield $y;
+        }
     }
 
     private static function _parse_selector($selector)
