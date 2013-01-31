@@ -119,15 +119,6 @@ class GinqTest extends PHPUnit2_Framework_TestCase {
         $arr = Ginq::from($data)->select("name")->toArray();
         $this->assertEquals(['Taro','Atsushi','Junko'], $arr);
 
-        // array selector
-        $arr = Ginq::from($data)->select(['name','city'])->toArray();
-        $this->assertEquals([
-              ['name'=>'Taro',    'city' => 'Takatsuki']
-            , ['name'=>'Atsushi', 'city' => 'Ibaraki']
-            , ['name'=>'Junko',   'city' => 'Sakai']
-            ], $arr);
-
-
         // invalid selector
         try {
             Ginq::from([1,2,3,4,5])->select(8); 

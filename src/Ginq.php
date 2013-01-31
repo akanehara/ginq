@@ -50,9 +50,7 @@ class Ginq implements IteratorAggregate
 
     public static function from($xs)
     {
-        if ($xs instanceof Generator) {
-            return new Ginq($xs);
-        } else if ($xs instanceof Iterator) {
+        if ($xs instanceof Iterator) {
             return new Ginq($xs);
         } else if ($xs instanceof IteratorAggregate) {
             return new Ginq($xs->getIterator());
@@ -114,7 +112,7 @@ class Ginq implements IteratorAggregate
 
     public function where($predicate)
     {
-        return self::from(self::_gen_where($this->iter, $predicate));
+        return self::from(self::_gen_where($this->iter, self::_parse_predicate($predicate)));
     }
 
     protected static function _gen_where($xs, $predicate)
@@ -254,8 +252,9 @@ class Ginq implements IteratorAggregate
     
     public function any($predicate)
     {
+        $p = self::_parse_predicate($predicate);
         foreach ($this->iter as $x) {
-            if ($predicate($x) == true) {
+            if ($p($x) == true) {
                 return true;
             }
         }
@@ -264,8 +263,9 @@ class Ginq implements IteratorAggregate
 
     public function all($predicate)
     {
+        $p = self::_parse_predicate($predicate);
         foreach ($this->iter as $x) {
-            if ($predicate($x) == false) {
+            if ($p($x) == false) {
                 return false;
             }
         }
@@ -292,7 +292,7 @@ class Ginq implements IteratorAggregate
 
     public function takeWhile($predicate)
     {
-        return self::from(self::_gen_takeWhile($this->iter, $predicate));
+        return self::from(self::_gen_takeWhile($this->iter, self::_parse_predicate($predicate)));
     }
 
     protected static function _gen_takeWhile($xs, $predicate)
@@ -308,7 +308,7 @@ class Ginq implements IteratorAggregate
 
     public function dropWhile($predicate)
     {
-        return self::from(self::_gen_dropWhile($this->iter, $predicate));
+        return self::from(self::_gen_dropWhile($this->iter, self::_parse_predicate($predicate)));
     }
 
     protected static function _gen_dropWhile($xs, $predicate)
@@ -361,34 +361,24 @@ class Ginq implements IteratorAggregate
                     throw new DomainException("'$type' object has no key or field"); 
                 }
             };
-        } else if (is_array($selector)) {
-            return function($x) use ($selector) {
-                $result = [];
-                if (is_array($x)) {
-                    foreach ($selector as $key) {
-                        $result[$key] = @$x[$key];
-                    }
-                } else if (is_object($x)) {
-                    foreach ($selector as $field) {
-                        $result[$key] = @$x->{$field};
-                    }
-                } else {
-                    $type = gettype($x);
-                    throw new DomainException("'$type' object has no key or field"); 
-                }
-                return $result;
-            };
         } else if (is_callable($selector)) {
             return $selector;
         } else {
             $type = gettype($selector);
             throw new InvalidArgumentException(
-                "'selector' string or array or callable expected, got $type");
+                "'selector' string or callable expected, got $type");
         }
     }
 
-    private static function _parse_predicate($selector)
+    private static function _parse_predicate($predicate)
     {
+        if (is_callable($predicate)) {
+            return $predicate;
+        } else {
+            $type = gettype($predicate);
+            throw new InvalidArgumentException(
+                "'predicate' callable expected, got $type");
+        }
     }
 
 }
