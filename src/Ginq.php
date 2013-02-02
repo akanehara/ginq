@@ -91,6 +91,24 @@ class Ginq implements IteratorAggregate
         return true;
     }
 
+    public function first($default = null) {
+        $this->it->rewind();
+        if ($this->it->valid()) {
+            return $this->it->current();
+        } else {
+            return $default;
+        }
+    }
+
+    public function find($predicate, $default = null) {
+        foreach ($this->it as $k => $x) {
+            if ($predicate($x, $k)) {
+                return $x;
+            }
+        }
+        return $default;
+    }
+
     public function fold($accumulator, $operator) {
         $acc = $accumulator;
         foreach ($this->it as $x) {

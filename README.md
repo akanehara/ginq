@@ -247,6 +247,18 @@ all($predicate)
 ```php
 ```
 
+first($default = null)
+--------
+
+```php
+```
+
+find($predicate, $default = null)
+--------
+
+```php
+```
+
 fold($accumulator, $operator)
 --------
 

@@ -117,7 +117,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @todo Implement testAll().
+     * testAll().
      */
     public function testAll()
     {
@@ -135,6 +135,64 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(
             Ginq::range(1)->all(function($x, $k) { return $x <= 10; })
         );
+    }
+
+    /**
+     * testFold
+     */
+    public function testFold() {
+        $x = Ginq::range(1, 10)->fold(0, function($acc, $x) {
+            return $acc - $x;
+        });
+        $this->assertEquals($x, -55);
+    }
+
+    /**
+     * testFirst
+     */
+    public function testFirst() {
+        // without default value (just)
+        $x = Ginq::from(array('apple', 'orange', 'grape'))
+                ->first();
+        $this->assertEquals($x, 'apple');
+
+        // without default value (nothing)
+        $x = Ginq::zero()->first();
+        $this->assertEquals($x, null);
+
+        // with default value (just)
+        $x = Ginq::from(array('apple', 'orange', 'grape'))
+                ->first('none');
+        $this->assertEquals($x, 'apple');
+
+        // with default value (nothing)
+        $x = Ginq::zero()->first('none');
+        $this->assertEquals($x, 'none');
+    }
+
+    /**
+     * testFind
+     */
+    public function testFind() {
+        $isOrange = function($x) { return $x == "orange"; };
+
+        // without default value (just)
+        $x = Ginq::from(array('apple', 'orange', 'grape'))
+                ->find($isOrange);
+        $this->assertEquals($x, 'orange');
+
+        // without default value (nothing)
+        $x = Ginq::zero()->find($isOrange);
+        $this->assertEquals($x, null);
+
+        // with default value (just)
+        $x = Ginq::from(array('apple', 'orange', 'grape'))
+                ->find($isOrange, 'none');
+        $this->assertEquals($x, 'orange');
+
+        // with default value (nothing)
+        $x = Ginq::zero()->find($isOrange, 'none');
+        $this->assertEquals($x, 'none'); 
     }
 
     /**
