@@ -1,11 +1,32 @@
 <?php
+/**
+ * Ginq: Generator INtegrated Query
+ * Copyright 2013, Atsushi Kanehara <akanehara@gmail.com>
+ *
+ * Licensed under The MIT License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * PHP Version 5.5 or later
+ *
+ * @author     Atsushi Kanehara <akanehara@gmail.com>
+ * @copyright  Copyright 2013, Atsushi Kanehara <akanehara@gmail.com>
+ * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * @package    Ginq
+ */
+
+require_once dirname(__FILE__) . "/iter.php";
+
+/**
+ * Lookup
+ * @package Ginq
+ */
 class Lookup implements IteratorAggregate
 {
     private $table = null;
 
     protected function __construct()
     {
-        $this->table = [];
+        $this->table = array();
     }
     
     public static function from($xs, $keySelector)
@@ -19,13 +40,7 @@ class Lookup implements IteratorAggregate
 
     public function getIterator()
     {
-        return $this->_gen_iter();
-    }
-
-    protected function _gen_iter() {
-        foreach ($this->table as $x) {
-            yield $x;
-        }
+        return iter($this->table);
     }
 
     public function get($key)
@@ -34,7 +49,7 @@ class Lookup implements IteratorAggregate
         if (is_array($v)) {
             return $v;
         }
-        return [];
+        return array();
     }
 
     public function put($key, $value)
@@ -43,7 +58,7 @@ class Lookup implements IteratorAggregate
         if (is_array($v)) {
             array_push($v, $value);
         } else {
-            $this->table[$key] = [$value];
+            $this->table[$key] = array($value);
         }
     }
 }
