@@ -41,7 +41,8 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        Ginq::useIterator();
+        //Ginq::useIterator();
+        //Ginq::useGenerator();
     }
 
     /**
@@ -67,6 +68,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         }
         $this->assertEquals(array(1,2,3,4,5), $arr);
     }
+
     /**
      * testToArray().
      */
@@ -76,24 +78,41 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array(1,2,3,4,5), $arr);
     }
 
+    /**
+     * testToArrayRec().
+     */
+    public function testToArrayRec()
+    {
+        $arr = Ginq::from(array(
+            new ArrayIterator(array(1,2,3)),
+            new ArrayObject(array(4,5,6))
+        ))->toArrayRec();
+        $this->assertEquals(array(array(1,2,3),array(4,5,6)), $arr);
+    }
+
    /**
-     * @todo Implement testAny().
+     * testAny().
      */
     public function testAny()
     {
         $this->assertTrue(
             Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
-                ->any(function($x) { return 5 <= $x; })
+                ->any(function($x, $k) { return 5 <= $x; })
         );
 
         $this->assertFalse(
             Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
-                ->any(function($x) { return 100 <= $x; })
+                ->any(function($x, $k) { return 100 <= $x; })
+        );
+
+        $this->assertTrue(
+            Ginq::from(array('foo'=>18, 'bar'=>42, 'baz'=> 7))
+                ->any(function($x, $k) { return 'bar' == $k; })
         );
 
         // infinite sequence
         $this->assertTrue(
-            Ginq::range(1)->any(function($x) { return 5 <= $x; })
+            Ginq::range(1)->any(function($x, $k) { return 5 <= $x; })
         );
     }
 
@@ -104,17 +123,17 @@ class GinqTest extends PHPUnit_Framework_TestCase
     {
         $this->assertTrue(
             Ginq::from(array(2,4,6,8,10))
-                ->all(function($x) { return $x % 2 == 0; })
+                ->all(function($x, $k) { return $x % 2 == 0; })
         );
 
         $this->assertFalse(
             Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
-                ->all(function($x) { return $x < 10; })
+                ->all(function($x, $k) { return $x < 10; })
         );
 
         // infinite sequence
         $this->assertFalse(
-            Ginq::range(1)->all(function($x) { return $x <= 10; })
+            Ginq::range(1)->all(function($x, $k) { return $x <= 10; })
         );
     }
 
@@ -218,7 +237,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
     {
         // selector function
         $xs = Ginq::from(array(1,2,3,4,5))
-                   ->select(function($x) { return $x * $x; })
+                   ->select(function($x, $k) { return $x * $x; })
                    ->toArray();
         $this->assertEquals(array(1,4,9,16,25), $xs);
 
@@ -250,7 +269,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
     public function testWhere()
     {
         $xs = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
-            ->where(function($x) { return ($x % 2) == 0; })
+            ->where(function($x, $k) { return ($x % 2) == 0; })
             ->toArray();
         $this->assertEquals(array(2,4,6,8,10), $xs);
     }
@@ -274,29 +293,29 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @todo Implement testTakeWhile().
+     * testTakeWhile().
      */
     public function testTakeWhile()
     {
         $xs = Ginq::from(array(1,2,3,4,5,6,7,8,9,8,7,6,5,4,3,2,1))
-            ->takeWhile(function($x) { return $x <= 5; })
+            ->takeWhile(function($x, $k) { return $x <= 5; })
             ->toArray();
         $this->assertEquals(array(1,2,3,4,5), $xs);
     }
 
     /**
-     * @todo Implement testDropWhile().
+     * testDropWhile().
      */
     public function testDropWhile()
     {
         $xs = Ginq::from(array(1,2,3,4,5,6,7,8,9,8,7,6,5,4,3,2,1))
-            ->dropWhile(function($x) { return $x <= 5; })
+            ->dropWhile(function($x, $k) { return $x <= 5; })
             ->toArray();
         $this->assertEquals(array(6,7,8,9,8,7,6,5,4,3,2,1), $xs);
     }
 
      /**
-     * @todo Implement testConcat().
+     * testConcat().
      */
     public function testConcat()
     {
@@ -345,8 +364,8 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $phones = Ginq::from($phoneBook)
             ->selectMany(
                 'phones',
-                function($person, $phone) {
-                    return "${person['name']} : $phone";
+                function($x0, $x1, $k0, $k1) {
+                    return "{$x0['name']} : $x1";
                 }
             )->toArray();
         $this->assertEquals(array(
@@ -382,7 +401,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         // key selector string
         $xs = Ginq::from($persons)->join($phones,
             'id', 'owner',
-            function($outer, $inner) {
+            function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
             }
         )->toArray();
@@ -401,7 +420,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $xs = Ginq::from($persons)->join($phones,
             function($outer) { return $outer['id']; },
             function($inner) { return $inner['owner']; },
-            function($outer, $inner) {
+            function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
             }
         )->toArray();
@@ -424,7 +443,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
     public function testZip()
     {
         $xs = Ginq::cycle(array("red", "green"))->zip(Ginq::range(1, 8),
-            function($c, $n) { return "$n - $c"; }
+            function($x0, $x1, $k0, $k1) { return "$x1 - $x0"; }
         )->toArray();
         $this->assertEquals(array(
             "1 - red", "2 - green",
@@ -448,13 +467,13 @@ class GinqTest extends PHPUnit_Framework_TestCase
             ,array('id' => 6, 'owner' => 3, 'phone' => '050-6667-2231')
         );
         $xss = Ginq::from($phones)->groupBy(
-            function($x) { return $x['owner']; },
-            function($x) { return $x['phone']; }
+            function($x, $k) { return $x['owner']; },
+            function($x, $k) { return $x['phone']; }
         )->toArrayRec();
         $this->assertEquals(array(
-            array('03-1234-5678', '090-8421-9061'),
-            array('050-1198-4458'),
-            array('06-1111-3333', '090-9898-1314', '050-6667-2231')
+            1 => array('03-1234-5678', '090-8421-9061'),
+            2 => array('050-1198-4458'),
+            3 => array('06-1111-3333', '090-9898-1314', '050-6667-2231')
         ), $xss);
     }
  }

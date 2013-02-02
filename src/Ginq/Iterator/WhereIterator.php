@@ -46,7 +46,7 @@ class WhereIterator implements Iterator
     private function nextSatisfied() {
         $p = $this->predicate;
         while ($this->it->valid()) {
-            if ($p($this->it->current())) {
+            if ($p($this->it->current(), $this->it->key())) {
                 break;
             } else {
                 $this->it->next();

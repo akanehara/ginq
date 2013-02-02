@@ -39,7 +39,9 @@ class ZipIterator implements Iterator
         $f = $this->joinSelector;
         return $f(
             $this->it0->current(),
-            $this->it1->current()
+            $this->it1->current(),
+            $this->it0->key(),
+            $this->it1->key()
         );
     }
 

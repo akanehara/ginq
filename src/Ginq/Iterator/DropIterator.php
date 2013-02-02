@@ -53,7 +53,7 @@ class DropIterator implements Iterator
         $this->it->rewind();
         for ($j = 0; $j < $this->n; $j++) {
             if ($this->it->valid()) {
-                $this->next();
+                $this->it->next();
             } else {
                 break;
             }

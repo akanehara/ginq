@@ -61,10 +61,16 @@ class SelectManyIterator implements Iterator
         $this->nextInner();
     }
 
-    protected function nextInner() {
+    protected function nextInner()
+    {
         if ($this->outer->valid()) {
             $k = $this->manySelector;
-            $this->inner = iter($k($this->outer->current()));
+            $this->inner = iter(
+                $k(
+                    $this->outer->current(),
+                    $this->outer->key()
+                )
+            );
         }
     }
 

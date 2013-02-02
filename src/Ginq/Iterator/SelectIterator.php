@@ -36,7 +36,7 @@ class SelectIterator implements Iterator
     public function current()
     {
         $f = $this->selector;
-        return $f($this->it->current());
+        return $f($this->it->current(), $this->it->key());
     }
 
     public function key() 

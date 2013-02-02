@@ -50,8 +50,8 @@ class Ginq implements IteratorAggregate
     public function toArray()
     {
         $arr = array();
-        foreach ($this->it as $x) {
-            array_push($arr, $x);
+        foreach ($this->it as $k => $x) {
+            $arr[$k] = $x;
         }
         return $arr;
     }
@@ -59,19 +59,21 @@ class Ginq implements IteratorAggregate
     public function toArrayRec()
     {
         $arr = array();
-        foreach ($this->it as $x) {
+        foreach ($this->it as $k => $x) {
             if ($x instanceof Iterator || $x instanceof IteratorAggregate) {
-                $x = Ginq::from($x)->toArray();
+                $arr[$k] = self::from($x)->toArrayRec();
+            } else {
+                $arr[$k] = $x;
             }
-            array_push($arr, $x);
         }
         return $arr;
     }
+
     public function any($predicate)
     {
         $p = self::_parse_predicate($predicate);
-        foreach ($this->it as $x) {
-            if ($p($x) == true) {
+        foreach ($this->it as $k => $x) {
+            if ($p($x, $k) == true) {
                 return true;
             }
         }
@@ -81,8 +83,8 @@ class Ginq implements IteratorAggregate
     public function all($predicate)
     {
         $p = self::_parse_predicate($predicate);
-        foreach ($this->it as $x) {
-            if ($p($x) == false) {
+        foreach ($this->it as $k => $x) {
+            if ($p($x, $k) == false) {
                 return false;
             }
         }
@@ -122,7 +124,7 @@ class Ginq implements IteratorAggregate
 
     public static function cycle($xs)
     {
-        return self::from(self::$gen->cycle(Ginq::from($xs)));
+        return self::from(self::$gen->cycle(self::from($xs)));
     }
 
     public static function from($xs)
@@ -175,8 +177,8 @@ class Ginq implements IteratorAggregate
 
     public function concat($rhs)
     {
-        return Ginq::from(self::$gen->concat(
-            $this->it, Ginq::from($rhs)
+        return self::from(self::$gen->concat(
+            $this->it, self::from($rhs)
         ));
     }
 
@@ -201,8 +203,10 @@ class Ginq implements IteratorAggregate
         $innerKeySelector = self::_parse_selector($innerKeySelector);
         $innerLookup = Lookup::from($inner, $innerKeySelector);
         return $this->selectMany(
-            function($outer) use ($innerLookup, $outerKeySelector) {
-                return $innerLookup->get($outerKeySelector($outer));
+            function($outer, $outerKey) use ($innerLookup, $outerKeySelector) {
+                return $innerLookup->get(
+                    $outerKeySelector($outer, $outerKey)
+                );
             },
             $joinSelector
         );
@@ -212,8 +216,9 @@ class Ginq implements IteratorAggregate
     {
         return self::from(self::$gen->zip(
             $this->it,
-            self::from($rhs),
-            self::_parse_join_selector($joinSelector)));
+            iter($rhs),
+            self::_parse_join_selector($joinSelector))
+        );
     }
 
     public function groupBy($keySelector, $elementSelector = null)
@@ -231,7 +236,7 @@ class Ginq implements IteratorAggregate
     protected static function _parse_selector($selector)
     {
         if (is_string($selector)) {
-            return function($x) use ($selector) {
+            return function($x, $k) use ($selector) {
                 if (is_array($x)) {
                     return @$x[$selector];
                 } else if (is_object($x)) {
@@ -264,7 +269,7 @@ class Ginq implements IteratorAggregate
     protected static function _parse_predicate($predicate)
     {
         if (is_string($predicate)) {
-            return function($x) use ($predicate) {
+            return function($x, $k) use ($predicate) {
                 if (is_array($x)) {
                     return @$x[$predicate];
                 } else if (is_object($x)) {

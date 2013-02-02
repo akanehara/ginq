@@ -45,7 +45,7 @@ class GroupByIterator implements Iterator
 
     public function key() 
     {
-        return $this->i;
+        return $this->group->key();
     }
 
     public function next()

@@ -55,7 +55,7 @@ class DropWhileIterator implements Iterator
         $this->it->rewind();
         $p = $this->predicate;
         while ($this->it->valid()) {
-            if ($p($this->it->current())) {
+            if ($p($this->it->current(), $this->it->key())) {
                 $this->it->next();
             } else {
                 break;

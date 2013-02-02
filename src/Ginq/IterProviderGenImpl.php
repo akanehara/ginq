@@ -64,7 +64,7 @@ class IterProviderGenImpl implements IterProvider
     public function cycle($xs)
     {
         while (true) {
-            foreach ($xs as $x) {
+            foreach ($xs as $k => $x) {
                 yield $x;
             }
         }
@@ -72,15 +72,15 @@ class IterProviderGenImpl implements IterProvider
 
     public function select($xs, $selector)
     {
-        foreach ($xs as $x) {
-            yield $selector($x);
+        foreach ($xs as $k => $x) {
+            yield $selector($x, $k);
         }
     }
 
     public function where($xs, $predicate)
     {
-        foreach ($xs as $x) {
-            if ($predicate($x)) {
+        foreach ($xs as $k => $x) {
+            if ($predicate($x, $k)) {
                 yield $x;
             }
         }
@@ -89,7 +89,7 @@ class IterProviderGenImpl implements IterProvider
     public function take($xs, $n)
     {
         $i = $n;
-        foreach ($xs as $x) {
+        foreach ($xs as $k => $x) {
             if ($i <= 0) {
                 break;
             } else {
@@ -102,7 +102,7 @@ class IterProviderGenImpl implements IterProvider
     public function drop($xs, $n)
     {
         $i = $n;
-        foreach ($xs as $x) {
+        foreach ($xs as $k => $x) {
             if (0 < $i) {
                 $i--;
             } else {
@@ -113,8 +113,8 @@ class IterProviderGenImpl implements IterProvider
 
     public function takeWhile($xs, $predicate)
     {
-        foreach ($xs as $x) {
-            if ($predicate($x)) {
+        foreach ($xs as $k => $x) {
+            if ($predicate($x, $k)) {
                 yield $x;
             } else {
                 break; 
@@ -126,7 +126,7 @@ class IterProviderGenImpl implements IterProvider
     {
         $xs->rewind();
         while ($xs->valid()) {
-            if ($predicate($xs->current())) {
+            if ($predicate($xs->current(), $xs->key())) {
                 $xs->next();
             } else {
                 break;
@@ -140,18 +140,18 @@ class IterProviderGenImpl implements IterProvider
 
     public function concat($xs, $ys)
     {
-        foreach ($xs as $x) {
+        foreach ($xs as $k => $x) {
             yield $x;
         }
-        foreach ($ys as $y) {
+        foreach ($ys as $l => $y) {
             yield $y;
         }
     }
 
     public function selectMany($xs, $manySelector)
     {
-        foreach ($xs as $x) {
-            foreach ($manySelector($x) as $y) {
+        foreach ($xs as $k => $x) {
+            foreach ($manySelector($x, $k) as $l => $y) {
                 yield $y;
             }
         }
@@ -160,9 +160,9 @@ class IterProviderGenImpl implements IterProvider
     public function selectManyWithJoin(
         $xs, $manySelector, $joinSelector)
     {
-        foreach ($xs as $x) {
-            foreach ($manySelector($x) as $y) {
-                yield $joinSelector($x, $y);
+        foreach ($xs as $k => $x) {
+            foreach ($manySelector($x, $k) as $l => $y) {
+                yield $joinSelector($x, $y, $k, $l);
             }
         }
     }
@@ -172,7 +172,10 @@ class IterProviderGenImpl implements IterProvider
         $xs->rewind();
         $ys->rewind();
         while ($xs->valid() && $ys->valid()) {
-            yield $joinSelector($xs->current(), $ys->current());
+            yield $joinSelector(
+                $xs->current(), $ys->current(),
+                $xs->key(), $ys->key()
+            );
             $xs->next();
             $ys->next();
         }
@@ -180,8 +183,8 @@ class IterProviderGenImpl implements IterProvider
 
     public function groupBy($xs, $keySelector, $elementSelector)
     {
-        foreach (Lookup::from($xs, $keySelector) as $xs) {
-            yield self::from($xs)->select($elementSelector);
+        foreach (Lookup::from($xs, $keySelector) as $k => $ys) {
+            yield $k => $this->select($ys, $elementSelector);
         }
     }
 

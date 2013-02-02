@@ -59,6 +59,7 @@ class TakeWhileIterator implements Iterator
     public function valid()
     {
         $p = $this->predicate;
-        return $this->it->valid() && $p($this->it->current());
+        return $this->it->valid()
+            && $p($this->it->current(), $this->it->key());
     }
 }
