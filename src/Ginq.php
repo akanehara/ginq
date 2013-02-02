@@ -94,6 +94,7 @@ class Ginq implements IteratorAggregate
         foreach ($this->it as $x) {
             $acc = $operator($acc, $x);
         }
+        return $acc;
     }
 
     public static function zero()
