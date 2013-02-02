@@ -6,7 +6,7 @@
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * PHP Version 5.5 or later
+ * PHP Version 5.3 or later
  *
  * @author     Atsushi Kanehara <akanehara@gmail.com>
  * @copyright  Copyright 2013, Atsushi Kanehara <akanehara@gmail.com>
@@ -14,6 +14,7 @@
  * @package    Ginq
  */
 
+require_once dirname(__FILE__) . "/Ginq/iter.php";
 require_once dirname(__FILE__) . "/Ginq/Lookup.php";
 
 /**
@@ -22,31 +23,54 @@ require_once dirname(__FILE__) . "/Ginq/Lookup.php";
  */
 class Ginq implements IteratorAggregate
 {
-    protected $iter = null;
+    protected $it = null;
 
-    protected function __construct($iter)
+    public static $gen = null;
+
+    public static function useIterator() {
+        require_once dirname(__FILE__) . "/Ginq/IterProviderIterImpl.php";
+        self::$gen = new IterProviderIterImpl();
+    }
+
+    public static function useGenerator() {
+        require_once dirname(__FILE__) . "/Ginq/IterProviderGenImpl.php";
+        self::$gen = new IterProviderGenImpl();
+    }
+
+    protected function __construct($it)
     {
-        $this->iter = $iter;
+        $this->it = $it;
     }
 
     public function getIterator()
     {
-        return $this->iter;
+        return $this->it;
     }
 
     public function toArray()
     {
-        $arr = [];
-        foreach ($this->iter as $x) {
+        $arr = array();
+        foreach ($this->it as $x) {
             array_push($arr, $x);
         }
         return $arr;
     }
 
+    public function toArrayRec()
+    {
+        $arr = array();
+        foreach ($this->it as $x) {
+            if ($x instanceof Iterator || $x instanceof IteratorAggregate) {
+                $x = Ginq::from($x)->toArray();
+            }
+            array_push($arr, $x);
+        }
+        return $arr;
+    }
     public function any($predicate)
     {
         $p = self::_parse_predicate($predicate);
-        foreach ($this->iter as $x) {
+        foreach ($this->it as $x) {
             if ($p($x) == true) {
                 return true;
             }
@@ -57,7 +81,7 @@ class Ginq implements IteratorAggregate
     public function all($predicate)
     {
         $p = self::_parse_predicate($predicate);
-        foreach ($this->iter as $x) {
+        foreach ($this->it as $x) {
             if ($p($x) == false) {
                 return false;
             }
@@ -65,14 +89,16 @@ class Ginq implements IteratorAggregate
         return true;
     }
 
-    public static function zero()
-    {
-        return self::from(self::_gen_zero());
+    public function fold($accumulator, $operator) {
+        $acc = $accumulator;
+        foreach ($this->it as $x) {
+            $acc = $operator($acc, $x);
+        }
     }
 
-    protected static function _gen_zero()
+    public static function zero()
     {
-        while (false) { yield null; }
+        return self::from(self::$gen->zero());
     }
 
     public static function range($start, $stop = null, $step = 1)
@@ -82,228 +108,88 @@ class Ginq implements IteratorAggregate
                 "self::range() numeric start arguments expected.");
         }
         if (is_null($stop)) {
-            return self::from(self::_gen_range_inf($start, $step));
+            return self::from(self::$gen->rangeInf($start, $step));
         } else {
-            return self::from(self::_gen_range($start, $stop, $step));
-        }
-    }
-
-    protected static function _gen_range($start, $stop, $step)
-    {
-        if (0 <= $step) {
-            for($i = $start; $i <= $stop; $i += $step) {
-                yield $i;
-            }
-        } else {
-            for($i = $start; $i >= $stop; $i += $step) {
-                yield $i;
-            }
-        }
-    }
-
-    protected static function _gen_range_inf($start, $step)
-    {
-        if (0 <= $step) {
-            for($i = $start; true; $i += $step) {
-                yield $i;
-            }
-        } else {
-            for($i = $start; true; $i += $step) {
-                yield $i;
-            }
+            return self::from(self::$gen->range($start, $stop, $step));
         }
     }
 
     public static function repeat($x)
     {
-        return self::from(self::_gen_repeat($x));
-    }
-
-    protected static function _gen_repeat($x)
-    {
-        while (true) {
-            yield $x;
-        }
+        return self::from(self::$gen->repeat($x));
     }
 
     public static function cycle($xs)
     {
-        return self::from(self::_gen_cycle($xs));
-    }
-
-    protected static function _gen_cycle($xs)
-    {
-        while (true) {
-            foreach ($xs as $x) {
-                yield $x;
-            }
-        }
+        return self::from(self::$gen->cycle(Ginq::from($xs)));
     }
 
     public static function from($xs)
     {
-        if ($xs instanceof Iterator) {
-            return new Ginq($xs);
-        } else if ($xs instanceof IteratorAggregate) {
-            return new Ginq($xs->getIterator());
-        } else if (is_array($xs)) {
-            return new Ginq(new ArrayIterator($xs));
+        if ($xs instanceof Ginq) {
+            return $xs;
         } else {
-            throw new InvalidArgumentException(
-                'require Iterator or IteratorAggregate or array.');
+            return new Ginq(iter($xs));
         }
     }
 
     public function select($selector)
     {
-        return self::from(self::_gen_select(
-            $this->iter,
+        return self::from(self::$gen->select(
+            $this->it,
             self::_parse_selector($selector)
         ));
     }
 
-    protected static function _gen_select($xs, $selector)
-    {
-        foreach ($xs as $x) {
-            yield $selector($x);
-        }
-    }
     public function where($predicate)
     {
-        return self::from(self::_gen_where(
-            $this->iter, self::_parse_predicate($predicate))
-        );
-    }
-
-    protected static function _gen_where($xs, $predicate)
-    {
-        foreach ($xs as $x) {
-            if ($predicate($x)) {
-                yield $x;
-            }
-        }
+        return self::from(self::$gen->where(
+            $this->it,
+            self::_parse_predicate($predicate)
+        ));
     }
 
     public function take($n)
     {
-        return self::from(self::_gen_take($this->iter, $n));
-    }
-
-    protected static function _gen_take($xs, $n)
-    {
-        $i = $n;
-        foreach ($xs as $x) {
-            if ($i <= 0) {
-                break;
-            } else {
-                yield $x;
-                $i--;
-            }
-        }
+        return self::from(self::$gen->take($this->it, $n));
     }
 
     public function drop($n)
     {
-        return self::from(self::_gen_drop($this->iter, $n));
-    }
-
-    protected static function _gen_drop($xs, $n)
-    {
-        $i = $n;
-        foreach ($xs as $x) {
-            if (0 < $i) {
-                $i--;
-            } else {
-                yield $x;
-            }
-        }
+        return self::from(self::$gen->drop($this->it, $n));
     }
 
     public function takeWhile($predicate)
     {
-        return self::from(self::_gen_takeWhile($this->iter, self::_parse_predicate($predicate)));
-    }
-
-    protected static function _gen_takeWhile($xs, $predicate)
-    {
-        foreach ($xs as $x) {
-            if ($predicate($x)) {
-                yield $x;
-            } else {
-                break; 
-            }
-        }
+        return self::from(self::$gen->takeWhile(
+            $this->it,
+            self::_parse_predicate($predicate)
+        ));
     }
 
     public function dropWhile($predicate)
     {
-        return self::from(self::_gen_dropWhile($this->iter, self::_parse_predicate($predicate)));
-    }
-
-    protected static function _gen_dropWhile($xs, $predicate)
-    {
-        $xs->rewind();
-        while ($xs->valid()) {
-            if ($predicate($xs->current())) {
-                $xs->next();
-            } else {
-                break;
-            }
-        }
-        while ($xs->valid()) {
-            yield $xs->current();
-            $xs->next();
-        }
+        return self::from(self::$gen->dropWhile($this->it, self::_parse_predicate($predicate)));
     }
 
     public function concat($rhs)
     {
-        return Ginq::from(Ginq::_gen_concat(
-            $this->iter, Ginq::from($rhs)
+        return Ginq::from(self::$gen->concat(
+            $this->it, Ginq::from($rhs)
         ));
     }
-
-    protected function _gen_concat($xs, $ys)
-    {
-        foreach ($xs as $x) {
-            yield $x;
-        }
-        foreach ($ys as $y) {
-            yield $y;
-        }
-    }
-
 
     public function selectMany($manySelector, $joinSelector = null)
     {
         if (is_null($joinSelector)) {
-            return self::from(self::_gen_selectMany(
-                $this->iter,
+            return self::from(self::$gen->selectMany(
+                $this->it,
                 self::_parse_selector($manySelector)));
         } else {
-            return self::from(self::_gen_selectMany_with_select(
-                $this->iter,
+            return self::from(self::$gen->selectManyWithJoin(
+                $this->it,
                 self::_parse_selector($manySelector),
-                self::_parse_selector($joinSelector)));
-        }
-    }
-
-    protected static function _gen_selectMany($xs, $manySelector)
-    {
-        foreach ($xs as $x) {
-            foreach ($manySelector($x) as $y) {
-                yield $y;
-            }
-        }
-    }
-
-    protected static function _gen_selectMany_with_select(
-        $xs, $manySelector, $joinSelector)
-    {
-        foreach ($xs as $x) {
-            foreach ($manySelector($x) as $y) {
-                yield $joinSelector($x, $y);
-            }
+                self::_parse_join_selector($joinSelector)));
         }
     }
 
@@ -321,25 +207,12 @@ class Ginq implements IteratorAggregate
         );
     }
 
-   public function zip($rhs, $selector)
+    public function zip($rhs, $joinSelector)
     {
-        return self::from(self::_gen_zip(
-            $this->iter,
+        return self::from(self::$gen->zip(
+            $this->it,
             self::from($rhs),
-            self::_parse_selector($selector)));
-    }
-
-    protected static function _gen_zip($xs, $ys, $selector)
-    {
-        $xs->rewind();
-        $ys->rewind();
-        while ($xs->valid() && $ys->valid()) {
-            yield $selector($xs->current(), $ys->current());
-            $xs->next();
-            $ys->next();
-        }
-        //$xs->close();
-        //$ys->close();
+            self::_parse_join_selector($joinSelector)));
     }
 
     public function groupBy($keySelector, $elementSelector = null)
@@ -347,19 +220,14 @@ class Ginq implements IteratorAggregate
         if (is_null($elementSelector)) {
             $elementSelector = function($x) { return $x; };
         }
-        return self::from(self::_gen_groupBy(
-            $this->iter, $keySelector, $elementSelector
+        return self::from(self::$gen->groupBy(
+            $this->it,
+            self::_parse_selector($keySelector),
+            self::_parse_selector($elementSelector)
         ));
     }
 
-    protected static function _gen_groupBy($xs, $keySelector, $elementSelector)
-    {
-        foreach (Lookup::from($xs, $keySelector) as $xs) {
-            yield self::from($xs)->select($elementSelector);
-        }
-    }
-
-    private static function _parse_selector($selector)
+    protected static function _parse_selector($selector)
     {
         if (is_string($selector)) {
             return function($x) use ($selector) {
@@ -381,9 +249,31 @@ class Ginq implements IteratorAggregate
         }
     }
 
-    private static function _parse_predicate($predicate)
+    protected static function _parse_join_selector($joinSelector)
     {
-        if (is_callable($predicate)) {
+        if (is_callable($joinSelector)) {
+            return $joinSelector;
+        } else {
+            $type = gettype($joinSelector);
+            throw new InvalidArgumentException(
+                "'join selector' callable (2 arguments) expected, got $type");
+        }
+    }
+
+    protected static function _parse_predicate($predicate)
+    {
+        if (is_string($predicate)) {
+            return function($x) use ($predicate) {
+                if (is_array($x)) {
+                    return @$x[$predicate];
+                } else if (is_object($x)) {
+                    return @$x->{$predicate};
+                } else {
+                    $type = gettype($x);
+                    throw new DomainException("'$type' object has no key or field"); 
+                }
+            };
+        } else if (is_callable($predicate)) {
             return $predicate;
         } else {
             $type = gettype($predicate);
@@ -392,5 +282,11 @@ class Ginq implements IteratorAggregate
         }
     }
 
+}
+
+if (class_exists("Generator")) {
+    Ginq::useGenerator();
+} else {
+    Ginq::useIterator();
 }
 

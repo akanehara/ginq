@@ -6,7 +6,7 @@
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * PHP Version 5.5 or later
+ * PHP Version 5.3 or later
  *
  * @author     Atsushi Kanehara <akanehara@gmail.com>
  * @copyright  Copyright 2013, Atsushi Kanehara <akanehara@gmail.com>

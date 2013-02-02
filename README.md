@@ -1,6 +1,6 @@
 Ginq
 
-Ginq (Generator INtegrated Query), provides integrative interface for `array`, `Iterator`, `IteratorAggregate`, by generator on php5.5 or later.
+Ginq (Generator INtegrated Query), provides integrative interface for `array`, `Iterator`, `IteratorAggregate`.
 
 ```php
 require_once('Ginq.php');
