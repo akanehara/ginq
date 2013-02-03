@@ -121,9 +121,9 @@ class IterProviderIterImpl implements IterProvider
         return new ZipIterator($xs, $ys, $joinSelector);
     }
 
-    public function groupBy($xs, $keySelector, $elementSelector)
+    public function groupBy($xs, $keySelector, $elementSelector, $groupSelector)
     {
-        return new GroupByIterator($xs, $keySelector, $elementSelector);
+        return new GroupByIterator($xs, $keySelector, $elementSelector, $groupSelector);
     }
 
 }

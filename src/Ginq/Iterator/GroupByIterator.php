@@ -25,25 +25,29 @@ class GroupByIterator implements Iterator
 {
     private $keySelector;
     private $elementSelector;
+    private $groupSelector;
 
     private $it;
     private $group;
     private $i;
 
-    public function __construct($xs, $keySelector, $elementSelector)
+    public function __construct($xs, $keySelector, $elementSelector, $groupSelector)
     {
         $this->it = iter($xs);
         $this->keySelector     = $keySelector;
         $this->elementSelector = $elementSelector;
+        $this->groupSelector   = $groupSelector;
     }
 
     public function current()
     {
-        return new SelectIterator(
+        $group = new SelectIterator(
             $this->group->current(),
             $this->elementSelector,
             function($x, $k) { return $k; }
         );
+        $f = $this->groupSelector;
+        return $f($group, $this->group->key());
     }
 
     public function key() 

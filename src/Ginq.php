@@ -304,7 +304,8 @@ class Ginq implements IteratorAggregate
         return self::from(self::$gen->groupBy(
             $this->it,
             self::_parse_selector($keySelector),
-            self::_parse_selector($elementSelector)
+            self::_parse_selector($elementSelector),
+            function ($xs, $k) { return Ginq::from($xs); }
         ));
     }
 

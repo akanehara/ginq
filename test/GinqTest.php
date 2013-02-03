@@ -620,6 +620,20 @@ class GinqTest extends PHPUnit_Framework_TestCase
             2 => array('050-1198-4458'),
             3 => array('06-1111-3333', '090-9898-1314', '050-6667-2231')
         ), $xss);
+
+        $count = function ($acc, $x) { return $acc + 1; };
+
+        $xss = Ginq::from($phones)
+                ->groupBy('owner')
+                ->select(function($gr) use ($count) {
+                    return $gr->fold(0, $count);
+                })->toArray();
+
+        $this->assertEquals(array(
+            1 => 2,
+            2 => 1,
+            3 => 3
+        ), $xss);
     }
  }
 

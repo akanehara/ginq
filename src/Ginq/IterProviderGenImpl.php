@@ -181,13 +181,14 @@ class IterProviderGenImpl implements IterProvider
         }
     }
 
-    public function groupBy($xs, $keySelector, $elementSelector)
+    public function groupBy($xs, $keySelector, $elementSelector, $groupSelector)
     {
         foreach (Lookup::from($xs, $keySelector) as $k => $ys) {
-            yield $k => $this->select($ys,
+            $group = $this->select($ys,
                 $elementSelector,
                 function($x, $k) { return $k; }
             );
+            yield $k => $groupSelector($group, $k);
         }
     }
 

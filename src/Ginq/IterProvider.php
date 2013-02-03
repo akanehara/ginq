@@ -35,6 +35,6 @@ interface IterProvider
     public function selectMany($xs, $manySelector);
     public function selectManyWithJoin($xs, $manySelector, $joinSelector);
     public function zip($xs, $ys, $selector);
-    public function groupBy($xs, $keySelector, $elementSelector);
+    public function groupBy($xs, $keySelector, $elementSelector, $groupSelector);
 }
 
