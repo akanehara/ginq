@@ -56,7 +56,7 @@ class Ginq implements IteratorAggregate
 
     public function head($default = null) { return $this->first($default); }
 
-    public function tail($default = null) { return $this->rest($default); }
+    public function tail($default = array()) { return $this->rest($default); }
 
     public function reduce($accumulator, $operator) { return $this->fold($accumulator, $operator); }
 
