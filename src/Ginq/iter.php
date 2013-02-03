@@ -28,7 +28,7 @@ function iter($xs)
         return new ArrayIterator($xs);
     } else {
         $t = gettype($xs);
-        throw new ErrorException("'$t' object is not iterable");
+        throw new InvalidArgumentException("'$t' object is not iterable");
     }
 }
 

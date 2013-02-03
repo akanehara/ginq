@@ -24,13 +24,15 @@ class SelectIterator implements Iterator
 {
     private $it;
     private $selector;
+    private $keySelector;
 
     private $i;
 
-    public function __construct($xs, $selector)
+    public function __construct($xs, $selector, $keySelector)
     {
         $this->it = iter($xs);
         $this->selector = $selector;
+        $this->keySelector = $keySelector;
     }
 
     public function current()
@@ -41,7 +43,8 @@ class SelectIterator implements Iterator
 
     public function key() 
     {
-        return $this->i;
+        $f = $this->keySelector;
+        return $f($this->it->current(), $this->it->key());
     }
 
     public function next()

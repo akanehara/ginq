@@ -71,9 +71,9 @@ class IterProviderIterImpl implements IterProvider
         return new CycleIterator($xs);
     }
 
-    public function select($xs, $selector)
+    public function select($xs, $selector, $keySelector)
     {
-        return new SelectIterator($xs, $selector);
+        return new SelectIterator($xs, $selector, $keySelector);
     }
 
     public function where($xs, $predicate)

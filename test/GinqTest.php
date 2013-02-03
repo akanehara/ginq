@@ -90,6 +90,46 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array(array(1,2,3),array(4,5,6)), $arr);
     }
 
+    /**
+     * testToDictionary().
+     */
+    public function testToDictionary()
+    {
+        $data = array(
+             array('id' => 1, 'name' => 'Taro',    'city' => 'Takatsuki')
+            ,array('id' => 2, 'name' => 'Atsushi', 'city' => 'Ibaraki')
+            ,array('id' => 3, 'name' => 'Junko',   'city' => 'Sakai')
+        );
+
+        // key
+        $dict = Ginq::from($data)->toDictionary(
+            function($x, $k) { return $x['name']; }
+        );
+        $this->assertEquals(
+            array(
+                'Taro' =>
+                    array('id' => 1, 'name' => 'Taro', 'city' => 'Takatsuki'),
+                'Atsushi' =>
+                    array('id' => 2, 'name' => 'Atsushi', 'city' => 'Ibaraki'),
+                'Junko' =>
+                    array('id' => 3, 'name' => 'Junko', 'city' => 'Sakai')
+            ), $dict
+        );
+
+        // key and value
+        $dict = Ginq::from($data)->toDictionary(
+            'name', // it means `function($x, $k) { return $x['name']; }`
+            function($x, $k) { return "{$x['city']}"; }
+        );
+        $this->assertEquals(
+            array(
+                'Taro' => "Takatsuki",
+                'Atsushi' => "Ibaraki",
+                'Junko' => "Sakai"
+            ), $dict
+        );
+    }
+
    /**
      * testAny().
      */
@@ -138,19 +178,10 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * testFold
-     */
-    public function testFold() {
-        $x = Ginq::range(1, 10)->fold(0, function($acc, $x) {
-            return $acc - $x;
-        });
-        $this->assertEquals($x, -55);
-    }
-
-    /**
      * testFirst
      */
-    public function testFirst() {
+    public function testFirst()
+    {
         // without default value (just)
         $x = Ginq::from(array('apple', 'orange', 'grape'))
                 ->first();
@@ -171,10 +202,53 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testRest
+     *
+     * @expectedException InvalidArgumentException
+     */
+    public function testRest()
+    {
+        // without default value (just)
+        $xs = Ginq::from(array(1,2,3,4,5))->rest()->toArray();
+        $this->assertEquals(array(2,3,4,5), $xs);
+
+        // without default value (nothing)
+        $xs = Ginq::zero()->rest()->toArray();
+        $this->assertEquals(array(), $xs);
+
+        // with default value (just)
+        $xs = Ginq::from(array(1,2,3,4,5))->rest(array(42))->toArray();
+        $this->assertEquals(array(2,3,4,5), $xs);
+
+        // with default value (nothing)
+        $xs = Ginq::zero()->rest(array(42))->toArray();
+        $this->assertEquals(array(42), $xs);
+
+        // invalid default value.
+        $xs = Ginq::zero()->rest(42);
+    }
+
+    /**
+     * testContains
+     */
+    public function testContains()
+    {
+        $this->assertTrue(
+            Ginq::from(array('apple', 'orange', 'grape'))
+                ->contains('orange')
+        );
+
+        $this->assertFalse(
+            Ginq::from(array('apple', 'orange', 'grape'))
+                ->contains('meow!')
+        );
+    }
+
+    /**
      * testFind
      */
     public function testFind() {
-        $isOrange = function($x) { return $x == "orange"; };
+        $isOrange = function($x, $k) { return $x == "orange"; };
 
         // without default value (just)
         $x = Ginq::from(array('apple', 'orange', 'grape'))
@@ -193,6 +267,17 @@ class GinqTest extends PHPUnit_Framework_TestCase
         // with default value (nothing)
         $x = Ginq::zero()->find($isOrange, 'none');
         $this->assertEquals($x, 'none'); 
+    }
+
+    /**
+     * testFold
+     */
+    public function testFold()
+    {
+        $x = Ginq::range(1, 10)->fold(0, function($acc, $x) {
+            return $acc - $x;
+        });
+        $this->assertEquals($x, -55);
     }
 
     /**
@@ -476,8 +561,8 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         // key selector function
         $xs = Ginq::from($persons)->join($phones,
-            function($outer) { return $outer['id']; },
-            function($inner) { return $inner['owner']; },
+            function($outer, $k) { return $outer['id']; },
+            function($inner, $k) { return $inner['owner']; },
             function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
             }
@@ -524,10 +609,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
             ,array('id' => 5, 'owner' => 3, 'phone' => '090-9898-1314')
             ,array('id' => 6, 'owner' => 3, 'phone' => '050-6667-2231')
         );
+
         $xss = Ginq::from($phones)->groupBy(
             function($x, $k) { return $x['owner']; },
             function($x, $k) { return $x['phone']; }
         )->toArrayRec();
+
         $this->assertEquals(array(
             1 => array('03-1234-5678', '090-8421-9061'),
             2 => array('050-1198-4458'),

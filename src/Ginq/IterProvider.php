@@ -25,7 +25,7 @@ interface IterProvider
     public function rangeInf($start, $step);
     public function repeat($x);
     public function cycle($xs);
-    public function select($xs, $selector);
+    public function select($xs, $selector, $keySelector);
     public function where($xs, $predicate);
     public function take($xs, $n);
     public function drop($xs, $n);

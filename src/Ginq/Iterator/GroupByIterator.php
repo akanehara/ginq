@@ -39,8 +39,11 @@ class GroupByIterator implements Iterator
 
     public function current()
     {
-        $f = $this->elementSelector;
-        return new SelectIterator($this->group->current(), $f);
+        return new SelectIterator(
+            $this->group->current(),
+            $this->elementSelector,
+            function($x, $k) { return $k; }
+        );
     }
 
     public function key() 

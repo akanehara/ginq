@@ -42,6 +42,32 @@ class Ginq implements IteratorAggregate
         $this->it = $it;
     }
 
+    /**
+     * aliases.
+     */
+
+    public function map($selector, $keySelector = null) {
+        return $this->select($selector, $keySelector);
+    }
+
+    public function filter($predicate) { return $this->where($predicate); }
+
+    public function elem($element) { return $this->contains($element); }
+
+    public function head($default = null) { return $this->first($default); }
+
+    public function tail($default = null) { return $this->rest($default); }
+
+    public function reduce($accumulator, $operator) { return $this->fold($accumulator, $operator); }
+
+    public function skip($n) { return $this->drop($n); }
+
+    public function skipWhile($predicate) { return $this->dropWhile($predicate); }
+
+    /**
+     * methods.
+     */
+
     public function getIterator()
     {
         return $this->it;
@@ -67,6 +93,14 @@ class Ginq implements IteratorAggregate
             }
         }
         return $arr;
+    }
+
+    public function toDictionary($keySelector, $elementSelector = null)
+    {
+        if (is_null($elementSelector)) {
+            $elementSelector = function($x, $k) { return $x; };
+        }
+        return $this->select($elementSelector, $keySelector)->toArray();
     }
 
     public function any($predicate)
@@ -98,6 +132,23 @@ class Ginq implements IteratorAggregate
         } else {
             return $default;
         }
+    }
+
+    public function rest($default = array()) {
+        $this->it->rewind();
+        if ($this->it->valid()) {
+            return $this->drop(1);
+        } else {
+            return Ginq::from($default);
+        }
+    }
+
+    public function contains($element) {
+        return $this->any(
+            function($x, $k) use ($element) {
+                return $x == $element;
+            }
+        );
     }
 
     public function find($predicate, $default = null) {
@@ -135,9 +186,9 @@ class Ginq implements IteratorAggregate
         }
     }
 
-    public static function repeat($x)
+    public static function repeat($element)
     {
-        return self::from(self::$gen->repeat($x));
+        return self::from(self::$gen->repeat($element));
     }
 
     public static function cycle($xs)
@@ -154,11 +205,17 @@ class Ginq implements IteratorAggregate
         }
     }
 
-    public function select($selector)
+    public function select($selector, $keySelector = null)
     {
+        if (is_null($keySelector)) {
+            $keySelector = function($x, $k) { return $k; };
+        } else {
+            $keySelector = self::_parse_selector($keySelector);
+        }
         return self::from(self::$gen->select(
             $this->it,
-            self::_parse_selector($selector)
+            self::_parse_selector($selector),
+            $keySelector
         ));
     }
 
@@ -242,7 +299,7 @@ class Ginq implements IteratorAggregate
     public function groupBy($keySelector, $elementSelector = null)
     {
         if (is_null($elementSelector)) {
-            $elementSelector = function($x) { return $x; };
+            $elementSelector = function($x, $k) { return $x; };
         }
         return self::from(self::$gen->groupBy(
             $this->it,
