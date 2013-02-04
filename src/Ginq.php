@@ -364,6 +364,15 @@ class Ginq implements IteratorAggregate
         }
     }
 
+    public function __call($name, $args) {
+        if (isset(self::$registeredFunctions[$name])) {
+            call_user_func_array(
+                self::$registeredFunctions[$name], 
+                array_merge(array($this), $args)
+            );
+        }
+    }
+
     private static $registeredFunctions = array();
 
     public static function register($className) {
@@ -373,8 +382,11 @@ class Ginq implements IteratorAggregate
             ->where(function ($m) { return $m->isPublic(); })
             ->where(function ($m) {
                 $p = Ginq::from($m->getParameters())->first(false);
+                if ($p === false) return false;
 
-                return ($p !== false) and $p->getClass()->implementsInterface('Iterator');
+                $c = $p->getClass();
+
+                return ($c->getName() === 'Ginq') or $c->isSubclassOf('Ginq');
             })
             ->select(function ($m) { return $m->getName(); })
             ->toArray()

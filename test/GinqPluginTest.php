@@ -31,7 +31,7 @@ class GinqPluginTest extends PHPUnit_Framework_TestCase {
 
     	$sum = 0;
     	Ginq::range(1, 10)
-    		->each(function ($v) {
+    		->each(function ($v) use(&$sum) {
     			$sum += $v;
     		})
    		;
@@ -45,7 +45,13 @@ class SamplePlugin {
 		Ginq::register(get_called_class());
 	}
 
-	public static function each(\Iterator $iter, $selector) {
+	public static function each(\Ginq $self, $selector) {
+		if (is_null($selector)) {
+			throw new \ArgumentException('must be passed closure as 2nd argument.');
+		}
 
+		foreach ($self as $k => $v) {
+			$selector($v, $k);
+		}
 	}
 }
