@@ -646,7 +646,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
  }
 
 // Call GinqTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "GinqTest::main") {
+if (defined('PHPUnit_MAIN_METHOD') && PHPUnit_MAIN_METHOD == "GinqTest::main") {
     GinqTest::main();
 }
 
