@@ -15,7 +15,9 @@
  */
 
 /**
- * iter
+ * @param mixed
+ * @throws InvalidArgumentException
+ * @return Iterator
  * @package Ginq
  */
 function iter($xs)

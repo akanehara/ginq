@@ -18,17 +18,26 @@ require_once dirname(__FILE__) . "/iter.php";
 
 /**
  * Lookup
+ *
  * @package Ginq
  */
 class Ginq_Lookup implements IteratorAggregate
 {
-    private $table = null;
+    /**
+     * @var array
+     */
+    private $table;
 
     protected function __construct()
     {
         $this->table = array();
     }
-    
+
+    /**
+     * @param array|Traversable $xs
+     * @param callable $keySelector
+     * @return Ginq_Lookup
+     */
     public static function from($xs, $keySelector)
     {
         $lookup = new Ginq_Lookup();
@@ -38,11 +47,18 @@ class Ginq_Lookup implements IteratorAggregate
         return $lookup;
     }
 
+    /**
+     * @return Traversable
+     */
     public function getIterator()
     {
         return iter($this->table);
     }
 
+    /**
+     * @param mixed $key
+     * @return array
+     */
     public function get($key)
     {
         @$v = $this->table[$key];
@@ -52,6 +68,11 @@ class Ginq_Lookup implements IteratorAggregate
         return array();
     }
 
+    /**
+     * @param mixed $key
+     * @param mixed $value
+     * @return void
+     */
     public function put($key, $value)
     {
         @$v = &$this->table[$key];
