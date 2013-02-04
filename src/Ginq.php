@@ -32,7 +32,7 @@ class Ginq implements IteratorAggregate
     /**
      * @var Ginq_IterProvider
      */
-    public static $gen = null;
+    protected static $gen = null;
 
     public static function useIterator() {
         require_once dirname(__FILE__) . "/Ginq/IterProviderIterImpl.php";
@@ -482,7 +482,7 @@ class Ginq implements IteratorAggregate
             $this->it,
             self::_parse_selector($keySelector),
             self::_parse_selector($elementSelector),
-            function ($xs, $k) { return self::from($xs); }
+            function ($xs, $k) { return Ginq::from($xs); }
         ));
     }
 
