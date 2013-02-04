@@ -14,7 +14,7 @@
  * @package    Ginq
  */
 
-require_once dirname(__FILE__) . "/Ginq/iter.php";
+require_once __DIR__ . "/Ginq/iter.php";
 
 /**
  * Ginq

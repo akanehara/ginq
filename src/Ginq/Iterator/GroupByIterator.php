@@ -17,7 +17,7 @@ namespace Ginq\Iterator;
 
 use Ginq\Lookup;
 
-require_once dirname(dirname(__FILE__)) . "/iter.php";
+require_once dirname(__DIR__) . "/iter.php";
 
 /**
  * GroupByIterator

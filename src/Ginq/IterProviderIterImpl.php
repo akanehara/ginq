@@ -32,7 +32,7 @@ use Ginq\Iterator\SelectManyWithJoinIterator;
 use Ginq\Iterator\ZipIterator;
 use Ginq\Iterator\GroupByIterator;
 
-require_once dirname(__FILE__) . "/iter.php";
+require_once __DIR__ . "/iter.php";
 
 /**
  * IterProviderIterImpl

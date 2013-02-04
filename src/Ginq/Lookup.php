@@ -15,7 +15,7 @@
  */
 namespace Ginq;
 
-require_once dirname(__FILE__) . "/iter.php";
+require_once __DIR__ . "/iter.php";
 
 /**
  * Lookup
