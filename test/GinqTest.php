@@ -621,6 +621,16 @@ class GinqTest extends PHPUnit_Framework_TestCase
             3 => array('06-1111-3333', '090-9898-1314', '050-6667-2231')
         ), $xss);
 
+        $xss = Ginq::from($phones)
+            ->groupBy('owner', 'phone')
+            ->toDictionary(function($x, $k) { return $k; });
+
+        $this->assertEquals(array(
+            1 => array('03-1234-5678', '090-8421-9061'),
+            2 => array('050-1198-4458'),
+            3 => array('06-1111-3333', '090-9898-1314', '050-6667-2231')
+        ), $xss);
+
         $count = function ($acc, $x) { return $acc + 1; };
 
         $xss = Ginq::from($phones)

@@ -100,7 +100,7 @@ class Ginq implements IteratorAggregate
         if (is_null($elementSelector)) {
             $elementSelector = function($x, $k) { return $x; };
         }
-        return $this->select($elementSelector, $keySelector)->toArray();
+        return $this->select($elementSelector, $keySelector)->toArrayRec();
     }
 
     public function any($predicate)
