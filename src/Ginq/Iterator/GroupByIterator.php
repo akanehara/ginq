@@ -13,6 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 require_once dirname(dirname(__FILE__)) . "/iter.php";
 require_once dirname(dirname(__FILE__)) . "/Lookup.php";
@@ -21,7 +22,7 @@ require_once dirname(dirname(__FILE__)) . "/Lookup.php";
  * GroupByIterator
  * @package Ginq
  */
-class Ginq_Iterator_GroupByIterator implements Iterator
+class GroupByIterator implements \Iterator
 {
     private $keySelector;
     private $elementSelector;
@@ -41,7 +42,7 @@ class Ginq_Iterator_GroupByIterator implements Iterator
 
     public function current()
     {
-        $group = new Ginq_Iterator_SelectIterator(
+        $group = new SelectIterator(
             $this->group->current(),
             $this->elementSelector,
             function($x, $k) { return $k; }
@@ -66,7 +67,7 @@ class Ginq_Iterator_GroupByIterator implements Iterator
         $this->i = 0;
         $this->it->rewind();
         $f = $this->keySelector;
-        $this->group = Ginq_Lookup::from($this->it, $f)->getIterator();
+        $this->group = Lookup::from($this->it, $f)->getIterator();
     }
 
     public function valid()

@@ -13,6 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 require_once dirname(__FILE__) . "/iter.php";
 
@@ -21,7 +22,7 @@ require_once dirname(__FILE__) . "/iter.php";
  *
  * @package Ginq
  */
-class Ginq_Lookup implements IteratorAggregate
+class Lookup implements \IteratorAggregate
 {
     /**
      * @var array
@@ -36,7 +37,7 @@ class Ginq_Lookup implements IteratorAggregate
     /**
      * @param array|Traversable $xs
      * @param callable $keySelector
-     * @return Ginq_Lookup
+     * @return Ginq\Lookup
      */
     public static function from($xs, $keySelector)
     {

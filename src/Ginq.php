@@ -22,7 +22,7 @@ require_once dirname(__FILE__) . "/Ginq/Lookup.php";
  *
  * @package Ginq
  */
-class Ginq implements IteratorAggregate
+class Ginq implements \IteratorAggregate
 {
     /**
      * @var array|Traversable
@@ -30,18 +30,18 @@ class Ginq implements IteratorAggregate
     protected $it;
 
     /**
-     * @var Ginq_IterProvider
+     * @var Ginq\IterProvider
      */
     protected static $gen = null;
 
     public static function useIterator() {
         require_once dirname(__FILE__) . "/Ginq/IterProviderIterImpl.php";
-        self::$gen = new Ginq_IterProviderIterImpl();
+        self::$gen = new Ginq\IterProviderIterImpl();
     }
 
     public static function useGenerator() {
         require_once dirname(__FILE__) . "/Ginq/IterProviderGenImpl.php";
-        self::$gen = new Ginq_IterProviderGenImpl();
+        self::$gen = new Ginq\IterProviderGenImpl();
     }
 
     /**
@@ -133,7 +133,7 @@ class Ginq implements IteratorAggregate
      */
     public function getIterator()
     {
-        return iter($this->it);
+        return Ginq\iter($this->it);
     }
 
     /**
@@ -155,7 +155,7 @@ class Ginq implements IteratorAggregate
     {
         $arr = array();
         foreach ($this->it as $k => $x) {
-            if ($x instanceof Iterator || $x instanceof IteratorAggregate) {
+            if ($x instanceof \Iterator || $x instanceof \IteratorAggregate) {
                 $arr[$k] = self::from($x)->toArrayRec();
             } else {
                 $arr[$k] = $x;
@@ -327,7 +327,7 @@ class Ginq implements IteratorAggregate
         if ($xs instanceof self) {
             return $xs;
         } else {
-            return new self(iter($xs));
+            return new Ginq(Ginq\iter($xs));
         }
     }
 
@@ -443,7 +443,7 @@ class Ginq implements IteratorAggregate
     {
         $outerKeySelector = self::_parse_selector($outerKeySelector);
         $innerKeySelector = self::_parse_selector($innerKeySelector);
-        $innerLookup = Ginq_Lookup::from($inner, $innerKeySelector);
+        $innerLookup = Ginq\Lookup::from($inner, $innerKeySelector);
         return $this->selectMany(
             function($outer, $outerKey) use ($innerLookup, $outerKeySelector) {
                 return $innerLookup->get(
@@ -463,7 +463,7 @@ class Ginq implements IteratorAggregate
     {
         return self::from(self::$gen->zip(
             $this->it,
-            iter($rhs),
+            Ginq\iter($rhs),
             self::_parse_join_selector($joinSelector))
         );
     }

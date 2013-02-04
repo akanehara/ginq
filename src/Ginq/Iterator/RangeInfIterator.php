@@ -13,12 +13,13 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 /**
  * RangeInfIterator
  * @package Ginq
  */
-class Ginq_Iterator_RangeInfIterator implements Iterator
+class RangeInfIterator implements \Iterator
 {
     private $start;
     private $step;

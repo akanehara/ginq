@@ -13,12 +13,13 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 /**
  * ZeroIterator
  * @package Ginq
  */
-class Ginq_Iterator_ZeroIterator implements Iterator
+class ZeroIterator implements \Iterator
 {
     public function current()
     {

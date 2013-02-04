@@ -13,6 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 require_once dirname(dirname(__FILE__)) . "/iter.php";
 
@@ -20,7 +21,7 @@ require_once dirname(dirname(__FILE__)) . "/iter.php";
  * SelectIterator
  * @package Ginq
  */
-class Ginq_Iterator_SelectIterator implements Iterator
+class SelectIterator implements \Iterator
 {
     private $it;
     private $selector;

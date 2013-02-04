@@ -13,12 +13,13 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 /**
  * RepeatIterator
  * @package Ginq
  */
-class Ginq_Iterator_RepeatIterator implements Iterator
+class RepeatIterator implements \Iterator
 {
     private $i;
     private $x;

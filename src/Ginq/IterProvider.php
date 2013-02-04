@@ -13,12 +13,13 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 /**
  * IterProvider
  * @package Ginq
  */
-interface Ginq_IterProvider
+interface IterProvider
 {
     public function zero();
     public function range($start, $stop, $step);

@@ -13,12 +13,13 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 /**
  * DropIterator
  * @package Ginq
  */
-class Ginq_Iterator_DropIterator implements Iterator
+class DropIterator implements \Iterator
 {
     private $it;
     private $n;

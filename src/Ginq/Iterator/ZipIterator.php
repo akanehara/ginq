@@ -13,12 +13,13 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 /**
  * ZipIterator
  * @package Ginq
  */
-class Ginq_Iterator_ZipIterator implements Iterator
+class ZipIterator implements \Iterator
 {
     private $joinSelector;
 

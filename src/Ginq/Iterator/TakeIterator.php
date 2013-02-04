@@ -13,12 +13,13 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 /**
  * TakeIterator
  * @package Ginq
  */
-class Ginq_Iterator_TakeIterator implements Iterator
+class TakeIterator implements \Iterator
 {
     private $it;
     private $n;

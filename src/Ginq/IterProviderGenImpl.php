@@ -13,6 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 require_once dirname(__FILE__) . "/IterProvider.php";
 require_once dirname(__FILE__) . "/Lookup.php";
@@ -21,7 +22,7 @@ require_once dirname(__FILE__) . "/Lookup.php";
  * IterProviderGenImpl
  * @package Ginq
  */
-class Ginq_IterProviderGenImpl implements Ginq_IterProvider
+class IterProviderGenImpl implements IterProvider
 {
     public function zero()
     {
@@ -183,7 +184,7 @@ class Ginq_IterProviderGenImpl implements Ginq_IterProvider
 
     public function groupBy($xs, $keySelector, $elementSelector, $groupSelector)
     {
-        foreach (Ginq_Lookup::from($xs, $keySelector) as $k => $ys) {
+        foreach (Lookup::from($xs, $keySelector) as $k => $ys) {
             $group = $this->select($ys,
                 $elementSelector,
                 function($x, $k) { return $k; }

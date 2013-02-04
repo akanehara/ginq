@@ -13,12 +13,13 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 /**
  * CycleIterator
  * @package Ginq
  */
-class Ginq_Iterator_CycleIterator implements Iterator
+class CycleIterator implements \Iterator
 {
     private $i;
     private $it;
