@@ -13,7 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq;
+namespace Ginq\Iterator;
 
 require_once dirname(dirname(__FILE__)) . "/iter.php";
 
@@ -32,7 +32,7 @@ class SelectManyWithJoinIterator implements \Iterator
 
     public function __construct($xs, $manySelector, $joinSelector)
     {
-        $this->outer = iter($xs);
+        $this->outer = \Ginq\iter($xs);
         $this->manySelector = $manySelector;
         $this->joinSelector = $joinSelector;
     }
@@ -74,7 +74,7 @@ class SelectManyWithJoinIterator implements \Iterator
     {
         if ($this->outer->valid()) {
             $k = $this->manySelector;
-            $this->inner = iter(
+            $this->inner = \Ginq\iter(
                 $k(
                     $this->outer->current(),
                     $this->outer->key()

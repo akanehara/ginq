@@ -13,7 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq;
+namespace Ginq\Iterator;
 
 require_once dirname(dirname(__FILE__)) . "/iter.php";
 
@@ -30,7 +30,7 @@ class DropWhileIterator implements \Iterator
 
     public function __construct($xs, $predicate)
     {
-        $this->it = iter($xs);
+        $this->it = \Ginq\iter($xs);
         $this->predicate = $predicate;
     }
 

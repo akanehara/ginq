@@ -13,7 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq;
+namespace Ginq\Iterator;
 
 require_once dirname(dirname(__FILE__)) . "/iter.php";
 
@@ -31,7 +31,7 @@ class SelectIterator implements \Iterator
 
     public function __construct($xs, $selector, $keySelector)
     {
-        $this->it = iter($xs);
+        $this->it = \Ginq\iter($xs);
         $this->selector = $selector;
         $this->keySelector = $keySelector;
     }

@@ -15,6 +15,23 @@
  */
 namespace Ginq;
 
+use Ginq\Iterator\ZeroIterator;
+use Ginq\Iterator\RangeIterator;
+use Ginq\Iterator\RangeInfIterator;
+use Ginq\Iterator\CycleIterator;
+use Ginq\Iterator\RepeatIterator;
+use Ginq\Iterator\SelectIterator;
+use Ginq\Iterator\WhereIterator;
+use Ginq\Iterator\TakeIterator;
+use Ginq\Iterator\DropIterator;
+use Ginq\Iterator\TakeWhileIterator;
+use Ginq\Iterator\DropWhileIterator;
+use Ginq\Iterator\ConcatIterator;
+use Ginq\Iterator\SelectManyIterator;
+use Ginq\Iterator\SelectManyWithJoinIterator;
+use Ginq\Iterator\ZipIterator;
+use Ginq\Iterator\GroupByIterator;
+
 require_once dirname(__FILE__) . "/iter.php";
 
 require_once dirname(__FILE__) . "/IterProvider.php";
