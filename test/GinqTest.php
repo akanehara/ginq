@@ -128,7 +128,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
     }
 
-   /**
+    /**
      * testAny().
      */
     public function testAny()
@@ -287,7 +287,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $arr);
     }
 
-   /**
+    /**
      * testRange().
      */
     public function testRange()
