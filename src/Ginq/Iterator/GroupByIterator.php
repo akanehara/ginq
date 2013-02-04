@@ -44,6 +44,7 @@ class GroupByIterator implements \Iterator
 
     public function current()
     {
+        require_once dirname(__FILE__) . "/SelectIterator.php";
         $group = new SelectIterator(
             $this->group->current(),
             $this->elementSelector,
