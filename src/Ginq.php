@@ -162,8 +162,8 @@ class Ginq implements IteratorAggregate
 
     public function fold($accumulator, $operator) {
         $acc = $accumulator;
-        foreach ($this->it as $x) {
-            $acc = $operator($acc, $x);
+        foreach ($this->it as $k => $x) {
+            $acc = $operator($acc, $x, $k);
         }
         return $acc;
     }
