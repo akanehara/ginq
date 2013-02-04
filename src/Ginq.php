@@ -22,7 +22,7 @@ require_once dirname(__FILE__) . "/Ginq/Lookup.php";
  *
  * @package Ginq
  */
-class Ginq implements \IteratorAggregate
+class Ginq implements IteratorAggregate
 {
     /**
      * @var array|Traversable
