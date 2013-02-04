@@ -43,7 +43,7 @@ require_once $dir . "/Iterator/GroupByIterator.php";
  * IterProviderIterImpl
  * @package Ginq
  */
-class Ginq_IterProviderGinqIterImpl implements Ginq_IterProvider
+class Ginq_IterProviderIterImpl implements Ginq_IterProvider
 {
 
     public function zero()

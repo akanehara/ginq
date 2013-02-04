@@ -36,12 +36,12 @@ class Ginq implements IteratorAggregate
 
     public static function useIterator() {
         require_once dirname(__FILE__) . "/Ginq/IterProviderIterImpl.php";
-        self::$gen = new IterProviderIterImpl();
+        self::$gen = new Ginq_IterProviderIterImpl();
     }
 
     public static function useGenerator() {
         require_once dirname(__FILE__) . "/Ginq/IterProviderGenImpl.php";
-        self::$gen = new IterProviderGenImpl();
+        self::$gen = new Ginq_IterProviderGenImpl();
     }
 
     /**
