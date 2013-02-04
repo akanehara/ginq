@@ -15,7 +15,7 @@
  */
 namespace Ginq;
 
-require_once dirname(__FILE__) . "/iter.php";
+require_once __DIR__ . "/iter.php";
 
 /**
  * Lookup
@@ -35,9 +35,9 @@ class Lookup implements \IteratorAggregate
     }
 
     /**
-     * @param array|Traversable $xs
+     * @param array|\Traversable $xs
      * @param callable $keySelector
-     * @return Ginq\Lookup
+     * @return Lookup
      */
     public static function from($xs, $keySelector)
     {
@@ -49,7 +49,7 @@ class Lookup implements \IteratorAggregate
     }
 
     /**
-     * @return Traversable
+     * @return \Traversable
      */
     public function getIterator()
     {

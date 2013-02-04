@@ -13,7 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq;
+namespace Ginq\Iterator;
 
 /**
  * CycleIterator
@@ -26,7 +26,7 @@ class CycleIterator implements \Iterator
 
     public function __construct($xs)
     {
-        $this->it = iter($xs);
+        $this->it = \Ginq\iter($xs);
     }
 
     public function current()

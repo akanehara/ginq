@@ -16,10 +16,10 @@
 namespace Ginq;
 
 /**
- * @param mixed
- * @throws InvalidArgumentException
- * @return Iterator
  * @package Ginq
+ * @param mixed $xs
+ * @throws \InvalidArgumentException
+ * @return \Iterator
  */
 function iter($xs)
 {

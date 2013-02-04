@@ -13,7 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq;
+namespace Ginq\Iterator;
 
 /**
  * TakeIterator
@@ -28,7 +28,7 @@ class TakeIterator implements \Iterator
 
     public function __construct($xs, $n)
     {
-        $this->it = iter($xs);
+        $this->it = \Ginq\iter($xs);
         $this->n  = $n;
     }
 
