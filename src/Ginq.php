@@ -229,7 +229,7 @@ class Ginq implements IteratorAggregate
         if ($this->it->valid()) {
             return $this->drop(1);
         } else {
-            return Ginq::from($default);
+            return self::from($default);
         }
     }
 
@@ -324,10 +324,10 @@ class Ginq implements IteratorAggregate
      */
     public static function from($xs)
     {
-        if ($xs instanceof Ginq) {
+        if ($xs instanceof self) {
             return $xs;
         } else {
-            return new Ginq(iter($xs));
+            return new self(iter($xs));
         }
     }
 
@@ -482,7 +482,7 @@ class Ginq implements IteratorAggregate
             $this->it,
             self::_parse_selector($keySelector),
             self::_parse_selector($elementSelector),
-            function ($xs, $k) { return Ginq::from($xs); }
+            function ($xs, $k) { return self::from($xs); }
         ));
     }
 

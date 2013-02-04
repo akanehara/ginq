@@ -40,7 +40,7 @@ class Ginq_Lookup implements IteratorAggregate
      */
     public static function from($xs, $keySelector)
     {
-        $lookup = new Ginq_Lookup();
+        $lookup = new self();
         foreach ($xs as $k => $x) {
             $lookup->put($keySelector($x, $k), $x);
         }
