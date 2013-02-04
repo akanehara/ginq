@@ -18,7 +18,6 @@ namespace Ginq\Iterator;
 use Ginq\Lookup;
 
 require_once dirname(dirname(__FILE__)) . "/iter.php";
-require_once dirname(dirname(__FILE__)) . "/Lookup.php";
 
 /**
  * GroupByIterator
@@ -44,7 +43,6 @@ class GroupByIterator implements \Iterator
 
     public function current()
     {
-        require_once dirname(__FILE__) . "/SelectIterator.php";
         $group = new SelectIterator(
             $this->group->current(),
             $this->elementSelector,
