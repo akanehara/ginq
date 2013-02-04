@@ -13,12 +13,13 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 /**
  * ConcatIterator
  * @package Ginq
  */
-class ConcatIterator implements Iterator
+class ConcatIterator implements \Iterator
 {
     private $it0;
     private $it1;

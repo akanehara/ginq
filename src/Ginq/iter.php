@@ -13,6 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 /**
  * iter
@@ -20,15 +21,15 @@
  */
 function iter($xs)
 {
-    if ($xs instanceof Iterator) {
+    if ($xs instanceof \Iterator) {
         return $xs;
-    } else if ($xs instanceof IteratorAggregate) {
+    } else if ($xs instanceof \IteratorAggregate) {
         return $xs->getIterator();
     } else if (is_array($xs)) {
-        return new ArrayIterator($xs);
+        return new \ArrayIterator($xs);
     } else {
         $t = gettype($xs);
-        throw new InvalidArgumentException("'$t' object is not iterable");
+        throw new \InvalidArgumentException("'$t' object is not iterable");
     }
 }
 

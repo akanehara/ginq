@@ -13,6 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 require_once dirname(__FILE__) . "/iter.php";
 
@@ -20,7 +21,7 @@ require_once dirname(__FILE__) . "/iter.php";
  * Lookup
  * @package Ginq
  */
-class Lookup implements IteratorAggregate
+class Lookup implements \IteratorAggregate
 {
     private $table = null;
 

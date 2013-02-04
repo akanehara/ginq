@@ -13,6 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 require_once dirname(__FILE__) . "/IterProvider.php";
 require_once dirname(__FILE__) . "/Lookup.php";

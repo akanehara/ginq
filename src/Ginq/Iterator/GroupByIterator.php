@@ -13,6 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+namespace Ginq;
 
 require_once dirname(dirname(__FILE__)) . "/iter.php";
 require_once dirname(dirname(__FILE__)) . "/Lookup.php";
@@ -21,7 +22,7 @@ require_once dirname(dirname(__FILE__)) . "/Lookup.php";
  * GroupByIterator
  * @package Ginq
  */
-class GroupByIterator implements Iterator
+class GroupByIterator implements \Iterator
 {
     private $keySelector;
     private $elementSelector;
