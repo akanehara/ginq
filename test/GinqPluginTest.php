@@ -26,18 +26,18 @@ class GinqPluginTest extends PHPUnit_Framework_TestCase {
     	$this->assertEquals(array('SamplePlugin', 'each'), $functions['each']);
     }
 
-    // public function testUsePluginFunction() {
-    // 	SamplePlugin::register();
+    public function testUsePluginFunction() {
+    	SamplePlugin::register();
 
-    // 	$sum = 0;
-    // 	Ginq::range(1, 10)
-    // 		->foreach(function ($v) {
-    // 			$sum += $v;
-    // 		})
-   	// 	;
+    	$sum = 0;
+    	Ginq::range(1, 10)
+    		->each(function ($v) {
+    			$sum += $v;
+    		})
+   		;
 
-   	// 	$this->assertEquals(55, $sum);    	
-    // }
+   		$this->assertEquals(55, $sum);    	
+    }
 }
 
 class SamplePlugin {
