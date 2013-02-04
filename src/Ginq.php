@@ -327,7 +327,7 @@ class Ginq implements \IteratorAggregate
         if ($xs instanceof self) {
             return $xs;
         } else {
-            return new Ginq(Ginq\iter($xs));
+            return new self(Ginq\iter($xs));
         }
     }
 
