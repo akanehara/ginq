@@ -651,4 +651,4 @@ class GinqTest extends PHPUnit_Framework_TestCase
 if (PHPUnit_MAIN_METHOD == "GinqTest::main") {
     GinqTest::main();
 }
-?>
+
