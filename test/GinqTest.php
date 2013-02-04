@@ -1,5 +1,4 @@
 <?php
-require_once "PHPUnit/Framework/IncompleteTestError.php";
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
 
 class Person
@@ -28,7 +27,6 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        require_once "PHPUnit/TextUI/TestRunner.php";
         $suite  = new PHPUnit_Framework_TestSuite("GinqTest");
         $result = PHPUnit_TextUI_TestRunner::run($suite);
     }
