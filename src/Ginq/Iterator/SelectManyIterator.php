@@ -25,7 +25,7 @@ class SelectManyIterator implements Iterator
     private $manySelector;
 
     private $outer;
-    private $innter;
+    private $inner;
     private $i;
 
     public function __construct($xs, $manySelector)

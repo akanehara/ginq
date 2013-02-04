@@ -26,7 +26,7 @@ class SelectManyWithJoinIterator implements Iterator
     private $joinSelector;
 
     private $outer;
-    private $innter;
+    private $inner;
     private $i;
 
     public function __construct($xs, $manySelector, $joinSelector)
