@@ -18,7 +18,7 @@
  * TakeIterator
  * @package Ginq
  */
-class TakeIterator implements Iterator
+class Ginq_Iterator_TakeIterator implements Iterator
 {
     private $it;
     private $n;

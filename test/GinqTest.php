@@ -1,5 +1,4 @@
 <?php
-require_once "PHPUnit/Framework/IncompleteTestError.php";
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
 
 class Person
@@ -28,7 +27,6 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        require_once "PHPUnit/TextUI/TestRunner.php";
         $suite  = new PHPUnit_Framework_TestSuite("GinqTest");
         $result = PHPUnit_TextUI_TestRunner::run($suite);
     }
@@ -130,7 +128,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
     }
 
-   /**
+    /**
      * testAny().
      */
     public function testAny()
@@ -266,7 +264,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         // with default value (nothing)
         $x = Ginq::zero()->find($isOrange, 'none');
-        $this->assertEquals($x, 'none'); 
+        $this->assertEquals($x, 'none');
     }
 
     /**
@@ -289,7 +287,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $arr);
     }
 
-   /**
+    /**
      * testRange().
      */
     public function testRange()
@@ -299,30 +297,30 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array(1,2,3,4,5,6,7,8,9,10), $xs);
 
         // finite sequence with step
-        $xs = Ginq::range(1,10, 2)->toArray(); 
+        $xs = Ginq::range(1,10, 2)->toArray();
         $this->assertEquals(array(1,3,5,7,9), $xs);
 
         // finite sequence with negative step
-        $xs = Ginq::range(0,-9, -1)->toArray(); 
+        $xs = Ginq::range(0,-9, -1)->toArray();
         $this->assertEquals(array(0,-1,-2,-3,-4,-5,-6,-7,-8,-9), $xs);
 
         // infinite sequence
-        $xs = Ginq::range(1)->take(10)->toArray(); 
+        $xs = Ginq::range(1)->take(10)->toArray();
         $this->assertEquals(array(1,2,3,4,5,6,7,8,9,10), $xs);
 
         // infinite sequence with step
-        $xs = Ginq::range(10, null, 5)->take(5)->toArray(); 
+        $xs = Ginq::range(10, null, 5)->take(5)->toArray();
         $this->assertEquals(array(10,15,20,25,30), $xs);
 
         // infinite sequence with negative step
-        $xs = Ginq::range(-10, null, -5)->take(5)->toArray(); 
+        $xs = Ginq::range(-10, null, -5)->take(5)->toArray();
         $this->assertEquals(array(-10,-15,-20,-25,-30), $xs);
 
         // contradict range
-        $xs = Ginq::range(1, -10, 1)->toArray(); 
+        $xs = Ginq::range(1, -10, 1)->toArray();
         $this->assertEquals(array(), $xs);
 
-        $xs = Ginq::range(1, 10, -1)->toArray(); 
+        $xs = Ginq::range(1, 10, -1)->toArray();
         $this->assertEquals(array(), $xs);
     }
 
@@ -357,11 +355,11 @@ class GinqTest extends PHPUnit_Framework_TestCase
         // array
         $arr = Ginq::from(array(1,2,3,4,5))->toArray();
         $this->assertEquals(array(1,2,3,4,5), $arr);
-        
+
         // Iterator
         $arr = Ginq::from(new ArrayIterator(array(1,2,3,4,5)))->toArray();
         $this->assertEquals(array(1,2,3,4,5), $arr);
-        
+
         // IteratorAggregate
         $arr = Ginq::from(new ArrayObject(array(1,2,3,4,5)))->toArray();
         $this->assertEquals(array(1,2,3,4,5), $arr);
@@ -373,7 +371,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
     /**
      * testSelect().
-     * 
+     *
      * @expectedException InvalidArgumentException
      */
     public function testSelect()
@@ -403,7 +401,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array('Taro','Atsushi','Junko'), $xs);
 
         // invalid selector
-        Ginq::from(array(1,2,3,4,5))->select(8); 
+        Ginq::from(array(1,2,3,4,5))->select(8);
     }
 
     /**
@@ -484,7 +482,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
                 'phones' => array(
                     '050-1198-4458'
                 )
-            ), 
+            ),
             array(
                 'name'   => 'Junko',
                 'phones' => array(
@@ -648,7 +646,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
  }
 
 // Call GinqTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "GinqTest::main") {
+if (defined('PHPUnit_MAIN_METHOD') && PHPUnit_MAIN_METHOD == "GinqTest::main") {
     GinqTest::main();
 }
-?>
+

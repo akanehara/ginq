@@ -21,7 +21,7 @@ require_once dirname(dirname(__FILE__)) . "/Lookup.php";
  * GroupByIterator
  * @package Ginq
  */
-class GroupByIterator implements Iterator
+class Ginq_Iterator_GroupByIterator implements Iterator
 {
     private $keySelector;
     private $elementSelector;
@@ -41,7 +41,7 @@ class GroupByIterator implements Iterator
 
     public function current()
     {
-        $group = new SelectIterator(
+        $group = new Ginq_Iterator_SelectIterator(
             $this->group->current(),
             $this->elementSelector,
             function($x, $k) { return $k; }
@@ -66,7 +66,7 @@ class GroupByIterator implements Iterator
         $this->i = 0;
         $this->it->rewind();
         $f = $this->keySelector;
-        $this->group = Lookup::from($this->it, $f)->getIterator();
+        $this->group = Ginq_Lookup::from($this->it, $f)->getIterator();
     }
 
     public function valid()

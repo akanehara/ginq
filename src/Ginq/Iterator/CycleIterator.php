@@ -18,7 +18,7 @@
  * CycleIterator
  * @package Ginq
  */
-class CycleIterator implements Iterator
+class Ginq_Iterator_CycleIterator implements Iterator
 {
     private $i;
     private $it;

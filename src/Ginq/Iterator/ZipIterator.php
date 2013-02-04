@@ -18,7 +18,7 @@
  * ZipIterator
  * @package Ginq
  */
-class ZipIterator implements Iterator
+class Ginq_Iterator_ZipIterator implements Iterator
 {
     private $joinSelector;
 

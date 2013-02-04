@@ -18,7 +18,7 @@
  * ConcatIterator
  * @package Ginq
  */
-class ConcatIterator implements Iterator
+class Ginq_Iterator_ConcatIterator implements Iterator
 {
     private $it0;
     private $it1;

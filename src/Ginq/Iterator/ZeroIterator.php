@@ -18,7 +18,7 @@
  * ZeroIterator
  * @package Ginq
  */
-class ZeroIterator implements Iterator
+class Ginq_Iterator_ZeroIterator implements Iterator
 {
     public function current()
     {
