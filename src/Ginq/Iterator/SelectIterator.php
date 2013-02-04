@@ -20,7 +20,7 @@ require_once dirname(dirname(__FILE__)) . "/iter.php";
  * SelectIterator
  * @package Ginq
  */
-class SelectIterator implements Iterator
+class Ginq_Iterator_SelectIterator implements Iterator
 {
     private $it;
     private $selector;

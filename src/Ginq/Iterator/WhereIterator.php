@@ -20,7 +20,7 @@ require_once dirname(dirname(__FILE__)) . "/iter.php";
  * WhereIterator
  * @package Ginq
  */
-class WhereIterator implements Iterator
+class Ginq_Iterator_WhereIterator implements Iterator
 {
     private $it;
     private $predicate;

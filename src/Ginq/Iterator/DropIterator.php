@@ -18,7 +18,7 @@
  * DropIterator
  * @package Ginq
  */
-class DropIterator implements Iterator
+class Ginq_Iterator_DropIterator implements Iterator
 {
     private $it;
     private $n;

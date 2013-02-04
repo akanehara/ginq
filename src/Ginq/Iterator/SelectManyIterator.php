@@ -20,12 +20,12 @@ require_once dirname(dirname(__FILE__)) . "/iter.php";
  * SelectManyIterator
  * @package Ginq
  */
-class SelectManyIterator implements Iterator
+class Ginq_Iterator_SelectManyIterator implements Iterator
 {
     private $manySelector;
 
     private $outer;
-    private $innter;
+    private $inner;
     private $i;
 
     public function __construct($xs, $manySelector)

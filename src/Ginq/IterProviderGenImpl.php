@@ -21,7 +21,7 @@ require_once dirname(__FILE__) . "/Lookup.php";
  * IterProviderGenImpl
  * @package Ginq
  */
-class IterProviderGenImpl implements IterProvider
+class Ginq_IterProviderGenImpl implements Ginq_IterProvider
 {
     public function zero()
     {
@@ -183,7 +183,7 @@ class IterProviderGenImpl implements IterProvider
 
     public function groupBy($xs, $keySelector, $elementSelector, $groupSelector)
     {
-        foreach (Lookup::from($xs, $keySelector) as $k => $ys) {
+        foreach (Ginq_Lookup::from($xs, $keySelector) as $k => $ys) {
             $group = $this->select($ys,
                 $elementSelector,
                 function($x, $k) { return $k; }

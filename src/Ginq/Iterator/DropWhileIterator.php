@@ -20,7 +20,7 @@ require_once dirname(dirname(__FILE__)) . "/iter.php";
  * DropWhileIterator
  * @package Ginq
  */
-class DropWhileIterator implements Iterator
+class Ginq_Iterator_DropWhileIterator implements Iterator
 {
     private $it;
     private $predicate;

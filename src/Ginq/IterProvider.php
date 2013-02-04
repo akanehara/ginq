@@ -18,7 +18,7 @@
  * IterProvider
  * @package Ginq
  */
-interface IterProvider
+interface Ginq_IterProvider
 {
     public function zero();
     public function range($start, $stop, $step);
