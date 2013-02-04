@@ -276,7 +276,7 @@ class Ginq implements IteratorAggregate
     {
         $outerKeySelector = self::_parse_selector($outerKeySelector);
         $innerKeySelector = self::_parse_selector($innerKeySelector);
-        $innerLookup = Lookup::from($inner, $innerKeySelector);
+        $innerLookup = Ginq_Lookup::from($inner, $innerKeySelector);
         return $this->selectMany(
             function($outer, $outerKey) use ($innerLookup, $outerKeySelector) {
                 return $innerLookup->get(

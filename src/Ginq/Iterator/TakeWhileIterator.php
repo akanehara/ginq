@@ -20,7 +20,7 @@ require_once dirname(dirname(__FILE__)) . "/iter.php";
  * TakeWhileIterator
  * @package Ginq
  */
-class TakeWhileIterator implements Iterator
+class Ginq_Iterator_TakeWhileIterator implements Iterator
 {
     private $it;
     private $predicate;

@@ -18,7 +18,7 @@
  * RangeInfIterator
  * @package Ginq
  */
-class RangeInfIterator implements Iterator
+class Ginq_Iterator_RangeInfIterator implements Iterator
 {
     private $start;
     private $step;

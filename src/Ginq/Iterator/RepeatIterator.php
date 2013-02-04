@@ -18,7 +18,7 @@
  * RepeatIterator
  * @package Ginq
  */
-class RepeatIterator implements Iterator
+class Ginq_Iterator_RepeatIterator implements Iterator
 {
     private $i;
     private $x;

@@ -20,7 +20,7 @@ require_once dirname(__FILE__) . "/iter.php";
  * Lookup
  * @package Ginq
  */
-class Lookup implements IteratorAggregate
+class Ginq_Lookup implements IteratorAggregate
 {
     private $table = null;
 
@@ -31,7 +31,7 @@ class Lookup implements IteratorAggregate
     
     public static function from($xs, $keySelector)
     {
-        $lookup = new Lookup();
+        $lookup = new Ginq_Lookup();
         foreach ($xs as $k => $x) {
             $lookup->put($keySelector($x, $k), $x);
         }
