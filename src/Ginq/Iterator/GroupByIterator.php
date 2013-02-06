@@ -24,7 +24,7 @@ require_once dirname(dirname(__FILE__)) . "/Lookup.php";
  */
 class GroupByIterator implements \Iterator
 {
-    private $keySelector;
+    private $groupingKeySelector;
     private $elementSelector;
     private $groupSelector;
 
@@ -32,10 +32,10 @@ class GroupByIterator implements \Iterator
     private $group;
     private $i;
 
-    public function __construct($xs, $keySelector, $elementSelector, $groupSelector)
+    public function __construct($xs, $groupingKeySelector, $elementSelector, $groupSelector)
     {
         $this->it = iter($xs);
-        $this->keySelector     = $keySelector;
+        $this->groupingKeySelector = $groupingKeySelector;
         $this->elementSelector = $elementSelector;
         $this->groupSelector   = $groupSelector;
     }
@@ -66,7 +66,7 @@ class GroupByIterator implements \Iterator
     {
         $this->i = 0;
         $this->it->rewind();
-        $f = $this->keySelector;
+        $f = $this->groupingKeySelector;
         $this->group = Lookup::from($this->it, $f)->getIterator();
     }
 

@@ -21,23 +21,25 @@ namespace Ginq;
  */
 class ZipIterator implements \Iterator
 {
-    private $joinSelector;
+    private $valueJoinSelector;
+    private $keyJoinSelector;
 
     private $it0;
     private $it1;
 
     private $i;
 
-    public function __construct($xs, $ys, $joinSelector)
+    public function __construct($xs, $ys, $valueJoinSelector, $keyJoinSelector)
     {
-        $this->joinSelector = $joinSelector;
+        $this->valueJoinSelector = $valueJoinSelector;
+        $this->keyJoinSelector = $keyJoinSelector;
         $this->it0 = iter($xs);
         $this->it1 = iter($ys);
     }
 
     public function current()
     {
-        $f = $this->joinSelector;
+        $f = $this->valueJoinSelector;
         return $f(
             $this->it0->current(),
             $this->it1->current(),
@@ -48,7 +50,13 @@ class ZipIterator implements \Iterator
 
     public function key() 
     {
-        return $this->i;
+        $f = $this->keyJoinSelector;
+        return $f(
+            $this->it0->current(),
+            $this->it1->current(),
+            $this->it0->key(),
+            $this->it1->key()
+        );
     }
 
     public function next()

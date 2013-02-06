@@ -57,6 +57,12 @@ class IterProviderIterImpl implements IterProvider
         return new CycleIterator($xs);
     }
 
+    public function sequence($xs)
+    {
+        require_once dirname(__FILE__) . "/Iterator/SequenceIterator.php";
+        return new SequenceIterator($xs);
+    }
+
     public function select($xs, $selector, $keySelector)
     {
         require_once dirname(__FILE__) . "/Iterator/SelectIterator.php";
@@ -67,6 +73,12 @@ class IterProviderIterImpl implements IterProvider
     {
         require_once dirname(__FILE__) . "/Iterator/WhereIterator.php";
         return new WhereIterator($xs, $predicate);
+    }
+
+    public function reverse($xs)
+    {
+        require_once dirname(__FILE__) . "/Iterator/ReverseIterator.php";
+        return new ReverseIterator($xs, $predicate);
     }
 
     public function take($xs, $n)
@@ -105,16 +117,16 @@ class IterProviderIterImpl implements IterProvider
         return new SelectManyIterator($xs, $manySelector);
     }
 
-    public function selectManyWithJoin($xs, $manySelector, $joinSelector)
+    public function selectManyWithJoin($xs, $manySelector, $valueJoinSelector, $keyJoinSelector)
     {
         require_once dirname(__FILE__) . "/Iterator/SelectManyWithJoinIterator.php";
-        return new SelectManyWithJoinIterator($xs, $manySelector, $joinSelector);
+        return new SelectManyWithJoinIterator($xs, $manySelector, $valueJoinSelector, $keyJoinSelector);
     }
 
-    public function zip($xs, $ys, $joinSelector)
+    public function zip($xs, $ys, $valueJoinSelector, $keyJoinSelector)
     {
         require_once dirname(__FILE__) . "/Iterator/ZipIterator.php";
-        return new ZipIterator($xs, $ys, $joinSelector);
+        return new ZipIterator($xs, $ys, $valueJoinSelector, $keyJoinSelector);
     }
 
     public function groupBy($xs, $keySelector, $elementSelector, $groupSelector)

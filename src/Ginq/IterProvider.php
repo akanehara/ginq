@@ -26,16 +26,17 @@ interface IterProvider
     public function rangeInf($start, $step);
     public function repeat($x);
     public function cycle($xs);
-    public function select($xs, $selector, $keySelector);
+    public function select($xs, $valueSelector, $keySelector);
     public function where($xs, $predicate);
+    public function reverse($xs);
     public function take($xs, $n);
     public function drop($xs, $n);
     public function takeWhile($xs, $predicate);
     public function dropWhile($xs, $predicate);
     public function concat($xs, $ys);
     public function selectMany($xs, $manySelector);
-    public function selectManyWithJoin($xs, $manySelector, $joinSelector);
-    public function zip($xs, $ys, $selector);
-    public function groupBy($xs, $keySelector, $elementSelector, $groupSelector);
+    public function selectManyWithJoin($xs, $manySelector, $valueJoinSelector, $keyJoinSelector);
+    public function zip($xs, $ys, $valueJoinSelector, $keyJoinSelector);
+    public function groupBy($xs, $groupingKeySelector, $elementSelector, $groupSelector);
 }
 

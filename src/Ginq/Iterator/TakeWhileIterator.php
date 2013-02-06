@@ -42,7 +42,7 @@ class TakeWhileIterator implements \Iterator
 
     public function key() 
     {
-        return $this->i;
+        return $this->it->key();
     }
     
     public function next()

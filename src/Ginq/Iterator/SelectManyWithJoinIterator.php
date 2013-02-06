@@ -24,22 +24,24 @@ require_once dirname(dirname(__FILE__)) . "/iter.php";
 class SelectManyWithJoinIterator implements \Iterator
 {
     private $manySelector;
-    private $joinSelector;
+    private $valueJoinSelector;
+    private $keyJoinSelector;
 
     private $outer;
     private $inner;
     private $i;
 
-    public function __construct($xs, $manySelector, $joinSelector)
+    public function __construct($xs, $manySelector, $valueJoinSelector, $keyJoinSelector)
     {
         $this->outer = iter($xs);
         $this->manySelector = $manySelector;
-        $this->joinSelector = $joinSelector;
+        $this->valueJoinSelector = $valueJoinSelector;
+        $this->keyJoinSelector = $keyJoinSelector;
     }
 
     public function current()
     {
-        $f = $this->joinSelector;
+        $f = $this->valueJoinSelector;
         return $f(
             $this->outer->current(),
             $this->inner->current(),
@@ -50,7 +52,13 @@ class SelectManyWithJoinIterator implements \Iterator
 
     public function key() 
     {
-        return $this->i;
+        $f = $this->keyJoinSelector;
+        return $f(
+            $this->outer->current(),
+            $this->inner->current(),
+            $this->outer->key(),
+            $this->inner->key()
+        );
     }
 
     public function next()
@@ -75,10 +83,7 @@ class SelectManyWithJoinIterator implements \Iterator
         if ($this->outer->valid()) {
             $k = $this->manySelector;
             $this->inner = iter(
-                $k(
-                    $this->outer->current(),
-                    $this->outer->key()
-                )
+                $k($this->outer->current(), $this->outer->key())
             );
         }
     }

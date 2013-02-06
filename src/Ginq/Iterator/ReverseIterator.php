@@ -18,50 +18,52 @@ namespace Ginq;
 require_once dirname(dirname(__FILE__)) . "/iter.php";
 
 /**
- * SelectIterator
+ * ReverseIterator
  * @package Ginq
  */
 class SelectIterator implements \Iterator
 {
     private $it;
-    private $valueSelector;
-    private $keySelector;
 
+    private $items;
     private $i;
 
-    public function __construct($xs, $valueSelector, $keySelector)
+    public function __construct($xs)
     {
         $this->it = iter($xs);
-        $this->valueSelector = $valueSelector;
-        $this->keySelector = $keySelector;
     }
 
     public function current()
     {
-        $f = $this->valueSelector;
-        return $f($this->it->current(), $this->it->key());
+        return $this->item[$this->i][1];
     }
 
     public function key() 
     {
-        $f = $this->keySelector;
-        return $f($this->it->current(), $this->it->key());
+        return $this->item[$this->i][0];
     }
 
     public function next()
     {
-        $this->i++;
-        $this->it->next();
+        $this->i--;
     }
 
     public function rewind()
     {
         $this->i = 0;
         $this->it->rewind();
+        $this->items = array();
+        $len = 0;
+        foreach ($this->it as $k => $v) {
+            array_push($this->items, array($k, $v));
+            $len++;
+        }
+        $this->i = $len - 1;
     }
 
     public function valid()
     {
-        return $this->it->valid();
+        return 0 <= $this->i;
     }
 }
+

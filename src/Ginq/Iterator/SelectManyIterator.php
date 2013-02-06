@@ -42,7 +42,7 @@ class SelectManyIterator implements \Iterator
 
     public function key() 
     {
-        return $this->i;
+        return $this->inner->key();
     }
 
     public function next()
@@ -67,10 +67,7 @@ class SelectManyIterator implements \Iterator
         if ($this->outer->valid()) {
             $k = $this->manySelector;
             $this->inner = iter(
-                $k(
-                    $this->outer->current(),
-                    $this->outer->key()
-                )
+                $k($this->outer->current(), $this->outer->key())
             );
         }
     }

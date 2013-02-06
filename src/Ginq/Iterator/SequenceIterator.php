@@ -18,34 +18,27 @@ namespace Ginq;
 require_once dirname(dirname(__FILE__)) . "/iter.php";
 
 /**
- * SelectIterator
+ * SequenceIterator
  * @package Ginq
  */
-class SelectIterator implements \Iterator
+class SequenceIterator implements \Iterator
 {
     private $it;
-    private $valueSelector;
-    private $keySelector;
-
     private $i;
 
-    public function __construct($xs, $valueSelector, $keySelector)
+    public function __construct($xs)
     {
         $this->it = iter($xs);
-        $this->valueSelector = $valueSelector;
-        $this->keySelector = $keySelector;
     }
 
     public function current()
     {
-        $f = $this->valueSelector;
-        return $f($this->it->current(), $this->it->key());
+        return $this->it->current();
     }
 
     public function key() 
     {
-        $f = $this->keySelector;
-        return $f($this->it->current(), $this->it->key());
+        return $this->i;
     }
 
     public function next()

@@ -65,36 +65,57 @@ class IterProviderGenImpl implements IterProvider
     public function cycle($xs)
     {
         while (true) {
-            foreach ($xs as $k => $x) {
-                yield $x;
+            foreach ($xs as $k => $v) {
+                yield $k => $v;
             }
         }
     }
 
-    public function select($xs, $selector, $keySelector)
+    public function sequence($xs)
     {
-        foreach ($xs as $k => $x) {
-            yield $keySelector($x, $k) => $selector($x, $k);
+        foreach ($xs as $k => $v) {
+            yield $v;
+        }
+    }
+
+    public function select($xs, $valueSelector, $keySelector)
+    {
+        foreach ($xs as $k => $v) {
+            yield $keySelector($v, $k) => $valueSelector($v, $k);
         }
     }
 
     public function where($xs, $predicate)
     {
-        foreach ($xs as $k => $x) {
-            if ($predicate($x, $k)) {
-                yield $x;
+        foreach ($xs as $k => $v) {
+            if ($predicate($v, $k)) {
+                yield $k => $v;
             }
+        }
+    }
+
+    public function reverse($xs)
+    {
+        $items = array();
+        $len = 0;
+        foreach ($this->it as $k => $v) {
+            array_push($items, array($k, $v));
+            $len++;
+        }
+        for ($i = $len; 0 < $i; $i--) {
+            $x = $items[$i];
+            yield $x[0] => $x[1];
         }
     }
 
     public function take($xs, $n)
     {
         $i = $n;
-        foreach ($xs as $k => $x) {
+        foreach ($xs as $k => $v) {
             if ($i <= 0) {
                 break;
             } else {
-                yield $x;
+                yield $k => $v;
                 $i--;
             }
         }
@@ -103,20 +124,20 @@ class IterProviderGenImpl implements IterProvider
     public function drop($xs, $n)
     {
         $i = $n;
-        foreach ($xs as $k => $x) {
+        foreach ($xs as $k => $v) {
             if (0 < $i) {
                 $i--;
             } else {
-                yield $x;
+                yield $k => $v;
             }
         }
     }
 
     public function takeWhile($xs, $predicate)
     {
-        foreach ($xs as $k => $x) {
-            if ($predicate($x, $k)) {
-                yield $x;
+        foreach ($xs as $k => $v) {
+            if ($predicate($v, $k)) {
+                yield $k => $v;
             } else {
                 break; 
             }
@@ -134,60 +155,64 @@ class IterProviderGenImpl implements IterProvider
             }
         }
         while ($xs->valid()) {
-            yield $xs->current();
+            yield $xs->key() => $xs->current();
             $xs->next();
         }
     }
 
     public function concat($xs, $ys)
     {
-        foreach ($xs as $k => $x) {
-            yield $x;
+        foreach ($xs as $k => $v) {
+            yield $k => $v;
         }
-        foreach ($ys as $l => $y) {
-            yield $y;
+        foreach ($ys as $k => $v) {
+            yield $k => $v;
         }
     }
 
     public function selectMany($xs, $manySelector)
     {
-        foreach ($xs as $k => $x) {
-            foreach ($manySelector($x, $k) as $l => $y) {
-                yield $y;
+        foreach ($xs as $k0 => $v0) {
+            foreach ($manySelector($v0, $k0) as $k1 => $v1) {
+                yield $k1 => $v1;
             }
         }
     }
 
-    public function selectManyWithJoin(
-        $xs, $manySelector, $joinSelector)
+    public function selectManyWithJoin($xs, $manySelector, $valueJoinSelector, $keyJoinSelector)
     {
-        foreach ($xs as $k => $x) {
-            foreach ($manySelector($x, $k) as $l => $y) {
-                yield $joinSelector($x, $y, $k, $l);
+        foreach ($xs as $k0 => $v0) {
+            foreach ($manySelector($v0, $k0) as $k1 => $v1) {
+                $k = $keyJoinSelector($v0, $v1, $k0, $k1);
+                $v = $valueJoinSelector($v0, $v1, $k0, $k1);
+                yield $k => $v;
             }
         }
     }
 
-    public function zip($xs, $ys, $joinSelector)
+    public function zip($xs, $ys, $valueJoinSelector, $keyJoinSelector)
     {
         $xs->rewind();
         $ys->rewind();
         while ($xs->valid() && $ys->valid()) {
-            yield $joinSelector(
-                $xs->current(), $ys->current(),
-                $xs->key(), $ys->key()
+            $k = $keyJoinSelector(
+                $xs->current(), $ys->current(), $xs->key(), $ys->key()
             );
+            $v = $valueJoinSelector(
+                $xs->current(), $ys->current(), $xs->key(), $ys->key()
+            );
+            yield $k => $v;
             $xs->next();
             $ys->next();
         }
     }
 
-    public function groupBy($xs, $keySelector, $elementSelector, $groupSelector)
+    public function groupBy($xs, $groupingKeySelector, $elementSelector, $groupSelector)
     {
-        foreach (Lookup::from($xs, $keySelector) as $k => $ys) {
+        foreach (Lookup::from($xs, $groupingKeySelector) as $k => $ys) {
             $group = $this->select($ys,
                 $elementSelector,
-                function($x, $k) { return $k; }
+                function($v, $k) { return $k; }
             );
             yield $k => $groupSelector($group, $k);
         }
