@@ -814,6 +814,42 @@ class Ginq implements \IteratorAggregate
         }
     }
 
+    public function __call($name, $args) {
+        if (isset(self::$registeredFunctions[$name])) {
+            call_user_func_array(
+                self::$registeredFunctions[$name], 
+                array_merge(array($this), $args)
+            );
+        }
+    }
+
+    private static $registeredFunctions = array();
+
+    public static function register($className) {
+        $ref = new \ReflectionClass($className);
+
+        $funcNames = Ginq::from($ref->getMethods(ReflectionMethod::IS_STATIC))
+            ->where(function ($m) { return $m->isPublic(); })
+            ->where(function ($m) {
+                $p = Ginq::from($m->getParameters())->first(false);
+                if ($p === false) return false;
+
+                $c = $p->getClass();
+
+                return ($c->getName() === 'Ginq') or $c->isSubclassOf('Ginq');
+            })
+            ->select(function ($m) { return $m->getName(); })
+            ->toArray()
+        ;
+
+        foreach ($funcNames as $func) {
+            self::$registeredFunctions[$func] = array($className, $func);
+        }
+    }
+
+    public static function listRegisterdFunctions() {
+        return self::$registeredFunctions;
+    }
 }
 
 if (class_exists("Generator")) {
