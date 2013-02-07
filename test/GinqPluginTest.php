@@ -1,5 +1,4 @@
 <?php
-require_once "PHPUnit/Framework/IncompleteTestError.php";
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
 
 class GinqPluginTest extends PHPUnit_Framework_TestCase
