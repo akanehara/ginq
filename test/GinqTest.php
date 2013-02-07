@@ -72,12 +72,18 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testToArray()
     {
-        $arr = Ginq::from(array(1,2,3,4,5))->toArray();
-        $this->assertEquals(array(1,2,3,4,5), $arr);
+        $actual = Ginq::from(array(1,2,3,4,5))->toArray();
+        $this->assertEquals(array(1,2,3,4,5), $actual);
+
+        // key conflict
+        $data = array('apple' => 1, 'orange' => 2, 'grape' => 3);
+        $expected = array('apple' => 1, 'orange' => 2, 'grape' => 3);
+        $actual = Ginq::cycle($data)->take(8)->toArray();
+        $this->assertEquals($expected, $actual);
     }
 
     /**
-     * testToArrayRec().
+     * testToArrayRec()
      */
     public function testToArrayRec()
     {
@@ -86,6 +92,63 @@ class GinqTest extends PHPUnit_Framework_TestCase
             new ArrayObject(array(4,5,6))
         ))->toArrayRec();
         $this->assertEquals(array(array(1,2,3),array(4,5,6)), $arr);
+
+        $data = Ginq::cycle(array(
+            'foo' => new ArrayIterator(array('apple' => 1, 'orange' => 2)),
+            'bar' => new ArrayObject(array('cat' => 3, 'dog' => 5)),
+            'baz' => Ginq::cycle(array('car' => 6, 'plane' => array(1, 2)))->take(5)
+        ))->take(6);
+        $expected = array(
+            'foo' => array('apple' => 1, 'orange' => 2),
+            'bar' => array('cat' => 3, 'dog' => 5),
+            'baz' => array('car' => 6, 'plane' => array(1, 2))
+        );
+        $actual = Ginq::from($data)->toArrayRec();
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * testToArray().
+     */
+    public function testToAssoc()
+    {
+        $expected = array(
+            array(0, 1),
+            array(1, 2),
+            array(2, 3),
+            array(3, 4),
+            array(4, 5)
+        );
+        $actual = Ginq::from(array(1,2,3,4,5))->toAssoc();
+        $this->assertEquals($actual, $expected);
+    }
+
+    /**
+     * testToArrayRec().
+     */
+    public function testToAssocRec()
+    {
+        $expected = array(
+            array(0,
+                array(
+                    array(0, 1),
+                    array(1, 2),
+                    array(2, 3)
+                )
+            ),
+            array(1,
+                array(
+                    array(0, 4),
+                    array(1, 5),
+                    array(2, 6)
+                )
+            )
+        );
+        $actual = Ginq::from(array(
+            new ArrayIterator(array(1,2,3)),
+            new ArrayObject(array(4,5,6))
+        ))->toAssocRec();
+        $this->assertEquals($actual, $expected);
     }
 
     /**
@@ -103,6 +166,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $dict = Ginq::from($data)->toDictionary(
             function($x, $k) { return $x['name']; }
         );
+
         $this->assertEquals(
             array(
                 'Taro' =>
@@ -113,7 +177,8 @@ class GinqTest extends PHPUnit_Framework_TestCase
                     array('id' => 3, 'name' => 'Junko', 'city' => 'Sakai')
             ), $dict
         );
-
+        
+        
         // key and value
         $dict = Ginq::from($data)->toDictionary(
             'name', // it means `function($x, $k) { return $x['name']; }`
@@ -126,6 +191,23 @@ class GinqTest extends PHPUnit_Framework_TestCase
                 'Junko' => "Sakai"
             ), $dict
         );
+    }
+
+    /**
+     * testToDictionary().
+     */
+    public function testToDictionaryWith()
+    {
+        // key conflict
+        $data = array('apple' => array(1), 'orange' => array(2), 'grape' => array(3));
+        $expected = array('apple' => array(1,1,1), 'orange' => array(2,2,2), 'grape' => array(3,3,3));
+        $actual = Ginq::cycle($data)->take(9)
+            ->toDictionaryWith(
+                function($exist, $v, $k) {
+                    return array_merge($exist, $v);
+                }
+            );
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -208,7 +290,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
     {
         // without default value (just)
         $xs = Ginq::from(array(1,2,3,4,5))->rest()->toArray();
-        $this->assertEquals(array(2,3,4,5), $xs);
+        $this->assertEquals(array(1=>2,2=>3,3=>4,4=>5), $xs);
 
         // without default value (nothing)
         $xs = Ginq::zero()->rest()->toArray();
@@ -216,7 +298,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         // with default value (just)
         $xs = Ginq::from(array(1,2,3,4,5))->rest(array(42))->toArray();
-        $this->assertEquals(array(2,3,4,5), $xs);
+        $this->assertEquals(array(1=>2,2=>3,3=>4,4=>5), $xs);
 
         // with default value (nothing)
         $xs = Ginq::zero()->rest(array(42))->toArray();
@@ -239,6 +321,22 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(
             Ginq::from(array('apple', 'orange', 'grape'))
                 ->contains('meow!')
+        );
+    }
+
+    /**
+     * testContainsKey
+     */
+    public function testContainsKey()
+    {
+        $this->assertTrue(
+            Ginq::from(array('apple' => 1, 'orange' => 2, 'grape' => 3))
+                ->containsKey('orange')
+        );
+
+        $this->assertFalse(
+            Ginq::from(array('apple' => 1, 'orange' => 2, 'grape' => 3))
+                ->containsKey('meow!')
         );
     }
 
@@ -270,12 +368,45 @@ class GinqTest extends PHPUnit_Framework_TestCase
     /**
      * testFold
      */
-    public function testFold()
+    public function testFoldLeft()
     {
-        $x = Ginq::range(1, 10)->fold(0, function($acc, $x) {
-            return $acc - $x;
+        $actual = Ginq::range(1, 10)->foldLeft(0, function($acc, $v, $k) {
+            return $acc - $v;
         });
-        $this->assertEquals($x, -55);
+        $this->assertEquals(-55, $actual);
+    }
+
+    /**
+     * testFold
+     */
+    public function testFoldRight()
+    {
+        $actual = Ginq::range(1, 10)->foldRight(0, function($acc, $v, $k) {
+            return $v - $acc;
+        });
+        $this->assertEquals(-5, $actual);
+    }
+
+    /**
+     * testFold
+     */
+    public function testReduceLeft()
+    {
+        $actual = Ginq::range(0, 10)->reduceLeft(function($acc, $v, $k) {
+            return $acc - $v;
+        });
+        $this->assertEquals(-55, $actual);
+    }
+
+    /**
+     * testFold
+     */
+    public function testReduceRight()
+    {
+        $actual = Ginq::range(1, 10)->reduceRight(function($acc, $v, $k) {
+            return $v - $acc;
+        });
+        $this->assertEquals(-5, $actual);
     }
 
     /**
@@ -339,12 +470,21 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testCycle()
     {
-        $data = array('Mon','Tue','Wed','Thu','Fri','Sat','Sun');
-        $xs = Ginq::cycle($data)->take(10)->toArray();
-        $this->assertEquals(
-            array('Mon','Tue','Wed','Thu','Fri','Sat','Sun','Mon','Tue','Wed'),
-            $xs
+        $expected = array(
+            array(0, 'Mon'),
+            array(1, 'Tue'),
+            array(2, 'Wed'),
+            array(3, 'Thu'),
+            array(4, 'Fri'),
+            array(5, 'Sat'),
+            array(6, 'Sun'),
+            array(0, 'Mon'),
+            array(1, 'Tue'),
+            array(2, 'Wed')
         );
+        $data = array('Mon','Tue','Wed','Thu','Fri','Sat','Sun');
+        $actual = Ginq::cycle($data)->take(10)->toAssoc();
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -368,6 +508,21 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $arr = Ginq::from(Ginq::from(array(1,2,3,4,5)))->toArray();
         $this->assertEquals(array(1,2,3,4,5), $arr);
     }
+
+    /**
+     * testSequence().
+     */
+    public function testSequence()
+    {
+        $expected = array(2,4,6,8,10,12,14,16,18,20);
+        $actual = Ginq::range(1,20)
+                    ->where(function($x) { return $x % 2 == 0; })
+                    ->sequence()
+                    ->toArray();
+        $this->assertEquals($expected, $actual);
+    }
+
+
 
     /**
      * testSelect().
@@ -400,6 +555,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $xs = Ginq::from($data)->select("name")->toArray();
         $this->assertEquals(array('Taro','Atsushi','Junko'), $xs);
 
+        // key mapping
+        $xs = Ginq::from(1,2,3,4,5)
+            ->select(null, function($v, $k) { return $k * $k; })
+            ->toArray();
+        $this->assertEquals(array(0=>1,1=>2,4=>3,9=>4,16=>5), $xs);
+
         // invalid selector
         Ginq::from(array(1,2,3,4,5))->select(8);
     }
@@ -412,7 +573,31 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $xs = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
             ->where(function($x, $k) { return ($x % 2) == 0; })
             ->toArray();
-        $this->assertEquals(array(2,4,6,8,10), $xs);
+        $this->assertEquals(array(1=>2,3=>4,5=>6,7=>8,9=>10), $xs);
+    }
+
+    /**
+     * testReverse().
+     */
+    public function testReverse()
+    {
+        // reverse iterator
+        $xs = Ginq::from(array(1,2,3,4,5))->reverse();
+
+        // to array
+        $expected = array(1,2,3,4,5);
+        $actual = $xs->toArray();
+        $this->assertEquals($expected, $actual);
+
+        // with sequence
+        $expected = array(5,4,3,2,1);
+        $actual = $xs->sequence()->toArray();
+        $this->assertEquals($expected, $actual);
+
+        // to assoc
+        $expected = array(array(4, 5),array(3, 4),array(2, 3),array(1, 2),array(0, 1));
+        $actual = $xs->toAssoc();
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -430,7 +615,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
     public function testDrop()
     {
         $xs = Ginq::from(array(1,2,3,4,5,6,7,8,9))->drop(5)->toArray();
-        $this->assertEquals(array(6,7,8,9), $xs);
+        $this->assertEquals(array(5=>6,6=>7,7=>8,8=>9), $xs);
     }
 
     /**
@@ -452,7 +637,10 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $xs = Ginq::from(array(1,2,3,4,5,6,7,8,9,8,7,6,5,4,3,2,1))
             ->dropWhile(function($x, $k) { return $x <= 5; })
             ->toArray();
-        $this->assertEquals(array(6,7,8,9,8,7,6,5,4,3,2,1), $xs);
+        $this->assertEquals(array(
+            5=>6, 6=>7, 7=>8, 8=>9, 9=>8, 10=>7,
+            11=>6, 12=>5, 13=>4, 14=>3, 15=>2,16=>1
+        ), $xs);
     }
 
      /**
@@ -461,7 +649,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
     public function testConcat()
     {
         $xs = Ginq::from(array(1,2,3,4,5))->concat(array(6,7,8,9))->toArray();
-        $this->assertEquals(array(1,2,3,4,5,6,7,8,9), $xs);
+        $this->assertEquals(array(0=>1,1=>2,2=>3,3=>4,4=>5,0=>6,1=>7,2=>8,3=>9), $xs);
     }
 
     /**
@@ -493,29 +681,81 @@ class GinqTest extends PHPUnit_Framework_TestCase
             )
          );
 
-        // without join selector
-        $phones = Ginq::from($phoneBook)->selectMany('phones')->toArray();
+        $phones = Ginq::from($phoneBook)->selectMany('phones')->toAssoc();
         $this->assertEquals(array(
-            '03-1234-5678', '090-8421-9061',
-            '050-1198-4458', '06-1111-3333',
-            '090-9898-1314', '050-6667-2231'
+            array(0, '03-1234-5678'),
+            array(1, '090-8421-9061'),
+            array(0, '050-1198-4458'),
+            array(0, '06-1111-3333'),
+            array(1, '090-9898-1314'),
+            array(2, '050-6667-2231')
+        ), $phones);
+    }
+
+    /**
+     * testSelectManyWith().
+     */
+    public function testSelectManyWith() {
+
+        $phoneBook = array(
+            array(
+                'name'   => 'Taro',
+                'phones' => array(
+                    '03-1234-5678',
+                    '090-8421-9061'
+                )
+            ),
+            array(
+                'name'   => 'Atsushi',
+                'phones' => array(
+                    '050-1198-4458'
+                )
+            ),
+            array(
+                'name'   => 'Junko',
+                'phones' => array(
+                    '06-1111-3333',
+                    '090-9898-1314',
+                    '050-6667-2231'
+                )
+            )
+        );
+        
+        // without key join selector
+        $phones = Ginq::from($phoneBook)
+            ->selectManyWith(
+                'phones',
+                function($v0, $v1, $k0, $k1) {
+                    return "{$v0['name']} : $v1";
+                }
+            )->toAssoc();
+        $this->assertEquals(array(
+            array(0,'Taro : 03-1234-5678'),
+            array(1,'Taro : 090-8421-9061'),
+            array(0,'Atsushi : 050-1198-4458'),
+            array(0,'Junko : 06-1111-3333'),
+            array(1,'Junko : 090-9898-1314'),
+            array(2,'Junko : 050-6667-2231')
         ), $phones);
 
-        // with join selector
+
         $phones = Ginq::from($phoneBook)
-            ->selectMany(
+            ->selectManyWith(
                 'phones',
-                function($x0, $x1, $k0, $k1) {
-                    return "{$x0['name']} : $x1";
+                function($v0, $v1, $k0, $k1) {
+                    return "$v1";
+                },
+                function($v0, $v1, $k0, $k1) {
+                    return "{$v0['name']}-$k1";
                 }
-            )->toArray();
+            )->toAssoc();
         $this->assertEquals(array(
-            'Taro : 03-1234-5678',
-            'Taro : 090-8421-9061',
-            'Atsushi : 050-1198-4458',
-            'Junko : 06-1111-3333',
-            'Junko : 090-9898-1314',
-            'Junko : 050-6667-2231'
+            array('Taro-0',    '03-1234-5678'),
+            array('Taro-1',    '090-8421-9061'),
+            array('Atsushi-0', '050-1198-4458'),
+            array('Junko-0',   '06-1111-3333'),
+            array('Junko-1',   '090-9898-1314'),
+            array('Junko-2',   '050-6667-2231')
         ), $phones);
     }
 
@@ -544,7 +784,8 @@ class GinqTest extends PHPUnit_Framework_TestCase
             'id', 'owner',
             function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
-            }
+            },
+            Ginq::seq()
         )->toArray();
         $this->assertEquals(
             array(
@@ -564,7 +805,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
             }
-        )->toArray();
+        )->sequence()->toArray();
 
         $this->assertEquals(
             array(
@@ -583,14 +824,19 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testZip()
     {
+        // without key selector
         $xs = Ginq::cycle(array("red", "green"))->zip(Ginq::range(1, 8),
-            function($x0, $x1, $k0, $k1) { return "$x1 - $x0"; }
-        )->toArray();
+            function($v0, $v1, $k0, $k1) { return "$v1 - $v0"; }
+        )->toAssoc();
         $this->assertEquals(array(
-            "1 - red", "2 - green",
-            "3 - red", "4 - green",
-            "5 - red", "6 - green",
-            "7 - red", "8 - green"
+            array(0, "1 - red"),
+            array(1, "2 - green"),
+            array(0, "3 - red"),
+            array(1, "4 - green"),
+            array(0, "5 - red"),
+            array(1, "6 - green"),
+            array(0, "7 - red"),
+            array(1, "8 - green")
         ), $xs);
     }
 

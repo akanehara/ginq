@@ -78,7 +78,7 @@ class IterProviderIterImpl implements IterProvider
     public function reverse($xs)
     {
         require_once dirname(__FILE__) . "/Iterator/ReverseIterator.php";
-        return new ReverseIterator($xs, $predicate);
+        return new ReverseIterator($xs);
     }
 
     public function take($xs, $n)

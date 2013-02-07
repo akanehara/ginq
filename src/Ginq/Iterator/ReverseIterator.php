@@ -21,7 +21,7 @@ require_once dirname(dirname(__FILE__)) . "/iter.php";
  * ReverseIterator
  * @package Ginq
  */
-class SelectIterator implements \Iterator
+class ReverseIterator implements \Iterator
 {
     private $it;
 
@@ -35,12 +35,12 @@ class SelectIterator implements \Iterator
 
     public function current()
     {
-        return $this->item[$this->i][1];
+        return $this->items[$this->i][1];
     }
 
     public function key() 
     {
-        return $this->item[$this->i][0];
+        return $this->items[$this->i][0];
     }
 
     public function next()

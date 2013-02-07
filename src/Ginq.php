@@ -259,17 +259,22 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param callable      $keySelector   ($value, $key)
+     * @param callable|null $keySelector   ($value, $key)
      * @param callable|null $valueSelector ($value, $key)
      * @return array
      */
-    public function toDictionary($keySelector, $valueSelector = null)
+    public function toDictionary($keySelector = null, $valueSelector = null)
     {
         $keySelector = Ginq::_parse_selector($keySelector);
         if (is_null($valueSelector)) {
             $valueSelector = function($v, $k) { return $v; };
         } else {
             $valueSelector = Ginq::_parse_selector($valueSelector);
+        }
+        if (is_null($keySelector)) {
+            $keySelector = function($v, $k) { return $k; };
+        } else {
+            $keySelector = Ginq::_parse_selector($keySelector);
         }
         return $this->fold(
             array(),
@@ -286,29 +291,33 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param callable      $combiner      ($existValue, $value, $key)
-     * @param callable      $keySelector   ($value, $kay)
+     * @param callable      $combiner      ($exist, $value, $key)
+     * @param callable|null $keySelector   ($value, $kay)
      * @param callable|null $valueSelector ($value, $key)
      * @return array
      */
-    public function toDictionaryWith($combiner, $keySelector, $valueSelector = null)
+    public function toDictionaryWith($combiner, $keySelector = null, $valueSelector = null)
     {
-        $keySelector = Ginq::_parse_selector($keySelector);
         if (is_null($valueSelector)) {
             $valueSelector = function($v, $k) { return $v; };
         } else {
             $valueSelector = Ginq::_parse_selector($valueSelector);
         }
+        if (is_null($keySelector)) {
+            $keySelector = function($v, $k) { return $k; };
+        } else {
+            $keySelector = Ginq::_parse_selector($keySelector);
+        }
         return $this->fold(
             array(),
-            function($acc, $v0, $k0) use ($keySelector, $valueSelector) {
+            function($acc, $v0, $k0) use ($combiner, $keySelector, $valueSelector) {
                 $k1 = $keySelector($v0, $k0);
                 $v1 = $valueSelector($v0, $k0);
                 if ($v1 instanceof \Iterator || $v1 instanceof \IteratorAggregate) {
                     $v1 = Ginq::from($v1)->toArrayRec();
                 }
                 if (key_exists($k1, $acc)) {
-                    $acc[$k1] = $combiner($k1, $acc[$k1], $v1);
+                    $acc[$k1] = $combiner($acc[$k1], $v1, $k1);
                 } else {
                     $acc[$k1] = $v1;
                 }
@@ -445,7 +454,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param callable $operator ($accumulator, $value)
+     * @param callable $operator ($accumulator, $value, $key)
      * @return mixed
      */
     public function reduceLeft($operator)
@@ -465,7 +474,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param callable $operator ($accumulator, $value)
+     * @param callable $operator ($accumulator, $value, $key)
      * @return mixed
      */
     public function reduceRight($operator)
@@ -585,7 +594,8 @@ class Ginq implements \IteratorAggregate
     /**
      * @return Ginq
      */
-    public function reverse() {
+    public function reverse()
+    {
         return self::from(self::$gen->reverse($this->it));
     }
 
@@ -702,15 +712,15 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param array|Traversable $rhs
-     * @param string|callable $valueJoinSelector
-     * @param string|callable $keyJoinSelector
+     * @param array|Traversable    $rhs
+     * @param string|callable      $valueJoinSelector
+     * @param string|callable|null $keyJoinSelector
      * @return Ginq
      */
     public function zip($rhs, $valueJoinSelector, $keyJoinSelector = null)
     {
         if (is_null($keyJoinSelector)) {
-            $keyJoinSelector = function($v, $k, $v, $k) { return $k; };
+            $keyJoinSelector = function($v0, $v1, $k0, $k1) { return $k0; };
         } else {
             $keyJoinSelector = self::_parse_join_selector($keyJoinSelector);
         }
@@ -723,7 +733,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param string|callable $keySelector
+     * @param string|callable      $groupingKeySelector
      * @param string|callable|null $elementSelector
      * @return Ginq
      */
