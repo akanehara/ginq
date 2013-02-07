@@ -48,7 +48,8 @@ class Ginq implements IteratorAggregate
      */
     protected static $gen = null;
 
-    public static function useIterator() {
+    public static function useIterator()
+    {
         self::$gen = new Ginq\Core\IterProviderIterImpl();
     }
 
@@ -102,7 +103,7 @@ class Ginq implements IteratorAggregate
     public function filter($predicate)
     {
         return $this->where($predicate);
-    } 
+    }
 
     /**
      * Alias method to filter().
@@ -148,7 +149,7 @@ class Ginq implements IteratorAggregate
     public function has($value)
     {
         return $this->contains($value);
-    } 
+    }
 
     /**
      * Alias method to containsKey().
@@ -421,7 +422,7 @@ class Ginq implements IteratorAggregate
     public function contains($value)
     {
         return $this->any(
-            function($v, $k) use ($value) {
+            function ($v, $k) use ($value) {
                 return $v == $value;
             }
         );
@@ -434,7 +435,7 @@ class Ginq implements IteratorAggregate
     public function containsKey($key)
     {
         return $this->any(
-            function($v, $k) use ($key) {
+            function ($v, $k) use ($key) {
                 return $k == $key;
             }
         );
@@ -850,10 +851,11 @@ class Ginq implements IteratorAggregate
 
     //private static $registeredStaticFunctions = array();
 
-    public function __call($name, $args) {
+    public function __call($name, $args)
+    {
         if (isset(self::$registeredFunctions[$name])) {
             call_user_func_array(
-                self::$registeredFunctions[$name], 
+                self::$registeredFunctions[$name],
                 array_merge(array($this), $args)
             );
         }
@@ -862,7 +864,8 @@ class Ginq implements IteratorAggregate
     private static $registeredFunctions = array();
 
 
-    public static function register($className) {
+    public static function register($className)
+    {
         $ref = new \ReflectionClass($className);
 
         $funcNames = Ginq::from($ref->getMethods(ReflectionMethod::IS_STATIC))
@@ -883,12 +886,14 @@ class Ginq implements IteratorAggregate
         }
     }
 
-    public static function listRegisterdFunctions() {
+    public static function listRegisterdFunctions()
+    {
         return self::$registeredFunctions;
     }
 
-    public static function _registerAutoloadFunction() {
-        spl_autoload_register(function($class) {
+    public static function _registerAutoloadFunction()
+    {
+        spl_autoload_register(function ($class) {
             $class = ltrim($class, '\\');
             if ($class == 'Ginq') {
                 include __DIR__ . DIRECTORY_SEPARATOR . 'Ginq.php';
