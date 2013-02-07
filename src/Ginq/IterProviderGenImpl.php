@@ -15,10 +15,6 @@
  */
 namespace Ginq;
 
-require_once dirname(__FILE__) . "/IterProvider.php";
-require_once dirname(__FILE__) . "/RewindableGenerator.php";
-require_once dirname(__FILE__) . "/Lookup.php";
-
 /**
  * IterProviderGenImpl
  * @package Ginq

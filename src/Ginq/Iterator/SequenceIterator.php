@@ -13,9 +13,9 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq;
+namespace Ginq\Iterator;
 
-require_once dirname(dirname(__FILE__)) . "/iter.php";
+require_once dirname(__DIR__) . "/iter.php";
 
 /**
  * SequenceIterator
@@ -28,7 +28,7 @@ class SequenceIterator implements \Iterator
 
     public function __construct($xs)
     {
-        $this->it = iter($xs);
+        $this->it = \Ginq\iter($xs);
     }
 
     public function current()

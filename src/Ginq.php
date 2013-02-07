@@ -14,16 +14,15 @@
  * @package    Ginq
  */
 
-require_once dirname(__FILE__) . "/Ginq/iter.php";
-require_once dirname(__FILE__) . "/Ginq/selector.php";
-require_once dirname(__FILE__) . "/Ginq/Lookup.php";
+require_once __DIR__ . "/Ginq/iter.php";
+require_once __DIR__ . "/Ginq/selector.php";
 
 /**
  * Ginq
  *
  * @package Ginq
  */
-class Ginq implements \IteratorAggregate
+class Ginq implements IteratorAggregate
 {
     /**
      * @var array|Traversable
@@ -36,12 +35,10 @@ class Ginq implements \IteratorAggregate
     protected static $gen = null;
 
     public static function useIterator() {
-        require_once dirname(__FILE__) . "/Ginq/IterProviderIterImpl.php";
         self::$gen = new Ginq\IterProviderIterImpl();
     }
 
     public static function useGenerator() {
-        require_once dirname(__FILE__) . "/Ginq/IterProviderGenImpl.php";
         self::$gen = new Ginq\IterProviderGenImpl();
     }
 
@@ -548,7 +545,7 @@ class Ginq implements \IteratorAggregate
         if ($xs instanceof self) {
             return $xs;
         } else {
-            return new Ginq(Ginq\iter($xs));
+            return new self(Ginq\iter($xs));
         }
     }
     
@@ -860,11 +857,31 @@ class Ginq implements \IteratorAggregate
     public static function listRegisterdFunctions() {
         return self::$registeredFunctions;
     }
+
+    public static function _registerAutoloadFunction() {
+        spl_autoload_register(function($class) {
+            $class = ltrim($class, '\\');
+            if ($class == 'Ginq') {
+                include __DIR__ . DIRECTORY_SEPARATOR . 'Ginq.php';
+                return; // Ginq class itself.
+            }
+            $pos = strpos($class, '\\');
+            if ($pos === false) {
+                return; // Not in namespace.
+            }
+            $rootNS = substr($class, 0, $pos);
+            if ($rootNS != 'Ginq') {
+                return; // Not in Ginq namespace.
+            }
+            $classPath = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+            include __DIR__ . DIRECTORY_SEPARATOR . $classPath;
+        });
+    }
 }
 
+Ginq::_registerAutoloadFunction();
 if (class_exists("Generator")) {
     Ginq::useGenerator();
 } else {
     Ginq::useIterator();
 }
-
