@@ -49,15 +49,19 @@ class ConcatIterator implements \Iterator
         $this->it->next();
         if ($this->it === $this->it0 && !$this->it->valid()) {
             $this->it = $this->it1;
-            $this->it->rewind();
         }
     }
 
     public function rewind()
     {
         $this->i = 0;
-        $this->it = $this->it0;
-        $this->it->rewind();
+        $this->it0->rewind();
+        $this->it1->rewind();
+        if ($this->it0->valid()) {
+            $this->it = $this->it0;
+        } else {
+            $this->it = $this->it1;
+        }
     }
 
     public function valid()

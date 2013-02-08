@@ -650,6 +650,16 @@ class GinqTest extends PHPUnit_Framework_TestCase
     {
         $xs = Ginq::from(array(1,2,3,4,5))->concat(array(6,7,8,9))->toArray();
         $this->assertEquals(array(0=>1,1=>2,2=>3,3=>4,4=>5,0=>6,1=>7,2=>8,3=>9), $xs);
+
+        $expected = array(array(0, 2),array(1, 4),array(2, 6));
+
+        $actual = \Ginq::from(array())->concat(array(2,4,6))->toAssoc();
+        var_dump($actual);
+        $this->assertEquals($expected, $actual);
+
+        $actual = \Ginq::from(array(2,4,6))->concat(array())->toAssoc();
+        var_dump($actual);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
