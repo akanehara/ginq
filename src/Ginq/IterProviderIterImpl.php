@@ -20,7 +20,7 @@ use Ginq\Iterator\RangeIterator;
 use Ginq\Iterator\RangeInfIterator;
 use Ginq\Iterator\CycleIterator;
 use Ginq\Iterator\RepeatIterator;
-use Ginq\Iterator\SequenceIterator;
+use Ginq\Iterator\RehashIterator;
 use Ginq\Iterator\SelectIterator;
 use Ginq\Iterator\WhereIterator;
 use Ginq\Iterator\ReverseIterator;
@@ -66,9 +66,9 @@ class IterProviderIterImpl implements IterProvider
         return new CycleIterator($xs);
     }
 
-    public function sequence($xs)
+    public function rehash($xs)
     {
-        return new SequenceIterator($xs);
+        return new RehashIterator($xs);
     }
 
     public function select($xs, $selector, $keySelector)

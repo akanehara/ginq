@@ -510,14 +510,14 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * testSequence().
+     * testRehash().
      */
-    public function testSequence()
+    public function testRehash()
     {
         $expected = array(2,4,6,8,10,12,14,16,18,20);
         $actual = Ginq::range(1,20)
                     ->where(function($x) { return $x % 2 == 0; })
-                    ->sequence()
+                    ->rehash()
                     ->toArray();
         $this->assertEquals($expected, $actual);
     }
@@ -591,7 +591,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         // with sequence
         $expected = array(5,4,3,2,1);
-        $actual = $xs->sequence()->toArray();
+        $actual = $xs->rehash()->toArray();
         $this->assertEquals($expected, $actual);
 
         // to assoc
@@ -815,7 +815,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
             }
-        )->sequence()->toArray();
+        )->rehash()->toArray();
 
         $this->assertEquals(
             array(

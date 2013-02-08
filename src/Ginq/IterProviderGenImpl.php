@@ -93,12 +93,12 @@ class IterProviderGenImpl implements IterProvider
         }
     }
 
-    public function sequence($xs)
+    public function rehash($xs)
     {
-        return new RewindableGenerator(self::_sequence($xs));
+        return new RewindableGenerator(self::_rehash($xs));
     }
 
-    protected static function _sequence($xs)
+    protected static function _rehash($xs)
     {
         foreach ($xs as $k => $v) {
             yield $v;

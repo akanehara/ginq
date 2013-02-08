@@ -26,6 +26,7 @@ interface IterProvider
     public function rangeInf($start, $step);
     public function repeat($x);
     public function cycle($xs);
+    public function rehash($xs);
     public function select($xs, $valueSelector, $keySelector);
     public function where($xs, $predicate);
     public function reverse($xs);

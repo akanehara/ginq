@@ -552,9 +552,9 @@ class Ginq implements IteratorAggregate
     /**
      * @return Ginq
      */
-    public function sequence()
+    public function rehash()
     {
-        return self::from(self::$gen->sequence($this->it));
+        return self::from(self::$gen->rehash($this->it));
     }
 
     /**

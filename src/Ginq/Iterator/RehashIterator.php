@@ -18,10 +18,10 @@ namespace Ginq\Iterator;
 require_once dirname(__DIR__) . "/iter.php";
 
 /**
- * SequenceIterator
+ * RehashIterator
  * @package Ginq
  */
-class SequenceIterator implements \Iterator
+class RehashIterator implements \Iterator
 {
     private $it;
     private $i;
