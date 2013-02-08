@@ -510,6 +510,19 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testSequence().
+     */
+    public function testSeqnece()
+    {
+       $expected = array(2,4,6,8,10,12,14,16,18,20);
+        $actual = Ginq::range(1,20)
+                    ->where(function($x) { return $x % 2 == 0; })
+                    ->rehash()
+                    ->toArray();
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
      * testRehash().
      */
     public function testRehash()

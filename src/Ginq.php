@@ -55,6 +55,18 @@ class Ginq implements IteratorAggregate
     // aliases.
 
     /**
+     * @deprecated Alias method to rehash().
+     *
+     * @param string|callable      $valueSelector
+     * @param string|callable|null $keySelector
+     * @return Ginq
+     */
+    public function sequence($valueSelector, $keySelector = null)
+    {
+        return $this->rehash($valueSelector, $keySelector);
+    }
+
+    /**
      * Alias method to select().
      *
      * @param string|callable      $valueSelector
