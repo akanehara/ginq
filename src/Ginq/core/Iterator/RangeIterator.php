@@ -13,57 +13,56 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Iterator;
-
-require_once dirname(__DIR__) . "/iter.php";
+namespace Ginq\core\iterator;
 
 /**
- * ReverseIterator
+ * RangeIterator
  * @package Ginq
  */
-class ReverseIterator implements \Iterator
+class RangeIterator implements \Iterator
 {
-    private $it;
+    private $start;
+    private $stop;
+    private $step;
 
-    private $items;
     private $i;
+    private $x;
 
-    public function __construct($xs)
+    public function __construct($start, $stop,  $step)
     {
-        $this->it = \Ginq\iter($xs);
+        $this->start = $start;
+        $this->stop  = $stop;
+        $this->step  = $step;
     }
 
     public function current()
     {
-        return $this->items[$this->i][1];
+        return $this->x;
     }
 
     public function key() 
     {
-        return $this->items[$this->i][0];
+        return $this->i;
     }
 
     public function next()
     {
-        $this->i--;
+        $this->i++;
+        $this->x += $this->step;
     }
 
     public function rewind()
     {
         $this->i = 0;
-        $this->it->rewind();
-        $this->items = array();
-        $len = 0;
-        foreach ($this->it as $k => $v) {
-            array_push($this->items, array($k, $v));
-            $len++;
-        }
-        $this->i = $len - 1;
+        $this->x = $this->start;
     }
 
     public function valid()
     {
-        return 0 <= $this->i;
+        if (0 <= $this->step) {
+            return $this->x <= $this->stop;
+        } else {
+            return $this->stop <= $this->x;
+        }
     }
 }
-

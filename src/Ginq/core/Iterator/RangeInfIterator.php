@@ -13,20 +13,24 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Iterator;
+namespace Ginq\core\iterator;
 
 /**
- * RepeatIterator
+ * RangeInfIterator
  * @package Ginq
  */
-class RepeatIterator implements \Iterator
+class RangeInfIterator implements \Iterator
 {
+    private $start;
+    private $step;
+
     private $i;
     private $x;
 
-    public function __construct($x)
+    public function __construct($start, $step)
     {
-        $this->x = $x;
+        $this->start = $start;
+        $this->step  = $step;
     }
 
     public function current()
@@ -42,11 +46,13 @@ class RepeatIterator implements \Iterator
     public function next()
     {
         $this->i++;
+        $this->x += $this->step;
     }
 
     public function rewind()
     {
         $this->i = 0;
+        $this->x = $this->start;
     }
 
     public function valid()

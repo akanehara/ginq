@@ -13,20 +13,23 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Iterator;
+namespace Ginq\core\iterator;
 
 /**
- * CycleIterator
+ * DropIterator
  * @package Ginq
  */
-class CycleIterator implements \Iterator
+class DropIterator implements \Iterator
 {
-    private $i;
     private $it;
+    private $n;
 
-    public function __construct($xs)
+    private $i;
+
+    public function __construct($xs, $n)
     {
-        $this->it = \Ginq\iter($xs);
+        $this->it = \Ginq\core\iter($xs);
+        $this->n  = $n;
     }
 
     public function current()
@@ -43,16 +46,19 @@ class CycleIterator implements \Iterator
     {
         $this->i++;
         $this->it->next();
-        $v = $this->it->valid();
-        if (!$v) {
-            $this->it->rewind();
-        }
     }
 
     public function rewind()
     {
         $this->i = 0;
         $this->it->rewind();
+        for ($j = 0; $j < $this->n; $j++) {
+            if ($this->it->valid()) {
+                $this->it->next();
+            } else {
+                break;
+            }
+        }
     }
 
     public function valid()

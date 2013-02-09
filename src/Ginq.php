@@ -14,8 +14,8 @@
  * @package    Ginq
  */
 
-require_once __DIR__ . "/Ginq/iter.php";
-require_once __DIR__ . "/Ginq/selector.php";
+require_once __DIR__ . "/Ginq/core/iter.php";
+require_once __DIR__ . "/Ginq/core/selector.php";
 
 /**
  * Ginq
@@ -30,16 +30,16 @@ class Ginq implements IteratorAggregate
     protected $it;
 
     /**
-     * @var Ginq\IterProvider
+     * @var Ginq\core\IterProvider
      */
     protected static $gen = null;
 
     public static function useIterator() {
-        self::$gen = new Ginq\IterProviderIterImpl();
+        self::$gen = new Ginq\core\IterProviderIterImpl();
     }
 
     public static function useGenerator() {
-        self::$gen = new Ginq\IterProviderGenImpl();
+        self::$gen = new Ginq\core\IterProviderGenImpl();
     }
 
     /**
@@ -194,7 +194,7 @@ class Ginq implements IteratorAggregate
      */
     public static function seq($start = 0)
     {
-        return Ginq\seq($start);
+        return Ginq\core\selector\seq($start);
     }
 
     /**
@@ -204,7 +204,7 @@ class Ginq implements IteratorAggregate
      */
     public function getIterator()
     {
-        return Ginq\iter($this->it);
+        return Ginq\core\iter($this->it);
     }
 
     /**
@@ -553,7 +553,7 @@ class Ginq implements IteratorAggregate
         if ($xs instanceof self) {
             return $xs;
         } else {
-            return new self(Ginq\iter($xs));
+            return new self(Ginq\core\iter($xs));
         }
     }
     
@@ -704,7 +704,7 @@ class Ginq implements IteratorAggregate
         } else {
             $keyJoinSelector = self::_parse_join_selector($keyJoinSelector);
         }
-        $innerLookup = Ginq\Lookup::from($inner, $innerKeySelector);
+        $innerLookup = Ginq\core\Lookup::from($inner, $innerKeySelector);
         return $this->selectManyWith(
             function($outer, $outerKey) use ($innerLookup, $outerKeySelector) {
                 return $innerLookup->get(
@@ -731,7 +731,7 @@ class Ginq implements IteratorAggregate
         }
         return self::from(self::$gen->zip(
             $this->it,
-            Ginq\iter($rhs),
+            Ginq\core\iter($rhs),
             self::_parse_join_selector($valueJoinSelector),
             $keyJoinSelector
         ));
@@ -888,8 +888,6 @@ class Ginq implements IteratorAggregate
 }
 
 Ginq::_registerAutoloadFunction();
-if (class_exists("Generator")) {
-    Ginq::useGenerator();
-} else {
-    Ginq::useIterator();
-}
+
+Ginq::useIterator();
+

@@ -13,26 +13,26 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq;
+namespace Ginq\core;
 
-use Ginq\Iterator\ZeroIterator;
-use Ginq\Iterator\RangeIterator;
-use Ginq\Iterator\RangeInfIterator;
-use Ginq\Iterator\CycleIterator;
-use Ginq\Iterator\RepeatIterator;
-use Ginq\Iterator\RehashIterator;
-use Ginq\Iterator\SelectIterator;
-use Ginq\Iterator\WhereIterator;
-use Ginq\Iterator\ReverseIterator;
-use Ginq\Iterator\TakeIterator;
-use Ginq\Iterator\DropIterator;
-use Ginq\Iterator\TakeWhileIterator;
-use Ginq\Iterator\DropWhileIterator;
-use Ginq\Iterator\ConcatIterator;
-use Ginq\Iterator\SelectManyIterator;
-use Ginq\Iterator\SelectManyWithJoinIterator;
-use Ginq\Iterator\ZipIterator;
-use Ginq\Iterator\GroupByIterator;
+use Ginq\core\iterator\Zeroiterator;
+use Ginq\core\iterator\Rangeiterator;
+use Ginq\core\iterator\RangeInfiterator;
+use Ginq\core\iterator\Cycleiterator;
+use Ginq\core\iterator\Repeatiterator;
+use Ginq\core\iterator\Rehashiterator;
+use Ginq\core\iterator\Selectiterator;
+use Ginq\core\iterator\Whereiterator;
+use Ginq\core\iterator\Reverseiterator;
+use Ginq\core\iterator\Takeiterator;
+use Ginq\core\iterator\Dropiterator;
+use Ginq\core\iterator\TakeWhileiterator;
+use Ginq\core\iterator\DropWhileiterator;
+use Ginq\core\iterator\Concatiterator;
+use Ginq\core\iterator\SelectManyiterator;
+use Ginq\core\iterator\SelectManyWithJoiniterator;
+use Ginq\core\iterator\Zipiterator;
+use Ginq\core\iterator\GroupByiterator;
 
 /**
  * IterProviderIterImpl

@@ -496,7 +496,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $arr = Ginq::from(array(1,2,3,4,5))->toArray();
         $this->assertEquals(array(1,2,3,4,5), $arr);
 
-        // Iterator
+        // iterator
         $arr = Ginq::from(new ArrayIterator(array(1,2,3,4,5)))->toArray();
         $this->assertEquals(array(1,2,3,4,5), $arr);
 

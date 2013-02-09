@@ -13,25 +13,23 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Iterator;
-
-require_once dirname(__DIR__) . "/iter.php";
+namespace Ginq\core\iterator;
 
 /**
- * WhereIterator
+ * TakeIterator
  * @package Ginq
  */
-class WhereIterator implements \Iterator
+class TakeIterator implements \Iterator
 {
     private $it;
-    private $predicate;
+    private $n;
 
     private $i;
 
-    public function __construct($xs, $predicate)
+    public function __construct($xs, $n)
     {
-        $this->it = \Ginq\iter($xs);
-        $this->predicate = $predicate;
+        $this->it = \Ginq\core\iter($xs);
+        $this->n  = $n;
     }
 
     public function current()
@@ -43,34 +41,25 @@ class WhereIterator implements \Iterator
     {
         return $this->it->key();
     }
-    
-    private function nextSatisfied() {
-        $p = $this->predicate;
-        while ($this->it->valid()) {
-            if ($p($this->it->current(), $this->it->key())) {
-                break;
-            } else {
-                $this->it->next();
-            }
-        }
-    }
 
     public function next()
     {
-        $this->it->next();
         $this->i++;
-        $this->nextSatisfied();
+        $this->it->next();
     }
 
     public function rewind()
     {
         $this->i = 0;
         $this->it->rewind();
-        $this->nextSatisfied();
     }
 
     public function valid()
     {
-        return $this->it->valid();
+        if ($this->i < $this->n) {
+            return $this->it->valid();
+        } else {
+            return false;
+        }
     }
 }

@@ -13,51 +13,55 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Iterator;
-
-require_once dirname(__DIR__) . "/iter.php";
+namespace Ginq\core\iterator;
 
 /**
- * SelectIterator
+ * ConcatIterator
  * @package Ginq
  */
-class SelectIterator implements \Iterator
+class ConcatIterator implements \Iterator
 {
+    private $it0;
+    private $it1;
     private $it;
-    private $valueSelector;
-    private $keySelector;
 
     private $i;
 
-    public function __construct($xs, $valueSelector, $keySelector)
+    public function __construct($xs, $ys)
     {
-        $this->it = \Ginq\iter($xs);
-        $this->valueSelector = $valueSelector;
-        $this->keySelector = $keySelector;
+        $this->it0 = \Ginq\core\iter($xs);
+        $this->it1 = \Ginq\core\iter($ys);
     }
 
     public function current()
     {
-        $f = $this->valueSelector;
-        return $f($this->it->current(), $this->it->key());
+        return $this->it->current();
     }
 
     public function key() 
     {
-        $f = $this->keySelector;
-        return $f($this->it->current(), $this->it->key());
+        return $this->it->key();
     }
 
     public function next()
     {
         $this->i++;
         $this->it->next();
+        if ($this->it === $this->it0 && !$this->it->valid()) {
+            $this->it = $this->it1;
+        }
     }
 
     public function rewind()
     {
         $this->i = 0;
-        $this->it->rewind();
+        $this->it0->rewind();
+        $this->it1->rewind();
+        if ($this->it0->valid()) {
+            $this->it = $this->it0;
+        } else {
+            $this->it = $this->it1;
+        }
     }
 
     public function valid()

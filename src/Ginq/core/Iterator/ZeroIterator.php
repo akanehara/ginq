@@ -13,48 +13,34 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Iterator;
-
-require_once dirname(__DIR__) . "/iter.php";
+namespace Ginq\core\iterator;
 
 /**
- * RehashIterator
+ * ZeroIterator
  * @package Ginq
  */
-class RehashIterator implements \Iterator
+class ZeroIterator implements \Iterator
 {
-    private $it;
-    private $i;
-
-    public function __construct($xs)
-    {
-        $this->it = \Ginq\iter($xs);
-    }
-
     public function current()
     {
-        return $this->it->current();
+        return null;
     }
 
     public function key() 
     {
-        return $this->i;
+        return null;
     }
 
     public function next()
     {
-        $this->i++;
-        $this->it->next();
     }
 
     public function rewind()
     {
-        $this->i = 0;
-        $this->it->rewind();
     }
 
     public function valid()
     {
-        return $this->it->valid();
+        return false;
     }
 }
