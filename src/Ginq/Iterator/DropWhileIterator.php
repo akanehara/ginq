@@ -13,44 +13,59 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\core\iterator;
+namespace Ginq\Core\Iterator;
+
+require_once dirname(__DIR__) . "/iterator.php";
 
 /**
- * RepeatIterator
+ * DropWhileIterator
  * @package Ginq
  */
-class RepeatIterator implements \Iterator
+class DropWhileIterator implements \Iterator
 {
-    private $i;
-    private $x;
+    private $it;
+    private $predicate;
 
-    public function __construct($x)
+    private $i;
+
+    public function __construct($xs, $predicate)
     {
-        $this->x = $x;
+        $this->it = \Ginq\Core\iterator($xs);
+        $this->predicate = $predicate;
     }
 
     public function current()
     {
-        return $this->x;
+        return $this->it->current();
     }
 
     public function key() 
     {
-        return $this->i;
+        return $this->it->key();
     }
-
+    
     public function next()
     {
+        $this->it->next();
         $this->i++;
     }
 
     public function rewind()
     {
         $this->i = 0;
+        $this->it->rewind();
+        $p = $this->predicate;
+        while ($this->it->valid()) {
+            if ($p($this->it->current(), $this->it->key())) {
+                $this->it->next();
+            } else {
+                break;
+            }
+        }
     }
 
     public function valid()
     {
-        return true;
+        return $this->it->valid();
     }
 }

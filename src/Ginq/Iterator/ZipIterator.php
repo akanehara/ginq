@@ -13,7 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\core\iterator;
+namespace Ginq\Core\Iterator;
 
 /**
  * ZipIterator
@@ -33,8 +33,8 @@ class ZipIterator implements \Iterator
     {
         $this->valueJoinSelector = $valueJoinSelector;
         $this->keyJoinSelector = $keyJoinSelector;
-        $this->it0 = \Ginq\core\iter($xs);
-        $this->it1 = \Ginq\core\iter($ys);
+        $this->it0 = \Ginq\Core\iterator($xs);
+        $this->it1 = \Ginq\Core\iterator($ys);
     }
 
     public function current()

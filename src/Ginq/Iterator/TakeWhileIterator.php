@@ -13,50 +13,54 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\core\iterator;
+namespace Ginq\Core\Iterator;
+
+require_once dirname(__DIR__) . "/iterator.php";
 
 /**
- * RangeInfIterator
+ * TakeWhileIterator
  * @package Ginq
  */
-class RangeInfIterator implements \Iterator
+class TakeWhileIterator implements \Iterator
 {
-    private $start;
-    private $step;
+    private $it;
+    private $predicate;
 
     private $i;
-    private $x;
+    private $valid;
 
-    public function __construct($start, $step)
+    public function __construct($xs, $predicate)
     {
-        $this->start = $start;
-        $this->step  = $step;
+        $this->it = \Ginq\Core\iterator($xs);
+        $this->predicate = $predicate;
     }
 
     public function current()
     {
-        return $this->x;
+        return $this->it->current();
     }
 
     public function key() 
     {
-        return $this->i;
+        return $this->it->key();
     }
-
+    
     public function next()
     {
         $this->i++;
-        $this->x += $this->step;
+        $this->it->next();
     }
 
     public function rewind()
     {
         $this->i = 0;
-        $this->x = $this->start;
+        $this->it->rewind();
     }
 
     public function valid()
     {
-        return true;
+        $p = $this->predicate;
+        return $this->it->valid()
+            && $p($this->it->current(), $this->it->key());
     }
 }

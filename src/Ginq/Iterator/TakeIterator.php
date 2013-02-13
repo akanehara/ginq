@@ -13,22 +13,23 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\core\iterator;
-
-require_once dirname(__DIR__) . "/iter.php";
+namespace Ginq\Core\Iterator;
 
 /**
- * RehashIterator
+ * TakeIterator
  * @package Ginq
  */
-class RehashIterator implements \Iterator
+class TakeIterator implements \Iterator
 {
     private $it;
+    private $n;
+
     private $i;
 
-    public function __construct($xs)
+    public function __construct($xs, $n)
     {
-        $this->it = \Ginq\core\iter($xs);
+        $this->it = \Ginq\Core\iterator($xs);
+        $this->n  = $n;
     }
 
     public function current()
@@ -38,7 +39,7 @@ class RehashIterator implements \Iterator
 
     public function key() 
     {
-        return $this->i;
+        return $this->it->key();
     }
 
     public function next()
@@ -55,6 +56,10 @@ class RehashIterator implements \Iterator
 
     public function valid()
     {
-        return $this->it->valid();
+        if ($this->i < $this->n) {
+            return $this->it->valid();
+        } else {
+            return false;
+        }
     }
 }

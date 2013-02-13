@@ -13,9 +13,9 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\core\iterator;
+namespace Ginq\Core\Iterator;
 
-require_once dirname(__DIR__) . "/iter.php";
+require_once dirname(__DIR__) . "/iterator.php";
 
 /**
  * SelectManyWithJoinIterator
@@ -33,7 +33,7 @@ class SelectManyWithJoinIterator implements \Iterator
 
     public function __construct($xs, $manySelector, $valueJoinSelector, $keyJoinSelector)
     {
-        $this->outer = \Ginq\core\iter($xs);
+        $this->outer = \Ginq\Core\iterator($xs);
         $this->manySelector = $manySelector;
         $this->valueJoinSelector = $valueJoinSelector;
         $this->keyJoinSelector = $keyJoinSelector;
@@ -82,7 +82,7 @@ class SelectManyWithJoinIterator implements \Iterator
     {
         if ($this->outer->valid()) {
             $k = $this->manySelector;
-            $this->inner = \Ginq\core\iter(
+            $this->inner = \Ginq\Core\iterator(
                 $k($this->outer->current(), $this->outer->key())
             );
         }

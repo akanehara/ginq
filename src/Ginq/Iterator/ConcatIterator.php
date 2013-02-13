@@ -13,57 +13,59 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\core\iterator;
-
-require_once dirname(__DIR__) . "/iter.php";
+namespace Ginq\Core\Iterator;
 
 /**
- * ReverseIterator
+ * ConcatIterator
  * @package Ginq
  */
-class ReverseIterator implements \Iterator
+class ConcatIterator implements \Iterator
 {
+    private $it0;
+    private $it1;
     private $it;
 
-    private $items;
     private $i;
 
-    public function __construct($xs)
+    public function __construct($xs, $ys)
     {
-        $this->it = \Ginq\core\iter($xs);
+        $this->it0 = \Ginq\Core\iterator($xs);
+        $this->it1 = \Ginq\Core\iterator($ys);
     }
 
     public function current()
     {
-        return $this->items[$this->i][1];
+        return $this->it->current();
     }
 
     public function key() 
     {
-        return $this->items[$this->i][0];
+        return $this->it->key();
     }
 
     public function next()
     {
-        $this->i--;
+        $this->i++;
+        $this->it->next();
+        if ($this->it === $this->it0 && !$this->it->valid()) {
+            $this->it = $this->it1;
+        }
     }
 
     public function rewind()
     {
         $this->i = 0;
-        $this->it->rewind();
-        $this->items = array();
-        $len = 0;
-        foreach ($this->it as $k => $v) {
-            array_push($this->items, array($k, $v));
-            $len++;
+        $this->it0->rewind();
+        $this->it1->rewind();
+        if ($this->it0->valid()) {
+            $this->it = $this->it0;
+        } else {
+            $this->it = $this->it1;
         }
-        $this->i = $len - 1;
     }
 
     public function valid()
     {
-        return 0 <= $this->i;
+        return $this->it->valid();
     }
 }
-

@@ -13,56 +13,50 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\core\iterator;
+namespace Ginq\Core\Iterator;
 
 /**
- * RangeIterator
+ * CycleIterator
  * @package Ginq
  */
-class RangeIterator implements \Iterator
+class CycleIterator implements \Iterator
 {
-    private $start;
-    private $stop;
-    private $step;
-
     private $i;
-    private $x;
+    private $it;
 
-    public function __construct($start, $stop,  $step)
+    public function __construct($xs)
     {
-        $this->start = $start;
-        $this->stop  = $stop;
-        $this->step  = $step;
+        $this->it = \Ginq\Core\iterator($xs);
     }
 
     public function current()
     {
-        return $this->x;
+        return $this->it->current();
     }
 
     public function key() 
     {
-        return $this->i;
+        return $this->it->key();
     }
 
     public function next()
     {
         $this->i++;
-        $this->x += $this->step;
+        $this->it->next();
+        $v = $this->it->valid();
+        if (!$v) {
+            $this->it->rewind();
+        }
     }
 
     public function rewind()
     {
         $this->i = 0;
-        $this->x = $this->start;
+        $this->it->rewind();
     }
 
     public function valid()
     {
-        if (0 <= $this->step) {
-            return $this->x <= $this->stop;
-        } else {
-            return $this->stop <= $this->x;
-        }
+        return $this->it->valid();
     }
 }

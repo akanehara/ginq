@@ -13,25 +13,34 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\core;
+namespace Ginq\Core\Iterator;
 
 /**
+ * ZeroIterator
  * @package Ginq
- * @param mixed $xs
- * @throws \InvalidArgumentException
- * @return \Iterator
  */
-function iter($xs)
+class ZeroIterator implements \Iterator
 {
-    if ($xs instanceof \Iterator) {
-        return $xs;
-    } else if ($xs instanceof \IteratorAggregate) {
-        return $xs->getIterator();
-    } else if (is_array($xs)) {
-        return new \ArrayIterator($xs);
-    } else {
-        $t = gettype($xs);
-        throw new \InvalidArgumentException("'$t' object is not iterable");
+    public function current()
+    {
+        return null;
+    }
+
+    public function key() 
+    {
+        return null;
+    }
+
+    public function next()
+    {
+    }
+
+    public function rewind()
+    {
+    }
+
+    public function valid()
+    {
+        return false;
     }
 }
-

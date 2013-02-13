@@ -13,11 +13,11 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\core\iterator;
+namespace Ginq\Core\Iterator;
 
-use Ginq\core\Lookup;
+use Ginq\Core\Lookup;
 
-require_once dirname(__DIR__) . "/iter.php";
+require_once dirname(__DIR__) . "/iterator.php";
 
 /**
  * GroupByIterator
@@ -35,7 +35,7 @@ class GroupByIterator implements \Iterator
 
     public function __construct($xs, $groupingKeySelector, $elementSelector, $groupSelector)
     {
-        $this->it = \Ginq\core\iter($xs);
+        $this->it = \Ginq\Core\iterator($xs);
         $this->groupingKeySelector = $groupingKeySelector;
         $this->elementSelector = $elementSelector;
         $this->groupSelector   = $groupSelector;

@@ -13,20 +13,22 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\core\iterator;
+namespace Ginq\Iterator;
+
+require_once dirname(__DIR__) . "/iterator.php";
 
 /**
- * CycleIterator
+ * RehashIterator
  * @package Ginq
  */
-class CycleIterator implements \Iterator
+class RehashIterator implements \Iterator
 {
-    private $i;
     private $it;
+    private $i;
 
     public function __construct($xs)
     {
-        $this->it = \Ginq\core\iter($xs);
+        $this->it = \Ginq\Core\iterator($xs);
     }
 
     public function current()
@@ -36,17 +38,13 @@ class CycleIterator implements \Iterator
 
     public function key() 
     {
-        return $this->it->key();
+        return $this->i;
     }
 
     public function next()
     {
         $this->i++;
         $this->it->next();
-        $v = $this->it->valid();
-        if (!$v) {
-            $this->it->rewind();
-        }
     }
 
     public function rewind()
