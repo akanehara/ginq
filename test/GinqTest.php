@@ -178,7 +178,6 @@ class GinqTest extends PHPUnit_Framework_TestCase
             ), $dict
         );
         
-        
         // key and value
         $dict = Ginq::from($data)->toDictionary(
             'name', // it means `function($x, $k) { return $x['name']; }`
@@ -496,7 +495,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $arr = Ginq::from(array(1,2,3,4,5))->toArray();
         $this->assertEquals(array(1,2,3,4,5), $arr);
 
-        // iterator
+        // Iterator
         $arr = Ginq::from(new ArrayIterator(array(1,2,3,4,5)))->toArray();
         $this->assertEquals(array(1,2,3,4,5), $arr);
 
@@ -667,11 +666,9 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $expected = array(array(0, 2),array(1, 4),array(2, 6));
 
         $actual = \Ginq::from(array())->concat(array(2,4,6))->toAssoc();
-        var_dump($actual);
         $this->assertEquals($expected, $actual);
 
         $actual = \Ginq::from(array(2,4,6))->concat(array())->toAssoc();
-        var_dump($actual);
         $this->assertEquals($expected, $actual);
     }
 
@@ -808,7 +805,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
             },
-            Ginq::seq()
+            Ginq::COUNTER
         )->toArray();
         $this->assertEquals(
             array(

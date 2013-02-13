@@ -13,9 +13,10 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
 
-require_once dirname(__DIR__) . "/iterator.php";
+use Ginq\Core\Selector;
+use Ginq\Util\IteratorUtil;
 
 /**
  * SelectIterator
@@ -23,29 +24,50 @@ require_once dirname(__DIR__) . "/iterator.php";
  */
 class SelectIterator implements \Iterator
 {
+    /**
+     * @var \Iterator
+     */
     private $it;
+
+    /**
+     * @var Selector
+     */
     private $valueSelector;
+
+    /**
+     * @var Selector
+     */
     private $keySelector;
 
+    /**
+     * @var int
+     */
     private $i;
 
+    /**
+     * @param $xs
+     * @param Selector $valueSelector
+     * @param Selector $keySelector
+     */
     public function __construct($xs, $valueSelector, $keySelector)
     {
-        $this->it = \Ginq\Core\iterator($xs);
+        $this->it = IteratorUtil::iterator($xs);
         $this->valueSelector = $valueSelector;
         $this->keySelector = $keySelector;
     }
 
     public function current()
     {
-        $f = $this->valueSelector;
-        return $f($this->it->current(), $this->it->key());
+        return $this->valueSelector->select(
+            $this->it->current(), $this->it->key()
+        );
     }
 
     public function key() 
     {
-        $f = $this->keySelector;
-        return $f($this->it->current(), $this->it->key());
+        return $this->keySelector->select(
+            $this->it->current(), $this->it->key()
+        );
     }
 
     public function next()

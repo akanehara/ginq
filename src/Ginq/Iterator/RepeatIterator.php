@@ -13,7 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
 
 /**
  * RepeatIterator
@@ -21,9 +21,19 @@ namespace Ginq\Core\Iterator;
  */
 class RepeatIterator implements \Iterator
 {
+    /**
+     * @var int
+     */
     private $i;
+
+    /**
+     * @var mixed
+     */
     private $x;
 
+    /**
+     * @param mixed $x
+     */
     public function __construct($x)
     {
         $this->x = $x;

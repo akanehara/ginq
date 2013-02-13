@@ -13,9 +13,10 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
 
-require_once dirname(__DIR__) . "/iterator.php";
+use Ginq\Core\Selector;
+use Ginq\Util\IteratorUtil;
 
 /**
  * SelectManyIterator
@@ -23,15 +24,34 @@ require_once dirname(__DIR__) . "/iterator.php";
  */
 class SelectManyIterator implements \Iterator
 {
+
+    /**
+     * @var \Ginq\Core\Selector
+     */
     private $manySelector;
 
+    /**
+     * @var \Iterator
+     */
     private $outer;
+
+    /**
+     * @var \Iterator
+     */
     private $inner;
+
+    /**
+     * @var int
+     */
     private $i;
 
+    /**
+     * @param \Iterator $xs
+     * @param Selector $manySelector
+     */
     public function __construct($xs, $manySelector)
     {
-        $this->outer = \Ginq\Core\iterator($xs);
+        $this->outer = IteratorUtil::iterator($xs);
         $this->manySelector = $manySelector;
     }
 
@@ -65,9 +85,11 @@ class SelectManyIterator implements \Iterator
     protected function nextInner()
     {
         if ($this->outer->valid()) {
-            $k = $this->manySelector;
-            $this->inner = \Ginq\Core\iterator(
-                $k($this->outer->current(), $this->outer->key())
+            $this->inner = IteratorUtil::iterator(
+                $this->manySelector->select(
+                    $this->outer->current(),
+                    $this->outer->key()
+                )
             );
         }
     }

@@ -13,9 +13,9 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
 
-require_once dirname(__DIR__) . "/iterator.php";
+use Ginq\Util\IteratorUtil;
 
 /**
  * ReverseIterator
@@ -23,14 +23,24 @@ require_once dirname(__DIR__) . "/iterator.php";
  */
 class ReverseIterator implements \Iterator
 {
+    /**
+     * @var \Iterator
+     */
     private $it;
 
+    /**
+     * @var array
+     */
     private $items;
+
+    /**
+     * @var int
+     */
     private $i;
 
     public function __construct($xs)
     {
-        $this->it = \Ginq\Core\iterator($xs);
+        $this->it = IteratorUtil::iterator($xs);
     }
 
     public function current()

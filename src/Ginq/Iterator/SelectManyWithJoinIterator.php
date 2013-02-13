@@ -13,9 +13,11 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
 
-require_once dirname(__DIR__) . "/iterator.php";
+use Ginq\Util\IteratorUtil;
+use Ginq\Core\Selector;
+use Ginq\Core\JoinSelector;
 
 /**
  * SelectManyWithJoinIterator
@@ -23,17 +25,45 @@ require_once dirname(__DIR__) . "/iterator.php";
  */
 class SelectManyWithJoinIterator implements \Iterator
 {
+    /**
+     * @var Selector
+     */
     private $manySelector;
+
+    /**
+     * @var JoinSelector
+     */
     private $valueJoinSelector;
+
+    /**
+     * @var JoinSelector
+     */
     private $keyJoinSelector;
 
+    /**
+     * @var \Iterator
+     */
     private $outer;
+
+    /**
+     * @var \Iterator
+     */
     private $inner;
+
+    /**
+     * @var int
+     */
     private $i;
 
+    /**
+     * @param $xs
+     * @param Selector $manySelector
+     * @param JoinSelector $valueJoinSelector
+     * @param JoinSelector $keyJoinSelector
+     */
     public function __construct($xs, $manySelector, $valueJoinSelector, $keyJoinSelector)
     {
-        $this->outer = \Ginq\Core\iterator($xs);
+        $this->outer = IteratorUtil::iterator($xs);
         $this->manySelector = $manySelector;
         $this->valueJoinSelector = $valueJoinSelector;
         $this->keyJoinSelector = $keyJoinSelector;
@@ -41,8 +71,7 @@ class SelectManyWithJoinIterator implements \Iterator
 
     public function current()
     {
-        $f = $this->valueJoinSelector;
-        return $f(
+        return $this->valueJoinSelector->joinSelect(
             $this->outer->current(),
             $this->inner->current(),
             $this->outer->key(),
@@ -52,8 +81,7 @@ class SelectManyWithJoinIterator implements \Iterator
 
     public function key() 
     {
-        $f = $this->keyJoinSelector;
-        return $f(
+        return $this->keyJoinSelector->joinSelect(
             $this->outer->current(),
             $this->inner->current(),
             $this->outer->key(),
@@ -81,9 +109,11 @@ class SelectManyWithJoinIterator implements \Iterator
     protected function nextInner()
     {
         if ($this->outer->valid()) {
-            $k = $this->manySelector;
-            $this->inner = \Ginq\Core\iterator(
-                $k($this->outer->current(), $this->outer->key())
+            $this->inner = IteratorUtil::iterator(
+                $this->manySelector->select(
+                    $this->outer->current(),
+                    $this->outer->key()
+                )
             );
         }
     }

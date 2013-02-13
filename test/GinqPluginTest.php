@@ -22,8 +22,8 @@ class GinqPluginTest extends PHPUnit_Framework_TestCase {
     	$functions = Ginq::listRegisterdFunctions();
 
     	$this->assertCount(1, $functions);
-    	$this->assertArrayHasKey('each', $functions);
-    	$this->assertEquals(array('SamplePlugin', 'each'), $functions['each']);
+    	$this->assertArrayHasKey('eachEager', $functions);
+    	$this->assertEquals(array('SamplePlugin', 'eachEager'), $functions['eachEager']);
     }
 
     public function testUsePluginFunction() {
@@ -31,7 +31,7 @@ class GinqPluginTest extends PHPUnit_Framework_TestCase {
 
     	$sum = 0;
     	Ginq::range(1, 10)
-    		->each(function ($v) use(&$sum) {
+    		->eachEager(function ($v) use(&$sum) {
     			$sum += $v;
     		})
    		;
@@ -45,7 +45,7 @@ class SamplePlugin {
 		Ginq::register(get_called_class());
 	}
 
-	public static function each(\Ginq $self, $selector) {
+	public static function eachEager(\Ginq $self, $selector) {
 		if (is_null($selector)) {
 			throw new \ArgumentException('must be passed closure as 2nd argument.');
 		}

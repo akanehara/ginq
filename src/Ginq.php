@@ -14,8 +14,12 @@
  * @package    Ginq
  */
 
-require_once __DIR__ . "/Ginq/core/iter.php";
-require_once __DIR__ . "/Ginq/core/selector.php";
+use Ginq\Core\Selector;
+use Ginq\Core\JoinSelector;
+use Ginq\Selector\SelectorParser;
+use Ginq\JoinSelector\JoinSelectorParser;
+use Ginq\Predicate\PredicateParser;
+use Ginq\Util\IteratorUtil;
 
 /**
  * Ginq
@@ -24,22 +28,23 @@ require_once __DIR__ . "/Ginq/core/selector.php";
  */
 class Ginq implements IteratorAggregate
 {
+
+    const COUNTER = SelectorParser::COUNTER;
+    const VALUE_OF = SelectorParser::VALUE_OF;
+    const KEY_OF = SelectorParser::KEY_OF;
+
     /**
      * @var array|Traversable
      */
     protected $it;
 
     /**
-     * @var Ginq\core\IterProvider
+     * @var Ginq\Core\IterProvider
      */
     protected static $gen = null;
 
     public static function useIterator() {
-        self::$gen = new Ginq\core\IterProviderIterImpl();
-    }
-
-    public static function useGenerator() {
-        self::$gen = new Ginq\core\IterProviderGenImpl();
+        self::$gen = new Ginq\Core\IterProviderIterImpl();
     }
 
     /**
@@ -65,8 +70,8 @@ class Ginq implements IteratorAggregate
     /**
      * Alias method to select().
      *
-     * @param string|callable      $valueSelector
-     * @param string|callable|null $keySelector
+     * @param Closure|string|int|Selector      $valueSelector
+     * @param Closure|string|int|Selector|null $keySelector
      * @return Ginq
      */
     public function map($valueSelector, $keySelector = null)
@@ -88,8 +93,8 @@ class Ginq implements IteratorAggregate
     /**
      * Alias method to filter().
      *
-     * @param string|callable      $valueSelector
-     * @param string|callable|null $keySelector
+     * @param Closure|string|int|Selector      $valueSelector
+     * @param Closure|string|int|Selector|null $keySelector
      * @return Ginq
      */
     public function collect($valueSelector, $keySelector = null)
@@ -189,12 +194,13 @@ class Ginq implements IteratorAggregate
     // methods.
 
     /**
+     * @deprecated
      * @param int $start
      * @return callable
      */
     public static function seq($start = 0)
     {
-        return Ginq\core\selector\seq($start);
+        return new Ginq\Selector\CountSelector($start);
     }
 
     /**
@@ -204,7 +210,7 @@ class Ginq implements IteratorAggregate
      */
     public function getIterator()
     {
-        return Ginq\core\iter($this->it);
+        return IteratorUtil::iterator($this->it);
     }
 
     /**
@@ -264,28 +270,27 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param callable|null $keySelector   ($value, $key)
-     * @param callable|null $valueSelector ($value, $key)
+     * @param Closure|string|int|Selector|null $keySelector   ($value, $key)
+     * @param Closure|string|int|Selector|null $valueSelector ($value, $key)
      * @return array
      */
     public function toDictionary($keySelector = null, $valueSelector = null)
     {
-        $keySelector = Ginq::_parse_selector($keySelector);
-        if (is_null($valueSelector)) {
-            $valueSelector = function($v, $k) { return $v; };
-        } else {
-            $valueSelector = Ginq::_parse_selector($valueSelector);
-        }
         if (is_null($keySelector)) {
-            $keySelector = function($v, $k) { return $k; };
+            $keySelector = SelectorParser::parse(SelectorParser::KEY_OF);
         } else {
-            $keySelector = Ginq::_parse_selector($keySelector);
+            $keySelector = SelectorParser::parse($keySelector);
+        }
+        if (is_null($valueSelector)) {
+            $valueSelector = SelectorParser::parse(SelectorParser::VALUE_OF);
+        } else {
+            $valueSelector = SelectorParser::parse($valueSelector);
         }
         return $this->fold(
             array(),
             function($acc, $v0, $k0) use ($keySelector, $valueSelector) {
-                $k1 = $keySelector($v0, $k0);
-                $v1 = $valueSelector($v0, $k0);
+                $k1 = $keySelector->select($v0, $k0);
+                $v1 = $valueSelector->select($v0, $k0);
                 if ($v1 instanceof \Iterator || $v1 instanceof \IteratorAggregate) {
                     $v1 = Ginq::from($v1)->toArrayRec();
                 }
@@ -296,28 +301,28 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param callable      $combiner      ($exist, $value, $key)
-     * @param callable|null $keySelector   ($value, $kay)
-     * @param callable|null $valueSelector ($value, $key)
+     * @param callable                         $combiner      ($exist, $value, $key)
+     * @param Closure|string|int|Selector|null $keySelector   ($value, $kay)
+     * @param Closure|string|int|Selector|null $valueSelector ($value, $key)
      * @return array
      */
     public function toDictionaryWith($combiner, $keySelector = null, $valueSelector = null)
     {
         if (is_null($valueSelector)) {
-            $valueSelector = function($v, $k) { return $v; };
+            $valueSelector = SelectorParser::parse(SelectorParser::VALUE_OF);
         } else {
-            $valueSelector = Ginq::_parse_selector($valueSelector);
+            $valueSelector = SelectorParser::parse($valueSelector);
         }
         if (is_null($keySelector)) {
-            $keySelector = function($v, $k) { return $k; };
+            $keySelector = SelectorParser::parse(SelectorParser::KEY_OF);
         } else {
-            $keySelector = Ginq::_parse_selector($keySelector);
+            $keySelector = SelectorParser::parse($keySelector);
         }
         return $this->fold(
             array(),
             function($acc, $v0, $k0) use ($combiner, $keySelector, $valueSelector) {
-                $k1 = $keySelector($v0, $k0);
-                $v1 = $valueSelector($v0, $k0);
+                $k1 = $keySelector->select($v0, $k0);
+                $v1 = $valueSelector->select($v0, $k0);
                 if ($v1 instanceof \Iterator || $v1 instanceof \IteratorAggregate) {
                     $v1 = Ginq::from($v1)->toArrayRec();
                 }
@@ -337,9 +342,9 @@ class Ginq implements IteratorAggregate
      */
     public function any($predicate)
     {
-        $p = self::_parse_predicate($predicate);
+        $p = PredicateParser::parse($predicate);
         foreach ($this->it as $k => $v) {
-            if ($p($v, $k) == true) {
+            if ($p->predicate($v, $k) == true) {
                 return true;
             }
         }
@@ -352,9 +357,9 @@ class Ginq implements IteratorAggregate
      */
     public function all($predicate)
     {
-        $p = self::_parse_predicate($predicate);
+        $p = PredicateParser::parse($predicate);
         foreach ($this->it as $k => $v) {
-            if ($p($v, $k) == false) {
+            if ($p->predicate($v, $k) == false) {
                 return false;
             }
         }
@@ -459,7 +464,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param callable $operator ($accumulator, $value, $key)
+     * @param \Closure $operator ($accumulator, $value, $key)
      * @return mixed
      */
     public function reduceLeft($operator)
@@ -479,7 +484,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param callable $operator ($accumulator, $value, $key)
+     * @param \Closure $operator ($accumulator, $value, $key)
      * @return mixed
      */
     public function reduceRight($operator)
@@ -553,7 +558,7 @@ class Ginq implements IteratorAggregate
         if ($xs instanceof self) {
             return $xs;
         } else {
-            return new self(Ginq\core\iter($xs));
+            return new self(IteratorUtil::iterator($xs));
         }
     }
     
@@ -562,24 +567,24 @@ class Ginq implements IteratorAggregate
      */
     public function rehash()
     {
-        return self::from(self::$gen->rehash($this->it));
+        return self::from(self::$gen->renum($this->it));
     }
 
     /**
-     * @param string|callable $selector
-     * @param string|callable|null $keySelector
+     * @param Closure|string|int|Selector      $selector
+     * @param Closure|string|int|Selector|null $keySelector
      * @return Ginq
      */
-    public function select($selector, $keySelector = null)
+    public function select($valueSelector, $keySelector = null)
     {
         if (is_null($keySelector)) {
-            $keySelector = function($v, $k) { return $k; };
+            $keySelector = SelectorParser::parse(SelectorParser::KEY_OF);
         } else {
-            $keySelector = self::_parse_selector($keySelector);
+            $keySelector = SelectorParser::parse($keySelector);
         }
         return self::from(self::$gen->select(
             $this->it,
-            self::_parse_selector($selector),
+            SelectorParser::parse($valueSelector),
             $keySelector
         ));
     }
@@ -592,7 +597,7 @@ class Ginq implements IteratorAggregate
     {
         return self::from(self::$gen->where(
             $this->it,
-            self::_parse_predicate($predicate)
+            PredicateParser::parse($predicate)
         ));
     }
 
@@ -630,7 +635,7 @@ class Ginq implements IteratorAggregate
     {
         return self::from(self::$gen->takeWhile(
             $this->it,
-            self::_parse_predicate($predicate)
+            PredicateParser::parse($predicate)
         ));
     }
 
@@ -640,7 +645,7 @@ class Ginq implements IteratorAggregate
      */
     public function dropWhile($predicate)
     {
-        return self::from(self::$gen->dropWhile($this->it, self::_parse_predicate($predicate)));
+        return self::from(self::$gen->dropWhile($this->it, PredicateParser::parse($predicate)));
     }
 
     /**
@@ -655,179 +660,124 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param string|callable $manySelector
+     * @param Closure|string|int|Selector $manySelector
      * @return Ginq
      */
     public function selectMany($manySelector)
     {
         return self::from(self::$gen->selectMany(
             $this->it,
-            self::_parse_selector($manySelector)));
+            SelectorParser::parse($manySelector)));
     }
 
     /**
-     * @param string|callable $manySelector
-     * @param callable        $valueJoinSelector
-     * @param callable|null   $keyJoinSelector
+     * @param Closure|string|int|Selector $manySelector
+     * @param Closure|JoinSelector        $valueJoinSelector
+     * @param Closure|JoinSelector|null   $keyJoinSelector
      * @return Ginq
      */
     public function selectManyWith($manySelector, $valueJoinSelector, $keyJoinSelector = null)
     {
         if (is_null($keyJoinSelector)) {
-            $keyJoinSelector = function($v0, $k0, $v1, $k1) { return $k1; };
+            $keyJoinSelector = JoinSelectorParser::parse(
+                function($v0, $k0, $v1, $k1) { return $k1; }
+            );
         } else {
-            $keyJoinSelector = self::_parse_join_selector($keyJoinSelector);
+            $keyJoinSelector = JoinSelectorParser::parse($keyJoinSelector);
         }
         return self::from(self::$gen->selectManyWithJoin(
             $this->it,
-            self::_parse_selector($manySelector),
-            self::_parse_join_selector($valueJoinSelector),
+            SelectorParser::parse($manySelector),
+            JoinSelectorParser::parse($valueJoinSelector),
             $keyJoinSelector
         ));
     }
 
     /**
      * @param array|Traversable $inner
-     * @param string|callable      $outerKeySelector
-     * @param string|callable      $innerKeySelector
-     * @param string|callable      $valueJoinSelector
-     * @param string|callable|null $keyJoinSelector
+     * @param Closure|string|int|Selector $outerKeySelector
+     * @param Closure|string|int|Selector $innerKeySelector
+     * @param Closure|JoinSelector        $valueJoinSelector
+     * @param Closure|JoinSelector        $keyJoinSelector
      * @return Ginq
      */
     public function join(
         $inner, $outerKeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector = null)
     {
-        $outerKeySelector = self::_parse_selector($outerKeySelector);
-        $innerKeySelector = self::_parse_selector($innerKeySelector);
+        $outerKeySelector = SelectorParser::parse($outerKeySelector);
+        $innerKeySelector = SelectorParser::parse($innerKeySelector);
         if (is_null($keyJoinSelector)) {
-            $keyJoinSelector = function($v0, $v1, $k0, $k1) { return $k0; };
+            $keyJoinSelector = JoinSelectorParser::parse(
+                function($v0, $v1, $k0, $k1) { return $k0; }
+            );
         } else {
-            $keyJoinSelector = self::_parse_join_selector($keyJoinSelector);
+            $keyJoinSelector = JoinSelectorParser::parse($keyJoinSelector);
         }
-        $innerLookup = Ginq\core\Lookup::from($inner, $innerKeySelector);
+        $innerLookup = Ginq\Core\Lookup::from($inner, $innerKeySelector);
         return $this->selectManyWith(
             function($outer, $outerKey) use ($innerLookup, $outerKeySelector) {
                 return $innerLookup->get(
-                    $outerKeySelector($outer, $outerKey)
+                    $outerKeySelector->select($outer, $outerKey)
                 );
             },
-            self::_parse_join_selector($valueJoinSelector),
+            JoinSelectorParser::parse($valueJoinSelector),
             $keyJoinSelector
         );
     }
 
     /**
      * @param array|Traversable    $rhs
-     * @param string|callable      $valueJoinSelector
-     * @param string|callable|null $keyJoinSelector
+     * @param Closure|JoinSelector      $valueJoinSelector
+     * @param Closure|JoinSelector|null $keyJoinSelector
      * @return Ginq
      */
     public function zip($rhs, $valueJoinSelector, $keyJoinSelector = null)
     {
         if (is_null($keyJoinSelector)) {
-            $keyJoinSelector = function($v0, $v1, $k0, $k1) { return $k0; };
+            $keyJoinSelector = JoinSelectorParser::parse(
+                function($v0, $v1, $k0, $k1) { return $k0; }
+            );
         } else {
-            $keyJoinSelector = self::_parse_join_selector($keyJoinSelector);
+            $keyJoinSelector = JoinSelectorParser::parse($keyJoinSelector);
         }
         return self::from(self::$gen->zip(
             $this->it,
-            Ginq\core\iter($rhs),
-            self::_parse_join_selector($valueJoinSelector),
+            IteratorUtil::iterator($rhs),
+            JoinSelectorParser::parse($valueJoinSelector),
             $keyJoinSelector
         ));
     }
 
     /**
-     * @param string|callable      $groupingKeySelector
-     * @param string|callable|null $elementSelector
+     * @param Closure|string|int|Selector      $groupingKeySelector
+     * @param Closure|string|int|Selector|null $elementSelector
      * @return Ginq
      */
     public function groupBy($groupingKeySelector, $elementSelector = null)
     {
         if (is_null($elementSelector)) {
-            $elementSelector = function($v, $k) { return $v; };
+            $elementSelector = SelectorParser::parse(SelectorParser::VALUE_OF);
         } else {
-            $elementSelector = self::_parse_selector($elementSelector);
+            $elementSelector = SelectorParser::parse($elementSelector);
         }
         return self::from(self::$gen->groupBy(
             $this->it,
-            self::_parse_selector($groupingKeySelector),
+            SelectorParser::parse($groupingKeySelector),
             $elementSelector,
-            function ($xs, $k) { return Ginq::from($xs); }
+            SelectorParser::parse(function ($xs, $k) { return Ginq::from($xs); })
         ));
     }
 
-    /**
-     * @param string|callable $selector
-     * @return callable
-     * @throws InvalidArgumentException
-     * @throws DomainException
-     */
-    protected static function _parse_selector($selector)
-    {
-        if (is_string($selector)) {
-            return function($v, $k) use ($selector) {
-                if (is_array($v)) {
-                    return @$v[$selector];
-                } else if (is_object($v)) {
-                    return @$v->{$selector};
-                } else {
-                    $type = gettype($v);
-                    throw new DomainException("'$type' object has no key or field"); 
-                }
-            };
-        } else if (is_callable($selector)) {
-            return $selector;
-        } else {
-            $type = gettype($selector);
-            throw new InvalidArgumentException(
-                "'selector' string or callable expected, got $type");
+    /*
+    public function __callStatic($name, $args) {
+        if (isset(self::$registeredStaticFunctions[$name])) {
+            call_user_func_array(
+                self::$registeredStaticFunctions[$name], $args
+            );
         }
-    }
+    }*/
 
-    /**
-     * @param callable $joinSelector
-     * @return callable
-     * @throws InvalidArgumentException
-     */
-    protected static function _parse_join_selector($joinSelector)
-    {
-        if (is_callable($joinSelector)) {
-            return $joinSelector;
-        } else {
-            $type = gettype($joinSelector);
-            throw new InvalidArgumentException(
-                "'join selector' callable (2 arguments) expected, got $type");
-        }
-    }
-
-    /**
-     * @param string|callable $predicate
-     * @return callable
-     * @throws InvalidArgumentException
-     * @throws DomainException
-     */
-    protected static function _parse_predicate($predicate)
-    {
-        if (is_string($predicate)) {
-            return function($v, $k) use ($predicate) {
-                if (is_array($v)) {
-                    return @$v[$predicate];
-                } else if (is_object($v)) {
-                    return @$v->{$predicate};
-                } else {
-                    $type = gettype($v);
-                    throw new DomainException("'$type' object has no key or field"); 
-                }
-            };
-        } else if (is_callable($predicate)) {
-            return $predicate;
-        } else {
-            $type = gettype($predicate);
-            throw new InvalidArgumentException(
-                "'predicate' callable expected, got $type");
-        }
-    }
+    //private static $registeredStaticFunctions = array();
 
     public function __call($name, $args) {
         if (isset(self::$registeredFunctions[$name])) {
@@ -839,6 +789,7 @@ class Ginq implements IteratorAggregate
     }
 
     private static $registeredFunctions = array();
+
 
     public static function register($className) {
         $ref = new \ReflectionClass($className);
@@ -854,7 +805,6 @@ class Ginq implements IteratorAggregate
                 return ($c->getName() === 'Ginq') or $c->isSubclassOf('Ginq');
             })
             ->select(function ($m) { return $m->getName(); })
-            ->toArray()
         ;
 
         foreach ($funcNames as $func) {

@@ -13,9 +13,10 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
 
-require_once dirname(__DIR__) . "/iterator.php";
+use Ginq\Core\Predicate;
+use Ginq\Util\IteratorUtil;
 
 /**
  * DropWhileIterator
@@ -23,14 +24,28 @@ require_once dirname(__DIR__) . "/iterator.php";
  */
 class DropWhileIterator implements \Iterator
 {
+    /**
+     * @var \Iterator
+     */
     private $it;
+
+    /**
+     * @var Predicate
+     */
     private $predicate;
 
+    /**
+     * @var int
+     */
     private $i;
 
+    /**
+     * @param \Iterator $xs
+     * @param Predicate $predicate
+     */
     public function __construct($xs, $predicate)
     {
-        $this->it = \Ginq\Core\iterator($xs);
+        $this->it = IteratorUtil::iterator($xs);
         $this->predicate = $predicate;
     }
 
@@ -54,9 +69,10 @@ class DropWhileIterator implements \Iterator
     {
         $this->i = 0;
         $this->it->rewind();
-        $p = $this->predicate;
         while ($this->it->valid()) {
-            if ($p($this->it->current(), $this->it->key())) {
+            if ($this->predicate->predicate(
+                $this->it->current(), $this->it->key()
+            )) {
                 $this->it->next();
             } else {
                 break;

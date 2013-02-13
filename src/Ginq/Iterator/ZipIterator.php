@@ -13,7 +13,11 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
+
+use \Ginq\Core\Selector;
+use \Ginq\Core\JoinSelector;
+use \Ginq\Util\IteratorUtil;
 
 /**
  * ZipIterator
@@ -21,26 +25,48 @@ namespace Ginq\Core\Iterator;
  */
 class ZipIterator implements \Iterator
 {
+    /**
+     * @var JoinSelector
+     */
     private $valueJoinSelector;
+
+    /**
+     * @var JoinSelector
+     */
     private $keyJoinSelector;
 
+    /**
+     * @var \Iterator
+     */
     private $it0;
+
+    /**
+     * @var \Iterator
+     */
     private $it1;
 
+    /**
+     * @var int
+     */
     private $i;
 
+    /**
+     * @param \Iterator $xs
+     * @param \Iterator $ys
+     * @param JoinSelector $valueJoinSelector
+     * @param JoinSelector $keyJoinSelector
+     */
     public function __construct($xs, $ys, $valueJoinSelector, $keyJoinSelector)
     {
         $this->valueJoinSelector = $valueJoinSelector;
         $this->keyJoinSelector = $keyJoinSelector;
-        $this->it0 = \Ginq\Core\iterator($xs);
-        $this->it1 = \Ginq\Core\iterator($ys);
+        $this->it0 = IteratorUtil::iterator($xs);
+        $this->it1 = IteratorUtil::iterator($ys);
     }
 
     public function current()
     {
-        $f = $this->valueJoinSelector;
-        return $f(
+        return $this->valueJoinSelector->joinSelect(
             $this->it0->current(),
             $this->it1->current(),
             $this->it0->key(),
@@ -50,8 +76,7 @@ class ZipIterator implements \Iterator
 
     public function key() 
     {
-        $f = $this->keyJoinSelector;
-        return $f(
+        return $this->keyJoinSelector->joinSelect(
             $this->it0->current(),
             $this->it1->current(),
             $this->it0->key(),

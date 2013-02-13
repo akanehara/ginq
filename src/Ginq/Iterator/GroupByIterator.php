@@ -13,11 +13,12 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
 
 use Ginq\Core\Lookup;
-
-require_once dirname(__DIR__) . "/iterator.php";
+use Ginq\Core\Selector;
+use Ginq\Selector\DelegateSelector;
+use Ginq\Util\IteratorUtil;
 
 /**
  * GroupByIterator
@@ -25,17 +26,45 @@ require_once dirname(__DIR__) . "/iterator.php";
  */
 class GroupByIterator implements \Iterator
 {
+    /**
+     * @var Selector
+     */
     private $groupingKeySelector;
+
+    /**
+     * @var Selector
+     */
     private $elementSelector;
+
+    /**
+     * @var Selector
+     */
     private $groupSelector;
 
+    /**
+     * @var \Iterator
+     */
     private $it;
+
+    /**
+     * @var \Iterator
+     */
     private $group;
+
+    /**
+     * @var int
+     */
     private $i;
 
+    /**
+     * @param \Iterator $xs
+     * @param Selector $groupingKeySelector
+     * @param Selector $elementSelector
+     * @param Selector $groupSelector
+     */
     public function __construct($xs, $groupingKeySelector, $elementSelector, $groupSelector)
     {
-        $this->it = \Ginq\Core\iterator($xs);
+        $this->it = IteratorUtil::iterator($xs);
         $this->groupingKeySelector = $groupingKeySelector;
         $this->elementSelector = $elementSelector;
         $this->groupSelector   = $groupSelector;
@@ -46,10 +75,9 @@ class GroupByIterator implements \Iterator
         $group = new SelectIterator(
             $this->group->current(),
             $this->elementSelector,
-            function($x, $k) { return $k; }
+            new DelegateSelector(function($v, $k) { return $k; })
         );
-        $f = $this->groupSelector;
-        return $f($group, $this->group->key());
+        return $this->groupSelector->select($group, $this->group->key());
     }
 
     public function key() 
@@ -67,8 +95,9 @@ class GroupByIterator implements \Iterator
     {
         $this->i = 0;
         $this->it->rewind();
-        $f = $this->groupingKeySelector;
-        $this->group = Lookup::from($this->it, $f)->getIterator();
+        $this->group = Lookup::from(
+            $this->it, $this->groupingKeySelector
+        )->getIterator();
     }
 
     public function valid()

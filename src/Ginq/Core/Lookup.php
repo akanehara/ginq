@@ -13,7 +13,10 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\core;
+namespace Ginq\Core;
+
+use Ginq\Core\Selector;
+use Ginq\Util\IteratorUtil;
 
 /**
  * Lookup
@@ -34,14 +37,14 @@ class Lookup implements \IteratorAggregate
 
     /**
      * @param array|\Traversable $xs
-     * @param callable $keySelector
+     * @param Selector $keySelector
      * @return Lookup
      */
     public static function from($xs, $keySelector)
     {
         $lookup = new self();
         foreach ($xs as $k => $x) {
-            $lookup->put($keySelector($x, $k), $x);
+            $lookup->put($keySelector->select($x, $k), $x);
         }
         return $lookup;
     }
@@ -51,7 +54,7 @@ class Lookup implements \IteratorAggregate
      */
     public function getIterator()
     {
-        return iter($this->table);
+        return IteratorUtil::iterator($this->table);
     }
 
     /**

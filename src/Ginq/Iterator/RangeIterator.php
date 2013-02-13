@@ -13,7 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
 
 /**
  * RangeIterator
@@ -21,13 +21,36 @@ namespace Ginq\Core\Iterator;
  */
 class RangeIterator implements \Iterator
 {
+    /**
+     * @var int
+     */
     private $start;
+
+    /**
+     * @var int
+     */
     private $stop;
+
+    /**
+     * @var int
+     */
     private $step;
 
+    /**
+     * @var int
+     */
     private $i;
+
+    /**
+     * @var int
+     */
     private $x;
 
+    /**
+     * @param int $start
+     * @param int $stop
+     * @param int $step
+     */
     public function __construct($start, $stop,  $step)
     {
         $this->start = $start;

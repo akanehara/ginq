@@ -13,7 +13,9 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
+
+use Ginq\Util\IteratorUtil;
 
 /**
  * ConcatIterator
@@ -21,16 +23,34 @@ namespace Ginq\Core\Iterator;
  */
 class ConcatIterator implements \Iterator
 {
+    /**
+     * @var \Iterator
+     */
     private $it0;
+
+    /**
+     * @var \Iterator
+     */
     private $it1;
+
+    /**
+     * @var \Iterator
+     */
     private $it;
 
+    /**
+     * @var int
+     */
     private $i;
 
+    /**
+     * @param \Iterator $xs
+     * @param \Iterator $ys
+     */
     public function __construct($xs, $ys)
     {
-        $this->it0 = \Ginq\Core\iterator($xs);
-        $this->it1 = \Ginq\Core\iterator($ys);
+        $this->it0 = IteratorUtil::iterator($xs);
+        $this->it1 = IteratorUtil::iterator($ys);
     }
 
     public function current()

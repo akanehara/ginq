@@ -13,7 +13,9 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
+
+use Ginq\Util\IteratorUtil;
 
 /**
  * DropIterator
@@ -21,14 +23,28 @@ namespace Ginq\Core\Iterator;
  */
 class DropIterator implements \Iterator
 {
+    /**
+     * @var \Iterator
+     */
     private $it;
+
+    /**
+     * @var int
+     */
     private $n;
 
+    /**
+     * @var int
+     */
     private $i;
 
+    /**
+     * @param \Iterator $xs
+     * @param int $n
+     */
     public function __construct($xs, $n)
     {
-        $this->it = \Ginq\Core\iterator($xs);
+        $this->it = IteratorUtil::iterator($xs);
         $this->n  = $n;
     }
 

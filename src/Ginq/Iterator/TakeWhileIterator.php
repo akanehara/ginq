@@ -13,9 +13,10 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
 
-require_once dirname(__DIR__) . "/iterator.php";
+use Ginq\Util\IteratorUtil;
+use Ginq\Core\Predicate;
 
 /**
  * TakeWhileIterator
@@ -23,15 +24,24 @@ require_once dirname(__DIR__) . "/iterator.php";
  */
 class TakeWhileIterator implements \Iterator
 {
+    /**
+     * @var \Iterator
+     */
     private $it;
+
+    /**
+     * @var Predicate
+     */
     private $predicate;
 
+    /**
+     * @var int
+     */
     private $i;
-    private $valid;
 
     public function __construct($xs, $predicate)
     {
-        $this->it = \Ginq\Core\iterator($xs);
+        $this->it = IteratorUtil::iterator($xs);
         $this->predicate = $predicate;
     }
 
@@ -59,8 +69,7 @@ class TakeWhileIterator implements \Iterator
 
     public function valid()
     {
-        $p = $this->predicate;
         return $this->it->valid()
-            && $p($this->it->current(), $this->it->key());
+            && $this->predicate->predicate($this->it->current(), $this->it->key());
     }
 }

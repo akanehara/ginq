@@ -13,9 +13,10 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
 
-require_once dirname(__DIR__) . "/iterator.php";
+use Ginq\Core\Predicate;
+use Ginq\Util\IteratorUtil;
 
 /**
  * WhereIterator
@@ -23,14 +24,28 @@ require_once dirname(__DIR__) . "/iterator.php";
  */
 class WhereIterator implements \Iterator
 {
+    /**
+     * @var \Iterator
+     */
     private $it;
+
+    /**
+     * @var Predicate
+     */
     private $predicate;
 
+    /**
+     * @var int
+     */
     private $i;
 
+    /**
+     * @param \Iterator $xs
+     * @param Predicate $predicate
+     */
     public function __construct($xs, $predicate)
     {
-        $this->it = \Ginq\Core\iterator($xs);
+        $this->it = IteratorUtil::iterator($xs);
         $this->predicate = $predicate;
     }
 
@@ -45,9 +60,10 @@ class WhereIterator implements \Iterator
     }
     
     private function nextSatisfied() {
-        $p = $this->predicate;
         while ($this->it->valid()) {
-            if ($p($this->it->current(), $this->it->key())) {
+            if ($this->predicate->predicate(
+                $this->it->current(), $this->it->key()
+            )) {
                 break;
             } else {
                 $this->it->next();

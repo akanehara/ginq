@@ -15,20 +15,30 @@
  */
 namespace Ginq\Iterator;
 
-require_once dirname(__DIR__) . "/iterator.php";
+use Ginq\Util\IteratorUtil;
 
 /**
  * RehashIterator
  * @package Ginq
  */
-class RehashIterator implements \Iterator
+class RenumIterator implements \Iterator
 {
+    /**
+     * @var \Iterator
+     */
     private $it;
+
+    /**
+     * @var int
+     */
     private $i;
 
+    /**
+     * @param \Iterator $xs
+     */
     public function __construct($xs)
     {
-        $this->it = \Ginq\Core\iterator($xs);
+        $this->it = IteratorUtil::iterator($xs);
     }
 
     public function current()

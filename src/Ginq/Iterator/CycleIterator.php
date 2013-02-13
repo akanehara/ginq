@@ -13,7 +13,9 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Core\Iterator;
+namespace Ginq\Iterator;
+
+use Ginq\Util\IteratorUtil;
 
 /**
  * CycleIterator
@@ -21,12 +23,22 @@ namespace Ginq\Core\Iterator;
  */
 class CycleIterator implements \Iterator
 {
+    /**
+     * @var int
+     */
     private $i;
+
+    /**
+     * @var \Iterator
+     */
     private $it;
 
+    /**
+     * @param \Iterator $xs
+     */
     public function __construct($xs)
     {
-        $this->it = \Ginq\Core\iterator($xs);
+        $this->it = IteratorUtil::iterator($xs);
     }
 
     public function current()

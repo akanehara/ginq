@@ -13,34 +13,10 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
-namespace Ginq\Iterator;
 
-/**
- * ZeroIterator
- * @package Ginq
- */
-class ZeroIterator implements \Iterator
+namespace Ginq\Core;
+
+interface Comparer
 {
-    public function current()
-    {
-        return null;
-    }
-
-    public function key() 
-    {
-        return null;
-    }
-
-    public function next()
-    {
-    }
-
-    public function rewind()
-    {
-    }
-
-    public function valid()
-    {
-        return false;
-    }
+    public function compare($x, $y);
 }
