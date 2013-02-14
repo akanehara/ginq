@@ -60,11 +60,20 @@ class Ginq implements IteratorAggregate
     // aliases.
 
     /**
-     * @deprecated Alias method to rehash().
+     * @deprecated Alias method to renum().
      */
     public function sequence()
     {
-        return $this->rehash();
+        return $this->renum();
+    }
+
+    /**
+     * @deprecated Alias method to renum().
+     * @return Ginq
+     */
+    public function rehash()
+    {
+        return $this->renum();
     }
 
     /**
@@ -200,7 +209,10 @@ class Ginq implements IteratorAggregate
      */
     public static function seq($start = 0)
     {
-        return new Ginq\Selector\CountSelector($start);
+        $i = $start;
+        return function() use (&$i) {
+            return $i++;
+        };
     }
 
     /**
@@ -277,15 +289,13 @@ class Ginq implements IteratorAggregate
     public function toDictionary($keySelector = null, $valueSelector = null)
     {
         if (is_null($keySelector)) {
-            $keySelector = SelectorParser::parse(SelectorParser::KEY_OF);
-        } else {
-            $keySelector = SelectorParser::parse($keySelector);
+            $keySelector = Ginq::KEY_OF;
         }
         if (is_null($valueSelector)) {
-            $valueSelector = SelectorParser::parse(SelectorParser::VALUE_OF);
-        } else {
-            $valueSelector = SelectorParser::parse($valueSelector);
+            $valueSelector = Ginq::VALUE_OF;
         }
+        $keySelector = SelectorParser::parse($keySelector);
+        $valueSelector = SelectorParser::parse($valueSelector);
         return $this->fold(
             array(),
             function($acc, $v0, $k0) use ($keySelector, $valueSelector) {
@@ -309,15 +319,13 @@ class Ginq implements IteratorAggregate
     public function toDictionaryWith($combiner, $keySelector = null, $valueSelector = null)
     {
         if (is_null($valueSelector)) {
-            $valueSelector = SelectorParser::parse(SelectorParser::VALUE_OF);
-        } else {
-            $valueSelector = SelectorParser::parse($valueSelector);
+            $valueSelector = Ginq::VALUE_OF;
         }
         if (is_null($keySelector)) {
-            $keySelector = SelectorParser::parse(SelectorParser::KEY_OF);
-        } else {
-            $keySelector = SelectorParser::parse($keySelector);
+            $keySelector = Ginq::KEY_OF;
         }
+        $valueSelector = SelectorParser::parse($valueSelector);
+        $keySelector = SelectorParser::parse($keySelector);
         return $this->fold(
             array(),
             function($acc, $v0, $k0) use ($combiner, $keySelector, $valueSelector) {
@@ -561,31 +569,32 @@ class Ginq implements IteratorAggregate
             return new self(IteratorUtil::iterator($xs));
         }
     }
-    
+
     /**
      * @return Ginq
      */
-    public function rehash()
+    public function renum()
     {
         return self::from(self::$gen->renum($this->it));
     }
 
     /**
-     * @param Closure|string|int|Selector      $selector
+     * @param Closure|string|int|Selector|null $valueSelector
      * @param Closure|string|int|Selector|null $keySelector
      * @return Ginq
      */
-    public function select($valueSelector, $keySelector = null)
+    public function select($valueSelector = null, $keySelector = null)
     {
+        if (is_null($valueSelector)) {
+            $valueSelector = Ginq::VALUE_OF;
+        }
         if (is_null($keySelector)) {
-            $keySelector = SelectorParser::parse(SelectorParser::KEY_OF);
-        } else {
-            $keySelector = SelectorParser::parse($keySelector);
+            $keySelector = Ginq::KEY_OF;
         }
         return self::from(self::$gen->select(
             $this->it,
             SelectorParser::parse($valueSelector),
-            $keySelector
+            SelectorParser::parse($keySelector)
         ));
     }
 

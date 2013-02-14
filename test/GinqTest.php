@@ -522,14 +522,22 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * testRehash().
+     * testRenum().
      */
-    public function testRehash()
+    public function testRenum()
     {
         $expected = array(2,4,6,8,10,12,14,16,18,20);
         $actual = Ginq::range(1,20)
                     ->where(function($x) { return $x % 2 == 0; })
-                    ->rehash()
+                    ->renum()
+                    ->toArray();
+        $this->assertEquals($expected, $actual);
+
+        // key reunmbering use Ginq::COUNTER
+        $expected = array(2,4,6,8,10,12,14,16,18,20);
+        $actual = Ginq::range(1,20)
+                    ->where(function($x) { return $x % 2 == 0; })
+                    ->select(null, Ginq::COUNTER)
                     ->toArray();
         $this->assertEquals($expected, $actual);
     }
@@ -805,7 +813,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
             },
-            Ginq::COUNTER
+            Ginq::seq()
         )->toArray();
         $this->assertEquals(
             array(
