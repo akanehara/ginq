@@ -723,7 +723,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
     /**
      * testSelectManyWith().
      */
-    public function testSelectManyWith() {
+    public function testSelectManyWithJoin() {
 
         $phoneBook = array(
             array(
@@ -751,7 +751,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         
         // without key join selector
         $phones = Ginq::from($phoneBook)
-            ->selectManyWith(
+            ->selectMany(
                 'phones',
                 function($v0, $v1, $k0, $k1) {
                     return "{$v0['name']} : $v1";
@@ -768,7 +768,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
 
         $phones = Ginq::from($phoneBook)
-            ->selectManyWith(
+            ->selectMany(
                 'phones',
                 function($v0, $v1, $k0, $k1) {
                     return "$v1";

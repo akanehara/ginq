@@ -101,7 +101,7 @@ class Ginq implements IteratorAggregate
 
     /**
      * Alias method to filter().
-     *
+     * @deprecated
      * @param Closure|string|int|Selector      $valueSelector
      * @param Closure|string|int|Selector|null $keySelector
      * @return Ginq
@@ -670,36 +670,42 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param Closure|string|int|Selector $manySelector
-     * @return Ginq
-     */
-    public function selectMany($manySelector)
-    {
-        return self::from(self::$gen->selectMany(
-            $this->it,
-            SelectorParser::parse($manySelector)));
-    }
-
-    /**
-     * @param Closure|string|int|Selector $manySelector
-     * @param Closure|JoinSelector        $valueJoinSelector
+     * @param Closure|JoinSelector|null   $valueJoinSelector
      * @param Closure|JoinSelector|null   $keyJoinSelector
      * @return Ginq
      */
-    public function selectManyWith($manySelector, $valueJoinSelector, $keyJoinSelector = null)
+    public function selectMany($manySelector, $valueJoinSelector = null, $keyJoinSelector = null)
     {
-        if (is_null($keyJoinSelector)) {
-            $keyJoinSelector = JoinSelectorParser::parse(
-                function($v0, $k0, $v1, $k1) { return $k1; }
-            );
+        if (is_null($valueJoinSelector) && is_null($keyJoinSelector)) {
+            return self::from(self::$gen->selectMany(
+                $this->it,
+                SelectorParser::parse($manySelector)));
         } else {
-            $keyJoinSelector = JoinSelectorParser::parse($keyJoinSelector);
+            if (is_null($valueJoinSelector)) {
+                $valueJoinSelector = function($v0, $v1, $k0, $k1) { return $v1; };
+            }
+            if (is_null($keyJoinSelector)) {
+                $keyJoinSelector = function($v0, $v1, $k0, $k1) { return $k1; };
+            }
+            return self::from(self::$gen->selectManyWithJoin(
+                $this->it,
+                SelectorParser::parse($manySelector),
+                JoinSelectorParser::parse($valueJoinSelector),
+                JoinSelectorParser::parse($keyJoinSelector)
+            ));
         }
-        return self::from(self::$gen->selectManyWithJoin(
-            $this->it,
-            SelectorParser::parse($manySelector),
-            JoinSelectorParser::parse($valueJoinSelector),
-            $keyJoinSelector
-        ));
+    }
+
+    /**
+     * @deprecated
+     * @param Closure|string|int|Selector $manySelector
+     * @param Closure|JoinSelector|null   $valueJoinSelector
+     * @param Closure|JoinSelector|null   $keyJoinSelector
+     * @return Ginq
+     */
+    public function selectManyWith($manySelector, $valueJoinSelector = null, $keyJoinSelector = null)
+    {
+        return $this->selectMany($manySelector, $valueJoinSelector, $keyJoinSelector);
     }
 
     /**
@@ -716,11 +722,7 @@ class Ginq implements IteratorAggregate
         $outerKeySelector = SelectorParser::parse($outerKeySelector);
         $innerKeySelector = SelectorParser::parse($innerKeySelector);
         if (is_null($keyJoinSelector)) {
-            $keyJoinSelector = JoinSelectorParser::parse(
-                function($v0, $v1, $k0, $k1) { return $k0; }
-            );
-        } else {
-            $keyJoinSelector = JoinSelectorParser::parse($keyJoinSelector);
+            $keyJoinSelector = function($v0, $v1, $k0, $k1) { return $k0; };
         }
         $innerLookup = Ginq\Core\Lookup::from($inner, $innerKeySelector);
         return $this->selectManyWith(
@@ -730,7 +732,7 @@ class Ginq implements IteratorAggregate
                 );
             },
             JoinSelectorParser::parse($valueJoinSelector),
-            $keyJoinSelector
+            JoinSelectorParser::parse($keyJoinSelector)
         );
     }
 
@@ -743,17 +745,13 @@ class Ginq implements IteratorAggregate
     public function zip($rhs, $valueJoinSelector, $keyJoinSelector = null)
     {
         if (is_null($keyJoinSelector)) {
-            $keyJoinSelector = JoinSelectorParser::parse(
-                function($v0, $v1, $k0, $k1) { return $k0; }
-            );
-        } else {
-            $keyJoinSelector = JoinSelectorParser::parse($keyJoinSelector);
+            $keyJoinSelector = function($v0, $v1, $k0, $k1) { return $k0; };
         }
         return self::from(self::$gen->zip(
             $this->it,
             IteratorUtil::iterator($rhs),
             JoinSelectorParser::parse($valueJoinSelector),
-            $keyJoinSelector
+            JoinSelectorParser::parse($keyJoinSelector)
         ));
     }
 
@@ -765,14 +763,12 @@ class Ginq implements IteratorAggregate
     public function groupBy($groupingKeySelector, $elementSelector = null)
     {
         if (is_null($elementSelector)) {
-            $elementSelector = SelectorParser::parse(SelectorParser::VALUE_OF);
-        } else {
-            $elementSelector = SelectorParser::parse($elementSelector);
+            $elementSelector = SelectorParser::VALUE_OF;
         }
         return self::from(self::$gen->groupBy(
             $this->it,
             SelectorParser::parse($groupingKeySelector),
-            $elementSelector,
+            SelectorParser::parse($elementSelector),
             SelectorParser::parse(function ($xs, $k) { return Ginq::from($xs); })
         ));
     }
