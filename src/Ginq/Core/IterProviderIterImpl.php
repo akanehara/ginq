@@ -33,6 +33,7 @@ use Ginq\Iterator\SelectManyIterator;
 use Ginq\Iterator\SelectManyWithJoinIterator;
 use Ginq\Iterator\ZipIterator;
 use Ginq\Iterator\GroupByIterator;
+use Ginq\Iterator\MemoizeIterator;
 
 /**
  * IterProviderIterImpl
@@ -223,5 +224,13 @@ class IterProviderIterImpl implements IterProvider
         return new GroupByIterator($xs, $keySelector, $elementSelector, $groupSelector);
     }
 
+    /**
+     * @param \Iterator $xs
+     * @return \Ginq\Iterator\MemoizeIterator
+     */
+    public function memoize($xs)
+    {
+        return new MemoizeIterator($xs);
+    }
 }
 

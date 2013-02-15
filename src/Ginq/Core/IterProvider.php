@@ -152,5 +152,11 @@ interface IterProvider
      * @return \Ginq\Iterator\GroupByIterator
      */
     public function groupBy($xs, $groupingKeySelector, $elementSelector, $groupSelector);
+
+    /**
+     * @param \Iterator $xs
+     * @return \Ginq\Iterator\MemoizeIterator
+     */
+    public function memoize($xs);
 }
 

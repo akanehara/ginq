@@ -917,7 +917,35 @@ class GinqTest extends PHPUnit_Framework_TestCase
             3 => 3
         ), $xss);
     }
+
+    /**
+     * testMemoize().
+     */
+    public function testMemoize()
+    {
+        $xs = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
+                ->where(function($x) { return $x % 2 == 0; })
+                ->renum()
+                ->memoize();
+
+        $arr0 = $xs->take(2)->toArray();
+        $this->assertEquals(array(2,4), $arr0);
+
+        $arr1 = $xs->toArray();
+        $this->assertEquals(array(2,4,6,8,10), $arr1);
+
+        // empty iterator
+        $zero = Ginq::zero()->memoize()->toArray();
+        $this->assertEquals(array(), $zero);
+
+        // empty iterator
+        $zero = Ginq::from(array())->memoize()->toArray();
+        $this->assertEquals(array(), $zero);
+    }
+
  }
+
+
 
 // Call GinqTest::main() if this source file is executed directly.
 if (defined('PHPUnit_MAIN_METHOD') && PHPUnit_MAIN_METHOD == "GinqTest::main") {

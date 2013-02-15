@@ -773,6 +773,11 @@ class Ginq implements IteratorAggregate
         ));
     }
 
+    public function memoize()
+    {
+        return self::from(self::$gen->memoize($this->it));
+    }
+
     /*
     public function __callStatic($name, $args) {
         if (isset(self::$registeredStaticFunctions[$name])) {
