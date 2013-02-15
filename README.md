@@ -1,6 +1,7 @@
 # Ginq
 
 `LINQ to Object` inspired DSL for PHP.
+
 Ginq provides integrative interface for `array`, `Iterator`, `IteratorAggregate`, and `Generator`.
 
 # Usage
