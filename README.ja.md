@@ -42,7 +42,7 @@ foreach ($xs in $x) { echo "$x "; }
 ```
 
 今度は`toArray()`を使って配列を得ましょう。
-`where()`によってキーが欠落しているので、`renum()`で採番し直してやります。
+`where()`によってキーが不連続になっているので、`renum()`で採番し直してやります。
 
 ```php
 $xs->renum()->toArray();
