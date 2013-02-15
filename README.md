@@ -1,6 +1,7 @@
 # Ginq
 
-Ginq (Generator INtegrated Query), provides integrative interface for `array`, `Iterator`, `IteratorAggregate`.
+`LINQ to Object` inspired DSL for PHP.
+Ginq provides integrative interface for `array`, `Iterator`, `IteratorAggregate`, and `Generator`.
 
 # Usage
 
