@@ -34,39 +34,39 @@ interface IterProvider
      * @param int $start
      * @param int $stop
      * @param int $step
-     * @return \Ginq\Iterator\RangeIterator
+     * @return \Iterator
      */
     public function range($start, $stop, $step);
 
     /**
      * @param int $start
      * @param int $step
-     * @return \Ginq\Iterator\RangeInfIterator
+     * @return \Iterator
      */
     public function rangeInf($start, $step);
 
     /**
      * @param mixed $x
-     * @return \Ginq\Iterator\RepeatIterator
+     * @return \Iterator
      */
     public function repeat($x);
 
     /**
      * @param \Iterator $xs
-     * @return \Ginq\Iterator\CycleIterator
+     * @return \Iterator
      */
     public function cycle($xs);
 
     /**
      * @param \Iterator $xs
-     * @return \Ginq\Iterator\RenumIterator
+     * @return \Iterator
      */
     public function renum($xs);
 
     /**
      * @param \Iterator $xs
      * @param \Closure $fn
-     * @return \Ginq\Iterator\EachIterator
+     * @return \Iterator
      */
     public function each($xs, $fn);
 
@@ -74,62 +74,62 @@ interface IterProvider
      * @param \Iterator $xs
      * @param Selector $valueSelector
      * @param Selector $keySelector
-     * @return \Ginq\Iterator\SelectIterator
+     * @return \Iterator
      */
     public function select($xs, $valueSelector, $keySelector);
 
     /**
      * @param \Iterator $xs
      * @param Predicate $predicate
-     * @return \Ginq\Iterator\WhereIterator
+     * @return \Iterator
      */
     public function where($xs, $predicate);
 
     /**
      * @param \Iterator $xs
-     * @return \Ginq\Iterator\ReverseIterator
+     * @return \Iterator
      */
     public function reverse($xs);
 
     /**
      * @param \Iterator $xs
      * @param int $n
-     * @return \Ginq\Iterator\TakeIterator
+     * @return \Iterator
      */
     public function take($xs, $n);
 
     /**
      * @param \Iterator $xs
      * @param int $n
-     * @return \Ginq\Iterator\DropIterator
+     * @return \Iterator
      */
     public function drop($xs, $n);
 
     /**
      * @param \Iterator $xs
      * @param Predicate $predicate
-     * @return \Ginq\Iterator\TakeWhileIterator
+     * @return \Iterator
      */
     public function takeWhile($xs, $predicate);
 
     /**
      * @param \Iterator $xs
      * @param Predicate $predicate
-     * @return \Ginq\Iterator\DropWhileIterator
+     * @return \Iterator
      */
     public function dropWhile($xs, $predicate);
 
     /**
      * @param \Iterator $xs
      * @param \Iterator $ys
-     * @return \Ginq\Iterator\ConcatIterator
+     * @return \Iterator
      */
     public function concat($xs, $ys);
 
     /**
      * @param \Iterator $xs
      * @param Selector $manySelector
-     * @return \Ginq\Iterator\SelectManyIterator
+     * @return \Iterator
      */
     public function selectMany($xs, $manySelector);
 
@@ -138,7 +138,7 @@ interface IterProvider
      * @param Selector $manySelector
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
-     * @return \Ginq\Iterator\SelectManyWithJoinIterator
+     * @return \Iterator
      */
     public function selectManyWithJoin($xs, $manySelector, $valueJoinSelector, $keyJoinSelector);
 
@@ -147,7 +147,7 @@ interface IterProvider
      * @param \Iterator $ys
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
-     * @return \Ginq\Iterator\ZipIterator
+     * @return \Iterator
      */
     public function zip($xs, $ys, $valueJoinSelector, $keyJoinSelector);
 
@@ -156,13 +156,13 @@ interface IterProvider
      * @param Selector $groupingKeySelector
      * @param Selector $elementSelector
      * @param Selector $groupSelector
-     * @return \Ginq\Iterator\GroupByIterator
+     * @return \Iterator
      */
     public function groupBy($xs, $groupingKeySelector, $elementSelector, $groupSelector);
 
     /**
      * @param \Iterator $xs
-     * @return \Ginq\Iterator\MemoizeIterator
+     * @return \Iterator
      */
     public function memoize($xs);
 }
