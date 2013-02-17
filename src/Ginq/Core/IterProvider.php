@@ -26,7 +26,7 @@ use Ginq\Core\Predicate;
 interface IterProvider
 {
     /**
-     * @return \Ginq\Iterator\ZeroIterator
+     * @return \Iterator
      */
     public function zero();
 
@@ -62,6 +62,13 @@ interface IterProvider
      * @return \Ginq\Iterator\RenumIterator
      */
     public function renum($xs);
+
+    /**
+     * @param \Iterator $xs
+     * @param \Closure $fn
+     * @return \Ginq\Iterator\EachIterator
+     */
+    public function each($xs, $fn);
 
     /**
      * @param \Iterator $xs

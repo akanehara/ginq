@@ -579,6 +579,14 @@ class Ginq implements IteratorAggregate
     }
 
     /**
+     * @return Ginq
+     */
+    public function each($fn)
+    {
+        return self::from(self::$gen->each($this->it, $fn));
+    }
+
+    /**
      * @param Closure|string|int|Selector|null $valueSelector
      * @param Closure|string|int|Selector|null $keySelector
      * @return Ginq

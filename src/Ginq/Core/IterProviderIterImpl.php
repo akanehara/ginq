@@ -21,6 +21,7 @@ use Ginq\Iterator\RangeInfIterator;
 use Ginq\Iterator\CycleIterator;
 use Ginq\Iterator\RepeatIterator;
 use Ginq\Iterator\RenumIterator;
+use Ginq\Iterator\EachIterator;
 use Ginq\Iterator\SelectIterator;
 use Ginq\Iterator\WhereIterator;
 use Ginq\Iterator\ReverseIterator;
@@ -96,6 +97,17 @@ class IterProviderIterImpl implements IterProvider
     public function renum($xs)
     {
         return new RenumIterator($xs);
+    }
+
+
+    /**
+     * @param \Iterator $xs
+     * @param \Closure $fn
+     * @return \Ginq\Iterator\EachIterator
+     */
+    public function each($xs, $fn)
+    {
+        return new EachIterator($xs, $fn);
     }
 
     /**

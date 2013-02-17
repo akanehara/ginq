@@ -542,7 +542,31 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * testEach().
+     */
+    public function testEach()
+    {
+        $data = array('apple'=>99, 'orange'=>105, 'grape'=>298);
 
+        $sideEffect = array();
+
+        $actual = Ginq::from($data)->each(
+            function($v, $k) use (&$sideEffect) {
+                array_push($sideEffect, array($k, $v));
+                return $v * $v;
+            }
+        )->toArray();
+
+        $this->assertEquals($data, $actual);
+
+        $expectedSideEffect = array(
+            array('apple', 99),
+            array('orange', 105),
+            array('grape', 298)
+        );
+        $this->assertEquals($expectedSideEffect, $sideEffect);
+    }
 
     /**
      * testSelect().
