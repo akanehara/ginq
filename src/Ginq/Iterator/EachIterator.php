@@ -15,6 +15,8 @@
  */
 namespace Ginq\Iterator;
 
+use Ginq\Util\IteratorUtil;
+
 class EachIterator implements \Iterator
 {
     /**
@@ -48,7 +50,7 @@ class EachIterator implements \Iterator
      */
     public function __construct($xs, $fn)
     {
-        $this->it = $xs;
+        $this->it = IteratorUtil::iterator($xs);
         $this->fn = $fn;
     }
 
