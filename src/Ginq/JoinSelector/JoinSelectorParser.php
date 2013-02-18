@@ -23,8 +23,9 @@ use Ginq\Selector\CountSelector;
 class JoinSelectorParser
 {
     /**
-     * @src \Closure|JoinSelector
+     * @param \Closure|JoinSelector|int $src
      * @return JoinSelector
+     * @throws \InvalidArgumentException
      */
     public static function parse($src)
     {

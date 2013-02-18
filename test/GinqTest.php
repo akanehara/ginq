@@ -516,7 +516,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $expected = array(2,4,6,8,10,12,14,16,18,20);
         $actual = Ginq::range(1,20)
                     ->where(function($x) { return $x % 2 == 0; })
-                    ->sequence()
+                    ->renum()
                     ->toArray();
         $this->assertEquals($expected, $actual);
     }
@@ -635,7 +635,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         // with sequence
         $expected = array(5,4,3,2,1);
-        $actual = $xs->rehash()->toArray();
+        $actual = $xs->renum()->toArray();
         $this->assertEquals($expected, $actual);
 
         // to assoc
@@ -692,8 +692,19 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testConcat()
     {
-        $xs = Ginq::from(array(1,2,3,4,5))->concat(array(6,7,8,9))->toArray();
-        $this->assertEquals(array(0=>1,1=>2,2=>3,3=>4,4=>5,0=>6,1=>7,2=>8,3=>9), $xs);
+        $expected = array(
+            array(0, 1),
+            array(1, 2),
+            array(2, 3),
+            array(3, 4),
+            array(4, 5),
+            array(0, 6),
+            array(1, 7),
+            array(2, 8),
+            array(3, 9)
+        );
+        $actual = Ginq::from(array(1,2,3,4,5))->concat(array(6,7,8,9))->toAssoc();
+        $this->assertEquals($expected, $actual);
 
         $expected = array(array(0, 2),array(1, 4),array(2, 6));
 
@@ -837,7 +848,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
             },
-            Ginq::seq()
+            Ginq::COUNTER
         )->toArray();
         $this->assertEquals(
             array(
@@ -857,7 +868,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
             }
-        )->rehash()->toArray();
+        )->renum()->toArray();
 
         $this->assertEquals(
             array(

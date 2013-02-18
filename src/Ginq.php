@@ -324,8 +324,14 @@ class Ginq implements IteratorAggregate
         if (is_null($keySelector)) {
             $keySelector = Ginq::KEY_OF;
         }
+
+        /**
+         * @var Selector $valueSelector
+         * @var Selector $keySelector
+         */
         $valueSelector = SelectorParser::parse($valueSelector);
         $keySelector = SelectorParser::parse($keySelector);
+
         return $this->fold(
             array(),
             function($acc, $v0, $k0) use ($combiner, $keySelector, $valueSelector) {
@@ -474,6 +480,7 @@ class Ginq implements IteratorAggregate
     /**
      * @param \Closure $operator ($accumulator, $value, $key)
      * @return mixed
+     * @throws LengthException
      */
     public function reduceLeft($operator)
     {
@@ -494,6 +501,7 @@ class Ginq implements IteratorAggregate
     /**
      * @param \Closure $operator ($accumulator, $value, $key)
      * @return mixed
+     * @throws LengthException
      */
     public function reduceRight($operator)
     {
@@ -554,11 +562,11 @@ class Ginq implements IteratorAggregate
      */
     public static function cycle($xs)
     {
-        return self::from(self::$gen->cycle(self::from($xs)));
+        return self::from(self::$gen->cycle(IteratorUtil::iterator($xs)));
     }
 
     /**
-     * @param array|Traversable $xs
+     * @param array|\Iterator|\IteratorAggregate|\Traversable $xs
      * @return Ginq
      */
     public static function from($xs)
@@ -579,6 +587,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
+     * @param \Closure $fn
      * @return Ginq
      */
     public function each($fn)
@@ -672,14 +681,14 @@ class Ginq implements IteratorAggregate
     public function concat($rhs)
     {
         return self::from(self::$gen->concat(
-            $this->it, self::from($rhs)
+            $this->it, self::from(IteratorUtil::iterator($rhs))
         ));
     }
 
     /**
      * @param Closure|string|int|Selector $manySelector
-     * @param Closure|JoinSelector|null   $valueJoinSelector
-     * @param Closure|JoinSelector|null   $keyJoinSelector
+     * @param Closure|JoinSelector|int|null   $valueJoinSelector
+     * @param Closure|JoinSelector|int|null   $keyJoinSelector
      * @return Ginq
      */
     public function selectMany($manySelector, $valueJoinSelector = null, $keyJoinSelector = null)
@@ -707,8 +716,8 @@ class Ginq implements IteratorAggregate
     /**
      * @deprecated
      * @param Closure|string|int|Selector $manySelector
-     * @param Closure|JoinSelector|null   $valueJoinSelector
-     * @param Closure|JoinSelector|null   $keyJoinSelector
+     * @param Closure|JoinSelector|int|null   $valueJoinSelector
+     * @param Closure|JoinSelector|int|null   $keyJoinSelector
      * @return Ginq
      */
     public function selectManyWith($manySelector, $valueJoinSelector = null, $keyJoinSelector = null)
@@ -718,10 +727,10 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param array|Traversable $inner
-     * @param Closure|string|int|Selector $outerKeySelector
-     * @param Closure|string|int|Selector $innerKeySelector
-     * @param Closure|JoinSelector        $valueJoinSelector
-     * @param Closure|JoinSelector        $keyJoinSelector
+     * @param \Closure|string|int|Selector   $outerKeySelector
+     * @param \Closure|string|int|Selector   $innerKeySelector
+     * @param \Closure|JoinSelector|int      $valueJoinSelector
+     * @param \Closure|JoinSelector|int|null $keyJoinSelector
      * @return Ginq
      */
     public function join(
@@ -733,7 +742,7 @@ class Ginq implements IteratorAggregate
             $keyJoinSelector = function($v0, $v1, $k0, $k1) { return $k0; };
         }
         $innerLookup = Ginq\Core\Lookup::from($inner, $innerKeySelector);
-        return $this->selectManyWith(
+        return $this->selectMany(
             function($outer, $outerKey) use ($innerLookup, $outerKeySelector) {
                 return $innerLookup->get(
                     $outerKeySelector->select($outer, $outerKey)
@@ -746,8 +755,8 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param array|Traversable    $rhs
-     * @param Closure|JoinSelector      $valueJoinSelector
-     * @param Closure|JoinSelector|null $keyJoinSelector
+     * @param Closure|JoinSelector|int      $valueJoinSelector
+     * @param Closure|JoinSelector|int|null $keyJoinSelector
      * @return Ginq
      */
     public function zip($rhs, $valueJoinSelector, $keyJoinSelector = null)

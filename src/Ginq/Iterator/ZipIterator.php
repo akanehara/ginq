@@ -46,9 +46,14 @@ class ZipIterator implements \Iterator
     private $it1;
 
     /**
-     * @var int
+     * @var mixed
      */
-    private $i;
+    private $v;
+
+    /**
+     * @var mixed
+     */
+    private $k;
 
     /**
      * @param \Iterator $xs
@@ -66,40 +71,41 @@ class ZipIterator implements \Iterator
 
     public function current()
     {
-        return $this->valueJoinSelector->joinSelect(
-            $this->it0->current(),
-            $this->it1->current(),
-            $this->it0->key(),
-            $this->it1->key()
-        );
+        return $this->v;
     }
 
     public function key() 
     {
-        return $this->keyJoinSelector->joinSelect(
-            $this->it0->current(),
-            $this->it1->current(),
-            $this->it0->key(),
-            $this->it1->key()
-        );
+        return $this->k;
     }
 
     public function next()
     {
-        $this->i++;
         $this->it0->next();
         $this->it1->next();
+        $this->fetch();
     }
 
     public function rewind()
     {
-        $this->i = 0;
         $this->it0->rewind();
         $this->it1->rewind();
+        $this->fetch();
     }
 
     public function valid()
     {
         return $this->it0->valid() && $this->it1->valid();
     }
+
+    protected function fetch()
+    {
+        $v0 = $this->it0->current();
+        $v1 = $this->it1->current();
+        $k0 = $this->it0->key();
+        $k1 = $this->it1->key();
+        $this->v = $this->valueJoinSelector->joinSelect($v0, $v1, $k0, $k1);
+        $this->k = $this->keyJoinSelector->joinSelect($v0, $v1, $k0, $k1);
+    }
 }
+

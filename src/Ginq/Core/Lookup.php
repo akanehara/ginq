@@ -36,7 +36,7 @@ class Lookup implements \IteratorAggregate
     }
 
     /**
-     * @param array|\Traversable $xs
+     * @param array|\Iterator|\IteratorAggregate|\Traversable $xs
      * @param Selector $keySelector
      * @return Lookup
      */

@@ -24,8 +24,9 @@ class SelectorParser
     const KEY_OF   = 3;
 
     /**
-     * @src \Closure|string|int|Selector
+     * @param \Closure|string|int|Selector $src
      * @return Selector
+     * @throws \InvalidArgumentException
      */
     public static function parse($src)
     {

@@ -34,6 +34,7 @@ class PropertyPredicate implements \Ginq\Core\Predicate
     /**
      * @param mixed $v value
      * @param mixed $k key
+     * @throws \DomainException
      * @return bool
      */
     public function predicate($v, $k)
@@ -44,6 +45,6 @@ class PropertyPredicate implements \Ginq\Core\Predicate
             return @$v->{$this->name};
         }
         $type = gettype($v);
-        throw new DomainException("'$type' object has no key or field");
+        throw new \DomainException("'$type' object has no key or field");
     }
 }

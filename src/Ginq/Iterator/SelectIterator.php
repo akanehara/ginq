@@ -40,9 +40,14 @@ class SelectIterator implements \Iterator
     private $keySelector;
 
     /**
-     * @var int
+     * @var mixed
      */
-    private $i;
+    protected $v;
+
+    /**
+     * @var mixed
+     */
+    protected $k;
 
     /**
      * @param $xs
@@ -58,32 +63,38 @@ class SelectIterator implements \Iterator
 
     public function current()
     {
-        return $this->valueSelector->select(
-            $this->it->current(), $this->it->key()
-        );
+        return $this->v;
     }
 
     public function key() 
     {
-        return $this->keySelector->select(
-            $this->it->current(), $this->it->key()
-        );
+        return $this->k;
     }
 
     public function next()
     {
-        $this->i++;
         $this->it->next();
+        $this->fetch();
     }
 
     public function rewind()
     {
-        $this->i = 0;
         $this->it->rewind();
+        $this->fetch();
     }
 
     public function valid()
     {
         return $this->it->valid();
+    }
+
+    private function fetch()
+    {
+        if ($this->it->valid()) {
+            $v = $this->it->current();
+            $k = $this->it->key();
+            $this->v = $this->valueSelector->select($v, $k);
+            $this->k = $this->keySelector->select($v, $k);
+        }
     }
 }

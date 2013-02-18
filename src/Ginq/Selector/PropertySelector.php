@@ -27,6 +27,7 @@ class PropertySelector implements \Ginq\Core\Selector
     /**
      * @param mixed $v value
      * @param mixed $k key
+     * @throws \DomainException
      * @return mixed
      */
     public function select($v, $k)
@@ -37,7 +38,7 @@ class PropertySelector implements \Ginq\Core\Selector
             return @$v->{$this->name};
         }
         $type = gettype($v);
-        throw new DomainException("'$type' object has no key or field");
+        throw new \DomainException("'$type' object has no key or field");
     }
 }
 

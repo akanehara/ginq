@@ -46,14 +46,29 @@ class SelectManyWithJoinIterator implements \Iterator
     private $outer;
 
     /**
+     * @var mixed
+     */
+    private $outerV;
+
+    /**
+     * @var mixed
+     */
+    private $outerK;
+
+    /**
      * @var \Iterator
      */
     private $inner;
 
     /**
-     * @var int
+     * @var mixed
      */
-    private $i;
+    private $v;
+
+    /**
+     * @var mixed
+     */
+    private $k;
 
     /**
      * @param $xs
@@ -71,55 +86,66 @@ class SelectManyWithJoinIterator implements \Iterator
 
     public function current()
     {
-        return $this->valueJoinSelector->joinSelect(
-            $this->outer->current(),
-            $this->inner->current(),
-            $this->outer->key(),
-            $this->inner->key()
-        );
+        return $this->v;
     }
 
     public function key() 
     {
-        return $this->keyJoinSelector->joinSelect(
-            $this->outer->current(),
-            $this->inner->current(),
-            $this->outer->key(),
-            $this->inner->key()
-        );
+        return $this->k;
     }
 
     public function next()
     {
-        $this->i++;
         $this->inner->next();
         if (!$this->inner->valid()) {
             $this->outer->next();
-            $this->nextInner();
+            $this->fetchOuter();
         }
+        $this->fetchInner();
     }
 
     public function rewind()
     {
-        $this->i = 0;
         $this->outer->rewind();
-        $this->nextInner();
-    }
-
-    protected function nextInner()
-    {
-        if ($this->outer->valid()) {
-            $this->inner = IteratorUtil::iterator(
-                $this->manySelector->select(
-                    $this->outer->current(),
-                    $this->outer->key()
-                )
-            );
-        }
+        $this->fetchOuter();
+        $this->fetchInner();
     }
 
     public function valid()
     {
-        return $this->inner->valid();
+        return !is_null($this->inner) && $this->inner->valid();
+    }
+
+    protected function fetchOuter()
+    {
+        if ($this->outer->valid()) {
+            $this->outerV = $this->outer->current();
+            $this->outerK = $this->outer->key();
+            $this->inner = IteratorUtil::iterator(
+                $this->manySelector->select(
+                    $this->outerV,
+                    $this->outerK
+                )
+            );
+        } else {
+            $this->inner = null;
+        }
+    }
+
+    protected function fetchInner()
+    {
+        if ($this->valid()) {
+            $innerV = $this->inner->current();
+            $innerK = $this->inner->key();
+            $this->v = $this->valueJoinSelector->joinSelect(
+                $this->outerV, $innerV,
+                $this->outerK, $innerK
+            );
+            $this->k = $this->keyJoinSelector->joinSelect(
+                $this->outerV, $innerV,
+                $this->outerK, $innerK
+            );
+        }
     }
 }
+

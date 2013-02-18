@@ -30,11 +30,6 @@ class EachIterator implements \Iterator
     protected $fn;
 
     /**
-     * @var bool
-     */
-    protected $fetched;
-
-    /**
      * @var mixed
      */
     protected $v;
@@ -56,21 +51,17 @@ class EachIterator implements \Iterator
 
     public function current()
     {
-        $this->fetchOnce();
-        $fn = $this->fn;
-        $fn($this->v, $this->k);
         return $this->v;
     }
 
     public function next()
     {
         $this->it->next();
-        $this->fetched = false;
+        $this->fetch();
     }
 
     public function key()
     {
-        $this->fetchOnce();
         return $this->k;
     }
 
@@ -81,16 +72,18 @@ class EachIterator implements \Iterator
 
     public function rewind()
     {
-        $this->fetched = false;
         $this->it->rewind();
+        $this->fetch();
     }
 
-    private function fetchOnce()
+    private function fetch()
     {
-        if ($this->fetched) return;
-        $this->v = $this->it->current();
-        $this->k = $this->it->key();
-        $this->fetched = true;
+        if ($this->it->valid()) {
+            $this->v = $this->it->current();
+            $this->k = $this->it->key();
+            $fn = $this->fn;
+            $fn($this->v, $this->k);
+        }
     }
 }
 

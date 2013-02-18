@@ -24,9 +24,8 @@ use Ginq\Util\IteratorUtil;
  */
 class SelectManyIterator implements \Iterator
 {
-
     /**
-     * @var \Ginq\Core\Selector
+     * @var Selector
      */
     private $manySelector;
 
@@ -36,17 +35,32 @@ class SelectManyIterator implements \Iterator
     private $outer;
 
     /**
+     * @var mixed
+     */
+    private $outerV;
+
+    /**
+     * @var mixed
+     */
+    private $outerK;
+
+    /**
      * @var \Iterator
      */
     private $inner;
 
     /**
-     * @var int
+     * @var mixed
      */
-    private $i;
+    private $v;
 
     /**
-     * @param \Iterator $xs
+     * @var mixed
+     */
+    private $k;
+
+    /**
+     * @param $xs
      * @param Selector $manySelector
      */
     public function __construct($xs, $manySelector)
@@ -57,45 +71,57 @@ class SelectManyIterator implements \Iterator
 
     public function current()
     {
-        return $this->inner->current();
+        return $this->v;
     }
 
-    public function key() 
+    public function key()
     {
-        return $this->inner->key();
+        return $this->k;
     }
 
     public function next()
     {
-        $this->i++;
         $this->inner->next();
         if (!$this->inner->valid()) {
             $this->outer->next();
-            $this->nextInner();
+            $this->fetchOuter();
         }
+        $this->fetchInner();
     }
 
     public function rewind()
     {
-        $this->i = 0;
         $this->outer->rewind();
-        $this->nextInner();
-    }
-
-    protected function nextInner()
-    {
-        if ($this->outer->valid()) {
-            $this->inner = IteratorUtil::iterator(
-                $this->manySelector->select(
-                    $this->outer->current(),
-                    $this->outer->key()
-                )
-            );
-        }
+        $this->fetchOuter();
+        $this->fetchInner();
     }
 
     public function valid()
     {
-        return $this->inner->valid();
+        return !is_null($this->inner) && $this->inner->valid();
+    }
+
+    protected function fetchOuter()
+    {
+        if ($this->outer->valid()) {
+            $this->outerV = $this->outer->current();
+            $this->outerK = $this->outer->key();
+            $this->inner = IteratorUtil::iterator(
+                $this->manySelector->select(
+                    $this->outerV,
+                    $this->outerK
+                )
+            );
+        } else {
+            $this->inner = null;
+        }
+    }
+
+    protected function fetchInner()
+    {
+        if ($this->valid()) {
+            $this->v = $this->inner->current();
+            $this->k = $this->inner->key();
+        }
     }
 }
