@@ -127,6 +127,7 @@ class SelectManyWithJoinIterator implements \Iterator
                     $this->outerK
                 )
             );
+            $this->inner->rewind();
         } else {
             $this->inner = null;
         }

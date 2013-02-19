@@ -733,24 +733,23 @@ class Ginq implements IteratorAggregate
      * @param \Closure|JoinSelector|int|null $keyJoinSelector
      * @return Ginq
      */
-    public function join(
-        $inner, $outerKeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector = null)
+    public function join($inner,
+            $outerKeySelector, $innerKeySelector,
+            $valueJoinSelector, $keyJoinSelector = null)
     {
-        $outerKeySelector = SelectorParser::parse($outerKeySelector);
-        $innerKeySelector = SelectorParser::parse($innerKeySelector);
         if (is_null($keyJoinSelector)) {
             $keyJoinSelector = function($v0, $v1, $k0, $k1) { return $k0; };
         }
-        $innerLookup = Ginq\Core\Lookup::from($inner, $innerKeySelector);
-        return $this->selectMany(
-            function($outer, $outerKey) use ($innerLookup, $outerKeySelector) {
-                return $innerLookup->get(
-                    $outerKeySelector->select($outer, $outerKey)
-                );
-            },
-            JoinSelectorParser::parse($valueJoinSelector),
-            JoinSelectorParser::parse($keyJoinSelector)
-        );
+        $outerKeySelector = SelectorParser::parse($outerKeySelector);
+        $innerKeySelector = SelectorParser::parse($innerKeySelector);
+        $valueJoinSelector = JoinSelectorParser::parse($valueJoinSelector);
+        $keyJoinSelector = JoinSelectorParser::parse($keyJoinSelector);
+        return self::from(self::$gen->join(
+            $this->it,
+            IteratorUtil::iterator($inner),
+            $outerKeySelector, $innerKeySelector,
+            $valueJoinSelector, $keyJoinSelector
+        ));
     }
 
     /**

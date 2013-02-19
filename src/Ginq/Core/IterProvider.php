@@ -143,6 +143,17 @@ interface IterProvider
     public function selectManyWithJoin($xs, $manySelector, $valueJoinSelector, $keyJoinSelector);
 
     /**
+     * @param \Iterator $outer
+     * @param \Iterator $inner
+     * @param Selector $outerKeySelector
+     * @param Selector $innerKeySelector
+     * @param JoinSelector $valueJoinSelector
+     * @param JoinSelector $keyJoinSelector
+     * @return \Iterator
+     */
+    public function join($outer, $inner, $outerkeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector);
+
+    /**
      * @param \Iterator $xs
      * @param \Iterator $ys
      * @param JoinSelector $valueJoinSelector

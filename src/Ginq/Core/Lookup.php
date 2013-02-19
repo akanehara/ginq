@@ -43,8 +43,8 @@ class Lookup implements \IteratorAggregate
     public static function from($xs, $keySelector)
     {
         $lookup = new self();
-        foreach ($xs as $k => $x) {
-            $lookup->put($keySelector->select($x, $k), $x);
+        foreach ($xs as $k => $v) {
+            $lookup->put($keySelector->select($v, $k), $v);
         }
         return $lookup;
     }

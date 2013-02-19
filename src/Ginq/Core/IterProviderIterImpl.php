@@ -32,6 +32,7 @@ use Ginq\Iterator\DropWhileIterator;
 use Ginq\Iterator\ConcatIterator;
 use Ginq\Iterator\SelectManyIterator;
 use Ginq\Iterator\SelectManyWithJoinIterator;
+use Ginq\Iterator\JoinIterator;
 use Ginq\Iterator\ZipIterator;
 use Ginq\Iterator\GroupByIterator;
 use Ginq\Iterator\MemoizeIterator;
@@ -210,6 +211,20 @@ class IterProviderIterImpl implements IterProvider
     public function selectManyWithJoin($xs, $manySelector, $valueJoinSelector, $keyJoinSelector)
     {
         return new SelectManyWithJoinIterator($xs, $manySelector, $valueJoinSelector, $keyJoinSelector);
+    }
+
+    /**
+     * @param \Iterator $outer
+     * @param \Iterator $inner
+     * @param Selector $outerkeySelector
+     * @param Selector $innerKeySelector
+     * @param JoinSelector $valueJoinSelector
+     * @param JoinSelector $keyJoinSelector
+     * @return \Ginq\Iterator\JoinIterator|\Iterator
+     */
+    public function join($outer, $inner, $outerkeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector)
+    {
+        return new JoinIterator($outer, $inner, $outerkeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector);
     }
 
     /**
