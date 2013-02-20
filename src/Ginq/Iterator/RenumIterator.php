@@ -18,7 +18,7 @@ namespace Ginq\Iterator;
 use Ginq\Util\IteratorUtil;
 
 /**
- * RehashIterator
+ * RenumIterator
  * @package Ginq
  */
 class RenumIterator implements \Iterator

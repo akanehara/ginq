@@ -18,5 +18,13 @@ namespace Ginq\Core;
 
 interface Comparer
 {
-    public function compare($x, $y);
+    /**
+     * @param mixed $v0 - left value (sort key)
+     * @param mixed $v1 - right value (sort key)
+     * @param mixed $k0 - left key
+     * @param mixed $k1 - right key
+     * @return int
+     */
+    public function compare($v0, $v1, $k0, $k1);
 }
+

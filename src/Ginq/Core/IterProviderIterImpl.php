@@ -35,6 +35,7 @@ use Ginq\Iterator\SelectManyWithJoinIterator;
 use Ginq\Iterator\JoinIterator;
 use Ginq\Iterator\ZipIterator;
 use Ginq\Iterator\GroupByIterator;
+use Ginq\Iterator\OrderedIterator;
 use Ginq\Iterator\MemoizeIterator;
 
 /**
@@ -249,6 +250,16 @@ class IterProviderIterImpl implements IterProvider
     public function groupBy($xs, $keySelector, $elementSelector, $groupSelector)
     {
         return new GroupByIterator($xs, $keySelector, $elementSelector, $groupSelector);
+    }
+
+    /**
+     * @param \Iterator $xs
+     * @param Comparer $comparer
+     * @return \Iterator
+     */
+    public function orderBy($xs, $comparer)
+    {
+        return new OrderedIterator($xs, $comparer);
     }
 
     /**
