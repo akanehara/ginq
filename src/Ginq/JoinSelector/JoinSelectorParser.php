@@ -1,6 +1,6 @@
 <?php
 /**
- * Ginq: Generator INtegrated Query
+ * Ginq: `LINQ to Object` inspired DSL for PHP
  * Copyright 2013, Atsushi Kanehara <akanehara@gmail.com>
  *
  * Licensed under The MIT License

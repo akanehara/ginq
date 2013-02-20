@@ -1,6 +1,6 @@
 <?php
 /**
- * Ginq: Generator INtegrated Query
+ * Ginq: `LINQ to Object` inspired DSL for PHP
  * Copyright 2013, Atsushi Kanehara <akanehara@gmail.com>
  *
  * Licensed under The MIT License
@@ -13,6 +13,7 @@
  * @license    MIT License (http://www.opensource.org/licenses/mit-license.php)
  * @package    Ginq
  */
+
 namespace Ginq\Iterator;
 
 use \Ginq\Core\Selector;
