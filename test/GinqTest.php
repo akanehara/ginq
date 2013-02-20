@@ -954,6 +954,115 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testOrdering
+     */
+    public function testOrdering()
+    {
+        $data = array(9,7,8,3,5,2,1,6,4);
+
+        $xs = Ginq::from($data)->orderBy()->renum()->toArray();
+        $this->assertEquals(array(1,2,3,4,5,6,7,8,9), $xs);
+
+        $xs = Ginq::from($data)->orderByDesc()->renum()->toArray();
+        $this->assertEquals(array(9,8,7,6,5,4,3,2,1), $xs);
+
+        $data = array(
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950, 'born'=>1974),
+            array('name'=>'Suzuki Taro',    'score'=>10200, 'born'=>1986),
+            array('name'=>'Tamura Akira',   'score'=> 5840, 'born'=>1974),
+            array('name'=>'Suzuka Youichi', 'score'=> 6780, 'born'=>1990),
+            array('name'=>'Abe Shinji',     'score'=> 2990, 'born'=>1969),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950, 'born'=>1978),
+            array('name'=>'Yamada Taro',    'score'=>  680, 'born'=>1986),
+            array('name'=>'Yamada Rindai',  'score'=> 6680, 'born'=>1974),
+        );
+
+        $expected = array(
+            array('name'=>'Abe Shinji',     'score'=> 2990, 'born'=>1969),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950, 'born'=>1978),
+            array('name'=>'Suzuka Youichi', 'score'=> 6780, 'born'=>1990),
+            array('name'=>'Suzuki Taro',    'score'=>10200, 'born'=>1986),
+            array('name'=>'Tamura Akira',   'score'=> 5840, 'born'=>1974),
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950, 'born'=>1974),
+            array('name'=>'Yamada Rindai',  'score'=> 6680, 'born'=>1974),
+            array('name'=>'Yamada Taro',    'score'=>  680, 'born'=>1986),
+        );
+        $xs = Ginq::from($data)->orderBy('name')->renum()->toArray();
+        $this->assertEquals($expected, $xs);
+
+        $expected = array(
+            array('name'=>'Abe Shinji',     'score'=> 2990, 'born'=>1969),
+            array('name'=>'Tamura Akira',   'score'=> 5840, 'born'=>1974),
+            array('name'=>'Yamada Rindai',  'score'=> 6680, 'born'=>1974),
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950, 'born'=>1974),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950, 'born'=>1978),
+            array('name'=>'Yamada Taro',    'score'=>  680, 'born'=>1986),
+            array('name'=>'Suzuki Taro',    'score'=>10200, 'born'=>1986),
+            array('name'=>'Suzuka Youichi', 'score'=> 6780, 'born'=>1990),
+        );
+        $xs = Ginq::from($data)
+            ->orderBy(function($x) { return $x['born']; })
+            ->thenBy('score')
+            ->renum()->toArray();
+        $this->assertEquals($expected, $xs);
+
+        $xs = Ginq::from($data)->orderBy()->thenBy();
+
+        $expected = array(
+            array('name'=>'Abe Shinji',     'score'=> 2990, 'born'=>1969),
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950, 'born'=>1974),
+            array('name'=>'Yamada Rindai',  'score'=> 6680, 'born'=>1974),
+            array('name'=>'Tamura Akira',   'score'=> 5840, 'born'=>1974),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950, 'born'=>1978),
+            array('name'=>'Suzuki Taro',    'score'=>10200, 'born'=>1986),
+            array('name'=>'Yamada Taro',    'score'=>  680, 'born'=>1986),
+            array('name'=>'Suzuka Youichi', 'score'=> 6780, 'born'=>1990),
+        );
+        $xs = Ginq::from($data)
+            ->orderBy('born')
+            ->thenByDesc('score')
+            ->renum()->toArray();
+        $this->assertEquals($expected, $xs);
+
+        $expected = array(
+            array('name'=>'Suzuka Youichi', 'score'=> 6780, 'born'=>1990),
+            array('name'=>'Suzuki Taro',    'score'=>10200, 'born'=>1986),
+            array('name'=>'Yamada Taro',    'score'=>  680, 'born'=>1986),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950, 'born'=>1978),
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950, 'born'=>1974),
+            array('name'=>'Yamada Rindai',  'score'=> 6680, 'born'=>1974),
+            array('name'=>'Tamura Akira',   'score'=> 5840, 'born'=>1974),
+            array('name'=>'Abe Shinji',     'score'=> 2990, 'born'=>1969),
+        );
+        $xs = Ginq::from($data)
+            ->orderByDesc('born')
+            ->thenByDesc('score')
+            ->renum()->toArray();
+        $this->assertEquals($expected, $xs);
+
+        // custom comparer
+        $expected = array(
+            array('name'=>'Abe Shinji',     'score'=> 2990, 'born'=>1969),
+            array('name'=>'Suzuki Taro',    'score'=>10200, 'born'=>1986),
+            array('name'=>'Yamada Taro',    'score'=>  680, 'born'=>1986),
+            array('name'=>'Tamura Akira',   'score'=> 5840, 'born'=>1974),
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950, 'born'=>1974),
+            array('name'=>'Yamada Rindai',  'score'=> 6680, 'born'=>1974),
+            array('name'=>'Suzuka Youichi', 'score'=> 6780, 'born'=>1990),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950, 'born'=>1978),
+        );
+        $cmp = function ($x, $y) {
+            if ($x === $y) return 0;
+            return ($x < $y) ? -1 : 1;
+        };
+        $xs = Ginq::from($data)
+            ->orderBy(function($v, $k) { return strlen($v['name']); }, $cmp)
+            ->thenByDesc(function($v, $k) { return $v['score']; }, $cmp)
+            ->renum()->toArray();
+        $this->assertEquals($expected, $xs);
+    }
+
+    /**
      * testMemoize().
      */
     public function testMemoize()
@@ -979,8 +1088,6 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
  }
-
-
 
 // Call GinqTest::main() if this source file is executed directly.
 if (defined('PHPUnit_MAIN_METHOD') && PHPUnit_MAIN_METHOD == "GinqTest::main") {

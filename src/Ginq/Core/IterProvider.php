@@ -18,6 +18,7 @@ namespace Ginq\Core;
 use Ginq\Core\Selector;
 use Ginq\Core\JoinSelector;
 use Ginq\Core\Predicate;
+use Ginq\Core\Comparer;
 
 /**
  * IterProvider
@@ -170,6 +171,13 @@ interface IterProvider
      * @return \Iterator
      */
     public function groupBy($xs, $groupingKeySelector, $elementSelector, $groupSelector);
+
+    /**
+     * @param \Iterator $xs
+     * @param Comparer $comparer
+     * @return \Iterator
+     */
+    public function orderBy($xs, $comparer);
 
     /**
      * @param \Iterator $xs
