@@ -15,11 +15,16 @@
  */
 
 use Ginq\Core\Selector;
+use Ginq\Comparer\ComparerParser;
 use Ginq\Core\JoinSelector;
+use Ginq\Core\Comparer;
 use Ginq\Selector\SelectorParser;
 use Ginq\JoinSelector\JoinSelectorParser;
 use Ginq\Predicate\PredicateParser;
 use Ginq\Util\IteratorUtil;
+use Ginq\Comparer\DefaultComparer;
+use Ginq\Comparer\ReverseComparer;
+use Ginq\Comparer\ProjectionComparer;
 
 /**
  * Ginq
@@ -217,12 +222,11 @@ class Ginq implements IteratorAggregate
 
     /**
      * Overridden interface of IteratorAggregate.
-     *
-     * @return Traversable
+     * @return \Iterator
      */
     public function getIterator()
     {
-        return IteratorUtil::iterator($this->it);
+        return $this->it;
     }
 
     /**
@@ -231,7 +235,7 @@ class Ginq implements IteratorAggregate
     public function toArray()
     {
         $arr = array();
-        foreach ($this->it as $k => $v) {
+        foreach ($this->getIterator() as $k => $v) {
             $arr[$k] = $v;
         }
         return $arr;
@@ -243,7 +247,7 @@ class Ginq implements IteratorAggregate
     public function toArrayRec()
     {
         $arr = array();
-        foreach ($this->it as $k => $v) {
+        foreach ($this->getIterator() as $k => $v) {
             if ($v instanceof \Iterator || $v instanceof \IteratorAggregate) {
                 $arr[$k] = self::from($v)->toArrayRec();
             } else {
@@ -259,7 +263,7 @@ class Ginq implements IteratorAggregate
     public function toAssoc()
     {
         $alist = array();
-        foreach ($this->it as $k => $v) {
+        foreach ($this->getIterator() as $k => $v) {
             array_push($alist, array($k, $v));
         }
         return $alist;
@@ -271,7 +275,7 @@ class Ginq implements IteratorAggregate
     public function toAssocRec()
     {
         $alist = array();
-        foreach ($this->it as $k => $v) {
+        foreach ($this->getIterator() as $k => $v) {
             if ($v instanceof \Iterator || $v instanceof \IteratorAggregate) {
                 array_push($alist, array($k, self::from($v)->toAssocRec()));
             } else {
@@ -340,7 +344,7 @@ class Ginq implements IteratorAggregate
                 if ($v1 instanceof \Iterator || $v1 instanceof \IteratorAggregate) {
                     $v1 = Ginq::from($v1)->toArrayRec();
                 }
-                if (key_exists($k1, $acc)) {
+                if (array_key_exists($k1, $acc)) {
                     $acc[$k1] = $combiner($acc[$k1], $v1, $k1);
                 } else {
                     $acc[$k1] = $v1;
@@ -357,7 +361,7 @@ class Ginq implements IteratorAggregate
     public function any($predicate)
     {
         $p = PredicateParser::parse($predicate);
-        foreach ($this->it as $k => $v) {
+        foreach ($this->getIterator() as $k => $v) {
             if ($p->predicate($v, $k) == true) {
                 return true;
             }
@@ -372,7 +376,7 @@ class Ginq implements IteratorAggregate
     public function all($predicate)
     {
         $p = PredicateParser::parse($predicate);
-        foreach ($this->it as $k => $v) {
+        foreach ($this->getIterator() as $k => $v) {
             if ($p->predicate($v, $k) == false) {
                 return false;
             }
@@ -386,9 +390,10 @@ class Ginq implements IteratorAggregate
      */
     public function first($default = null)
     {
-        $this->it->rewind();
-        if ($this->it->valid()) {
-            return $this->it->current();
+        $it = $this->getIterator();
+        $it->rewind();
+        if ($it->valid()) {
+            return $it->current();
         } else {
             return $default;
         }
@@ -400,8 +405,9 @@ class Ginq implements IteratorAggregate
      */
     public function rest($default = array())
     {
-        $this->it->rewind();
-        if ($this->it->valid()) {
+        $it = $this->getIterator();
+        $it->rewind();
+        if ($it->valid()) {
             return $this->drop(1);
         } else {
             return self::from($default);
@@ -441,7 +447,7 @@ class Ginq implements IteratorAggregate
      */
     public function find($predicate, $default = null)
     {
-        foreach ($this->it as $k => $v) {
+        foreach ($this->getIterator() as $k => $v) {
             if ($predicate($v, $k)) {
                 return $v;
             }
@@ -484,7 +490,7 @@ class Ginq implements IteratorAggregate
      */
     public function reduceLeft($operator)
     {
-        $it = $this->it;
+        $it = $this->getIterator();
         $it->rewind();
         if (!$it->valid()) {
             throw new LengthException("reduce of empty sequence");
@@ -505,7 +511,7 @@ class Ginq implements IteratorAggregate
      */
     public function reduceRight($operator)
     {
-        $it = $this->reverse()->it;
+        $it = $this->reverse()->getIterator();
         $it->rewind();
         if (!$it->valid()) {
             throw new LengthException("reduce of empty sequence");
@@ -583,7 +589,7 @@ class Ginq implements IteratorAggregate
      */
     public function renum()
     {
-        return self::from(self::$gen->renum($this->it));
+        return self::from(self::$gen->renum($this->getIterator()));
     }
 
     /**
@@ -592,7 +598,7 @@ class Ginq implements IteratorAggregate
      */
     public function each($fn)
     {
-        return self::from(self::$gen->each($this->it, $fn));
+        return self::from(self::$gen->each($this->getIterator(), $fn));
     }
 
     /**
@@ -609,7 +615,7 @@ class Ginq implements IteratorAggregate
             $keySelector = Ginq::KEY_OF;
         }
         return self::from(self::$gen->select(
-            $this->it,
+            $this->getIterator(),
             SelectorParser::parse($valueSelector),
             SelectorParser::parse($keySelector)
         ));
@@ -622,7 +628,7 @@ class Ginq implements IteratorAggregate
     public function where($predicate)
     {
         return self::from(self::$gen->where(
-            $this->it,
+            $this->getIterator(),
             PredicateParser::parse($predicate)
         ));
     }
@@ -632,7 +638,7 @@ class Ginq implements IteratorAggregate
      */
     public function reverse()
     {
-        return self::from(self::$gen->reverse($this->it));
+        return self::from(self::$gen->reverse($this->getIterator()));
     }
 
     /**
@@ -641,7 +647,7 @@ class Ginq implements IteratorAggregate
      */
     public function take($n)
     {
-        return self::from(self::$gen->take($this->it, $n));
+        return self::from(self::$gen->take($this->getIterator(), $n));
     }
 
     /**
@@ -650,7 +656,7 @@ class Ginq implements IteratorAggregate
      */
     public function drop($n)
     {
-        return self::from(self::$gen->drop($this->it, $n));
+        return self::from(self::$gen->drop($this->getIterator(), $n));
     }
 
     /**
@@ -660,7 +666,7 @@ class Ginq implements IteratorAggregate
     public function takeWhile($predicate)
     {
         return self::from(self::$gen->takeWhile(
-            $this->it,
+            $this->getIterator(),
             PredicateParser::parse($predicate)
         ));
     }
@@ -671,7 +677,9 @@ class Ginq implements IteratorAggregate
      */
     public function dropWhile($predicate)
     {
-        return self::from(self::$gen->dropWhile($this->it, PredicateParser::parse($predicate)));
+        return self::from(self::$gen->dropWhile(
+            $this->getIterator(), PredicateParser::parse($predicate)
+        ));
     }
 
     /**
@@ -681,7 +689,8 @@ class Ginq implements IteratorAggregate
     public function concat($rhs)
     {
         return self::from(self::$gen->concat(
-            $this->it, self::from(IteratorUtil::iterator($rhs))
+            $this->getIterator(),
+            self::from(IteratorUtil::iterator($rhs))
         ));
     }
 
@@ -695,7 +704,7 @@ class Ginq implements IteratorAggregate
     {
         if (is_null($valueJoinSelector) && is_null($keyJoinSelector)) {
             return self::from(self::$gen->selectMany(
-                $this->it,
+                $this->getIterator(),
                 SelectorParser::parse($manySelector)));
         } else {
             if (is_null($valueJoinSelector)) {
@@ -705,7 +714,7 @@ class Ginq implements IteratorAggregate
                 $keyJoinSelector = function($v0, $v1, $k0, $k1) { return $k1; };
             }
             return self::from(self::$gen->selectManyWithJoin(
-                $this->it,
+                $this->getIterator(),
                 SelectorParser::parse($manySelector),
                 JoinSelectorParser::parse($valueJoinSelector),
                 JoinSelectorParser::parse($keyJoinSelector)
@@ -745,7 +754,7 @@ class Ginq implements IteratorAggregate
         $valueJoinSelector = JoinSelectorParser::parse($valueJoinSelector);
         $keyJoinSelector = JoinSelectorParser::parse($keyJoinSelector);
         return self::from(self::$gen->join(
-            $this->it,
+            $this->getIterator(),
             IteratorUtil::iterator($inner),
             $outerKeySelector, $innerKeySelector,
             $valueJoinSelector, $keyJoinSelector
@@ -764,7 +773,7 @@ class Ginq implements IteratorAggregate
             $keyJoinSelector = function($v0, $v1, $k0, $k1) { return $k0; };
         }
         return self::from(self::$gen->zip(
-            $this->it,
+            $this->getIterator(),
             IteratorUtil::iterator($rhs),
             JoinSelectorParser::parse($valueJoinSelector),
             JoinSelectorParser::parse($keyJoinSelector)
@@ -782,16 +791,52 @@ class Ginq implements IteratorAggregate
             $elementSelector = SelectorParser::VALUE_OF;
         }
         return self::from(self::$gen->groupBy(
-            $this->it,
+            $this->getIterator(),
             SelectorParser::parse($groupingKeySelector),
             SelectorParser::parse($elementSelector),
             SelectorParser::parse(function ($xs, $k) { return Ginq::from($xs); })
         ));
     }
 
+    /**
+     * @param Closure|string|int|Selector|null $orderingKeySelector
+     * @param Closure|Comparer|null $comparer
+     * @return OrderedGinq
+     */
+    public function orderBy($orderingKeySelector = null, $comparer = null)
+    {
+        if (is_null($orderingKeySelector)) {
+            $orderingKeySelector = Ginq::VALUE_OF;
+        }
+        $orderingKeySelector = SelectorParser::parse($orderingKeySelector);
+        $comparer = ComparerParser::parse($comparer);
+        $comparer = new ProjectionComparer($orderingKeySelector, $comparer);
+        return OrderedGinq::create($this->getIterator(), $comparer);
+    }
+
+    /**
+     * @param Closure|string|int|Selector|null $orderingKeySelector
+     * @param Closure|Comparer|null $comparer
+     * @return OrderedGinq
+     */
+    public function orderByDesc($orderingKeySelector = null, $comparer = null)
+    {
+        if (is_null($orderingKeySelector)) {
+            $orderingKeySelector = Ginq::VALUE_OF;
+        }
+        $orderingKeySelector = SelectorParser::parse($orderingKeySelector);
+        $comparer = ComparerParser::parse($comparer);
+        $comparer = new ProjectionComparer($orderingKeySelector, $comparer);
+        $comparer = new ReverseComparer($comparer);
+        return OrderedGinq::create($this->getIterator(), $comparer);
+    }
+
+    /**
+     * @return Ginq
+     */
     public function memoize()
     {
-        return self::from(self::$gen->memoize($this->it));
+        return self::from(self::$gen->memoize($this->getIterator()));
     }
 
     /*
@@ -866,4 +911,6 @@ class Ginq implements IteratorAggregate
 Ginq::_registerAutoloadFunction();
 
 Ginq::useIterator();
+
+require_once "OrderedGinq.php";
 
