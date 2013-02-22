@@ -11,7 +11,6 @@ class GinqPluginTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        require_once "PHPUnit/TextUI/TestRunner.php";
         $suite = new PHPUnit_Framework_TestSuite("GinqPluginTest");
         $result = PHPUnit_TextUI_TestRunner::run($suite);
     }
