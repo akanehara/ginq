@@ -218,15 +218,15 @@ class IterProviderIterImpl implements IterProvider
     /**
      * @param \Iterator $outer
      * @param \Iterator $inner
-     * @param Selector $outerkeySelector
+     * @param Selector $outerKeySelector
      * @param Selector $innerKeySelector
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
      * @return \Ginq\Iterator\JoinIterator|\Iterator
      */
-    public function join($outer, $inner, $outerkeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector)
+    public function join($outer, $inner, $outerKeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector)
     {
-        return new JoinIterator($outer, $inner, $outerkeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector);
+        return new JoinIterator($outer, $inner, $outerKeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector);
     }
 
     /**

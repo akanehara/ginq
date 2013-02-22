@@ -151,9 +151,10 @@ interface IterProvider
      * @param Selector $innerKeySelector
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
+     * @internal param \Ginq\Core\Selector $outerKeySelector
      * @return \Iterator
      */
-    public function join($outer, $inner, $outerkeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector);
+    public function join($outer, $inner, $outerKeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector);
 
     /**
      * @param \Iterator $xs

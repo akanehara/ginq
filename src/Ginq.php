@@ -886,7 +886,7 @@ class Ginq implements IteratorAggregate
         }
     }
 
-    public static function listRegisterdFunctions()
+    public static function listRegisteredFunctions()
     {
         return self::$registeredFunctions;
     }

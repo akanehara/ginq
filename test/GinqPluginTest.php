@@ -20,7 +20,7 @@ class GinqPluginTest extends PHPUnit_Framework_TestCase
     {
         SamplePlugin::register();
 
-        $functions = Ginq::listRegisterdFunctions();
+        $functions = Ginq::listRegisteredFunctions();
 
         $this->assertCount(1, $functions);
         $this->assertArrayHasKey('eachEager', $functions);
