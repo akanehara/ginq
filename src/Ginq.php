@@ -385,6 +385,22 @@ class Ginq implements IteratorAggregate
     }
 
     /**
+     * @param \Closure|string|null $predicate ($value, $key)
+     */
+    public function count($predicate = null) {
+        if (is_null($predicate)) {
+            return $this->foldLeft(0, function ($acc) { return $acc + 1; });
+        } else {
+            $p = PredicateParser::parse($predicate);
+            return $this->foldLeft(0,
+                function ($acc, $x) use ($predicate) {
+                    return ($predicate($x)) ? ($acc + 1) : $acc;
+                }
+            );
+        }
+    }
+
+    /**
      * @param mixed $default
      * @return mixed
      */

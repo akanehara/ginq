@@ -257,7 +257,20 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * testFirst
+     * testCount().
+     */
+    public function testCount()
+    {
+        $actual = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))->count();
+        $this->assertEquals(10, $actual);
+
+        $actual = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
+                    ->count(function($x) { return $x % 2 == 0; });
+        $this->assertEquals(5, $actual);
+    }
+
+    /**
+     * testFirst().
      */
     public function testFirst()
     {
