@@ -57,8 +57,8 @@ class ZipIterator implements \Iterator
     private $k;
 
     /**
-     * @param \Iterator $xs
-     * @param \Iterator $ys
+     * @param array|\Traversable $xs
+     * @param array|\Traversable $ys
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
      */

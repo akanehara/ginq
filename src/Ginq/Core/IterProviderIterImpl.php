@@ -85,7 +85,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @return \Ginq\Iterator\CycleIterator
      */
     public function cycle($xs)
@@ -94,7 +94,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @return \Ginq\Iterator\RenumIterator
      */
     public function renum($xs)
@@ -104,7 +104,7 @@ class IterProviderIterImpl implements IterProvider
 
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param \Closure $fn
      * @return \Ginq\Iterator\EachIterator
      */
@@ -114,7 +114,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Selector $valueSelector
      * @param Selector $keySelector
      * @return \Ginq\Iterator\SelectIterator
@@ -125,7 +125,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Predicate $predicate
      * @return \Ginq\Iterator\WhereIterator
      */
@@ -135,7 +135,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @return \Ginq\Iterator\ReverseIterator
      */
     public function reverse($xs)
@@ -144,7 +144,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param int $n
      * @return \Ginq\Iterator\TakeIterator
      */
@@ -154,7 +154,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param int $n
      * @return \Ginq\Iterator\DropIterator
      */
@@ -164,7 +164,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Predicate $predicate
      * @return \Ginq\Iterator\TakeWhileIterator
      */
@@ -174,7 +174,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Predicate $predicate
      * @return \Ginq\Iterator\DropWhileIterator
      */
@@ -184,8 +184,8 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
-     * @param \Iterator $ys
+     * @param array|\Traversable $xs
+     * @param array|\Traversable $ys
      * @return \Ginq\Iterator\ConcatIterator
      */
     public function concat($xs, $ys)
@@ -194,7 +194,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Selector $manySelector
      * @return \Ginq\Iterator\SelectManyIterator
      */
@@ -204,7 +204,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Selector $manySelector
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
@@ -216,8 +216,8 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $outer
-     * @param \Iterator $inner
+     * @param array|\Traversable $outer
+     * @param array|\Traversable $inner
      * @param Selector $outerKeySelector
      * @param Selector $innerKeySelector
      * @param JoinSelector $valueJoinSelector
@@ -230,8 +230,8 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
-     * @param \Iterator $ys
+     * @param array|\Traversable $xs
+     * @param array|\Traversable $ys
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
      * @return \Ginq\Iterator\ZipIterator
@@ -242,7 +242,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Selector $keySelector
      * @param Selector $elementSelector
      * @param Selector $groupSelector
@@ -254,7 +254,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Comparer $comparer
      * @return \Iterator
      */
@@ -264,7 +264,7 @@ class IterProviderIterImpl implements IterProvider
     }
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @return \Ginq\Iterator\MemoizeIterator
      */
     public function memoize($xs)

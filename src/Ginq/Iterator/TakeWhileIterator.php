@@ -40,6 +40,10 @@ class TakeWhileIterator implements \Iterator
      */
     private $i;
 
+    /**
+     * @param array|\Traversable $xs
+     * @param Predicate $predicate
+     */
     public function __construct($xs, $predicate)
     {
         $this->it = IteratorUtil::iterator($xs);

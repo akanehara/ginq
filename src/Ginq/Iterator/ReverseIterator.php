@@ -39,6 +39,9 @@ class ReverseIterator implements \Iterator
      */
     private $i;
 
+    /**
+     * @param array|\Traversable $xs
+     */
     public function __construct($xs)
     {
         $this->it = IteratorUtil::iterator($xs);

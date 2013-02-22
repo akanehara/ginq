@@ -54,26 +54,26 @@ interface IterProvider
     public function repeat($x);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @return \Iterator
      */
     public function cycle($xs);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @return \Iterator
      */
     public function renum($xs);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param \Closure $fn
      * @return \Iterator
      */
     public function each($xs, $fn);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Selector $valueSelector
      * @param Selector $keySelector
      * @return \Iterator
@@ -81,62 +81,62 @@ interface IterProvider
     public function select($xs, $valueSelector, $keySelector);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Predicate $predicate
      * @return \Iterator
      */
     public function where($xs, $predicate);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @return \Iterator
      */
     public function reverse($xs);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param int $n
      * @return \Iterator
      */
     public function take($xs, $n);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param int $n
      * @return \Iterator
      */
     public function drop($xs, $n);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Predicate $predicate
      * @return \Iterator
      */
     public function takeWhile($xs, $predicate);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Predicate $predicate
      * @return \Iterator
      */
     public function dropWhile($xs, $predicate);
 
     /**
-     * @param \Iterator $xs
-     * @param \Iterator $ys
+     * @param array|\Traversable $xs
+     * @param array|\Traversable $ys
      * @return \Iterator
      */
     public function concat($xs, $ys);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Selector $manySelector
      * @return \Iterator
      */
     public function selectMany($xs, $manySelector);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Selector $manySelector
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
@@ -145,8 +145,8 @@ interface IterProvider
     public function selectManyWithJoin($xs, $manySelector, $valueJoinSelector, $keyJoinSelector);
 
     /**
-     * @param \Iterator $outer
-     * @param \Iterator $inner
+     * @param array|\Traversable $outer
+     * @param array|\Traversable $inner
      * @param Selector $outerKeySelector
      * @param Selector $innerKeySelector
      * @param JoinSelector $valueJoinSelector
@@ -157,8 +157,8 @@ interface IterProvider
     public function join($outer, $inner, $outerKeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector);
 
     /**
-     * @param \Iterator $xs
-     * @param \Iterator $ys
+     * @param array|\Traversable $xs
+     * @param array|\Traversable $ys
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
      * @return \Iterator
@@ -166,7 +166,7 @@ interface IterProvider
     public function zip($xs, $ys, $valueJoinSelector, $keyJoinSelector);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Selector $groupingKeySelector
      * @param Selector $elementSelector
      * @param Selector $groupSelector
@@ -175,14 +175,14 @@ interface IterProvider
     public function groupBy($xs, $groupingKeySelector, $elementSelector, $groupSelector);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Comparer $comparer
      * @return \Iterator
      */
     public function orderBy($xs, $comparer);
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @return \Iterator
      */
     public function memoize($xs);

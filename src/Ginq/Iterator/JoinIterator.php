@@ -60,8 +60,8 @@ class JoinIterator implements \Iterator
     protected $keyJoinSelector;
 
     /**
-     * @param \Iterator $outer
-     * @param \Iterator $inner
+     * @param array|\Traversable $outer
+     * @param array|\Traversable $inner
      * @param Selector $outerKeySelector
      * @param Selector $innerKeySelector
      * @param JoinSelector $valueJoinSelector

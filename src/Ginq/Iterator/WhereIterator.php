@@ -41,7 +41,7 @@ class WhereIterator implements \Iterator
     private $i;
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Predicate $predicate
      */
     public function __construct($xs, $predicate)
