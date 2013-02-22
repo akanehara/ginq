@@ -36,6 +36,7 @@ class OrderedGinq extends Ginq
 
     /**
      * @param \Iterator $it
+     * @param \Ginq\Core\Comparer $comparer
      */
     protected function __construct($it, $comparer)
     {

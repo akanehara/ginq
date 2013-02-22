@@ -573,7 +573,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param array|\Iterator|\IteratorAggregate|\Traversable $xs
+     * @param array|\Traversable $xs
      * @return Ginq
      */
     public static function from($xs)
@@ -869,8 +869,13 @@ class Ginq implements IteratorAggregate
         $ref = new \ReflectionClass($className);
 
         $funcNames = Ginq::from($ref->getMethods(ReflectionMethod::IS_STATIC))
-            ->where(function ($m) { return $m->isPublic(); })
             ->where(function ($m) {
+                /** @var $m \ReflectionMethod  */
+                return $m->isPublic();
+            })
+            ->where(function ($m) {
+                /** @var $m \ReflectionMethod  */
+                /** @var $p \ReflectionParameter */
                 $p = Ginq::from($m->getParameters())->first(false);
                 if ($p === false) return false;
 
@@ -878,8 +883,10 @@ class Ginq implements IteratorAggregate
 
                 return ($c->getName() === 'Ginq') or $c->isSubclassOf('Ginq');
             })
-            ->select(function ($m) { return $m->getName(); })
-        ;
+            ->select(function ($m) {
+                /** @var $m \ReflectionMethod  */
+                return $m->getName();
+            });
 
         foreach ($funcNames as $func) {
             self::$registeredFunctions[$func] = array($className, $func);
