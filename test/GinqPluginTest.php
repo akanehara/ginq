@@ -48,7 +48,7 @@ class SamplePlugin
 
     public static function eachEager(\Ginq $self, $selector) {
         if (is_null($selector)) {
-            throw new \ArgumentException('must be passed closure as 2nd argument.');
+            throw new \InvalidArgumentException('must be passed closure as 2nd argument.');
         }
 
         foreach ($self as $k => $v) {
