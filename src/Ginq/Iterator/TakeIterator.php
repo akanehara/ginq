@@ -40,7 +40,7 @@ class TakeIterator implements \Iterator
     private $i;
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param int $n
      */
     public function __construct($xs, $n)

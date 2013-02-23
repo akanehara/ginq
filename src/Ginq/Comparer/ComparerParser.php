@@ -22,6 +22,8 @@ class ComparerParser
 {
     /**
      * @param \Closure|Comparer $src
+     * @throws \InvalidArgumentException
+     * @return \Ginq\Core\Comparer
      */
     static public function parse($src)
     {

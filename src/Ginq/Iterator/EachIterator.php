@@ -41,7 +41,7 @@ class EachIterator implements \Iterator
     protected $k;
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param \Closure $fn
      */
     public function __construct($xs, $fn)

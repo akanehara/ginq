@@ -72,7 +72,7 @@ class SelectManyWithJoinIterator implements \Iterator
     private $k;
 
     /**
-     * @param $xs
+     * @param array|\Traversable $xs
      * @param Selector $manySelector
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector

@@ -61,7 +61,7 @@ class SelectManyIterator implements \Iterator
     private $k;
 
     /**
-     * @param $xs
+     * @param array|\Traversable $xs
      * @param Selector $manySelector
      */
     public function __construct($xs, $manySelector)

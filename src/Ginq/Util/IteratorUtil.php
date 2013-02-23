@@ -19,7 +19,7 @@ namespace Ginq\Util;
 class IteratorUtil
 {
     /**
-     * @param $xs
+     * @param array|\Traversable $xs
      * @return \Iterator
      * @throws \InvalidArgumentException
      */

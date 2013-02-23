@@ -45,8 +45,8 @@ class ConcatIterator implements \Iterator
     private $i;
 
     /**
-     * @param \Iterator $xs
-     * @param \Iterator $ys
+     * @param array|\Traversable $xs
+     * @param array|\Traversable $ys
      */
     public function __construct($xs, $ys)
     {

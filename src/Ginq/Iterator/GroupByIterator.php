@@ -58,7 +58,7 @@ class GroupByIterator implements \Iterator
     private $i;
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Selector $groupingKeySelector
      * @param Selector $elementSelector
      * @param Selector $groupSelector
