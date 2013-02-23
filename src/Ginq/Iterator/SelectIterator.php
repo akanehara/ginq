@@ -51,7 +51,7 @@ class SelectIterator implements \Iterator
     protected $k;
 
     /**
-     * @param $xs
+     * @param array|\Traversable $xs
      * @param Selector $valueSelector
      * @param Selector $keySelector
      */

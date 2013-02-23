@@ -42,7 +42,7 @@ class MemoizeIterator implements \Iterator
 
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      */
     public function __construct($xs)
     {

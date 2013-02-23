@@ -35,7 +35,7 @@ class CycleIterator implements \Iterator
     private $it;
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      */
     public function __construct($xs)
     {

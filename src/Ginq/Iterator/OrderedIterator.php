@@ -58,7 +58,7 @@ class OrderedIterator implements \Iterator
     protected $k;
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      * @param Comparer $comparer
      */
     public function __construct($xs, $comparer)

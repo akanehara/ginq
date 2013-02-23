@@ -35,7 +35,7 @@ class RenumIterator implements \Iterator
     private $i;
 
     /**
-     * @param \Iterator $xs
+     * @param array|\Traversable $xs
      */
     public function __construct($xs)
     {
