@@ -1,8 +1,15 @@
 # Ginq
 
-`LINQ to Object` inspired DSL for PHP.
+### Array handling in PHP? Be happy with Ginq!
 
-Ginq provides integrative interface for `array`, `Iterator`, `IteratorAggregate`, and `Generator`.
+**Ginq** is a **DSL** that can handle array and iterator of PHP unified.
+
+Many functions in **Ginq** are evaluated in lazy, and no actions are taken until that time. This features brings you many benefits.
+
+**Ginq** is inspired by **Linq to Object**, but is not a clone.
+
+Do you need more functions? Don't worry, **Ginq** supports plug-ins, you can add features you need.
+Feel free to let me know if you request new functions into **Ginq**.
 
 # Usage
 
