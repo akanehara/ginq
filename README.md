@@ -2,7 +2,7 @@
 
 ### Array handling in PHP? Be happy with Ginq!
 
-**Ginq** is a **DSL** that can handle array and iterator of PHP unified.
+**Ginq** is a **DSL** that can handle arrays and iterators of PHP unified.
 
 Many functions in **Ginq** are evaluated in lazy, and no actions are taken until that time. This features brings you many benefits.
 
