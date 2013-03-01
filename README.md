@@ -4,7 +4,7 @@
 
 **Ginq** is a **DSL** that can handle arrays and iterators of PHP unified.
 
-Many functions in **Ginq** are evaluated in lazy, and no actions are taken until that time. This features brings you many benefits.
+Many functions in **Ginq** are evaluated in lazy, and no actions are taken until that time. This features bring you many benefits.
 
 **Ginq** is inspired by **Linq to Object**, but is not a clone.
 
