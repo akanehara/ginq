@@ -18,7 +18,7 @@ namespace Ginq\Comparer;
 
 use Ginq\Core\Comparer;
 
-class ReverseComparer implements Comparer
+class ReverseComparer extends Comparer
 {
     /**
      * @var Comparer

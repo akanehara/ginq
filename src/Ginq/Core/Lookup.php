@@ -27,13 +27,13 @@ use Ginq\Util\IteratorUtil;
 class Lookup implements \IteratorAggregate
 {
     /**
-     * @var array
+     * @var Dictionary
      */
-    private $table;
+    private $dict;
 
-    protected function __construct()
+    protected function __construct($equalityComparer)
     {
-        $this->table = array();
+        $this->dict = new Dictionary($equalityComparer);
     }
 
     /**
@@ -41,9 +41,9 @@ class Lookup implements \IteratorAggregate
      * @param Selector $keySelector
      * @return Lookup
      */
-    public static function from($xs, $keySelector)
+    public static function from($xs, $keySelector, $equalityComparer = null)
     {
-        $lookup = new self();
+        $lookup = new self($equalityComparer);
         foreach ($xs as $k => $v) {
             $lookup->put($keySelector->select($v, $k), $v);
         }
@@ -55,7 +55,7 @@ class Lookup implements \IteratorAggregate
      */
     public function getIterator()
     {
-        return IteratorUtil::iterator($this->table);
+        return $this->dict->getIterator();
     }
 
     /**
@@ -64,11 +64,11 @@ class Lookup implements \IteratorAggregate
      */
     public function get($key)
     {
-        @$v = $this->table[$key];
-        if (is_array($v)) {
-            return $v;
-        }
-        return array();
+        /**
+         * @var \ArrayObject $xs
+         */
+        $xs = $this->dict->get($key, array());
+        return $xs;
     }
 
     /**
@@ -78,12 +78,14 @@ class Lookup implements \IteratorAggregate
      */
     public function put($key, $value)
     {
-        @$v = &$this->table[$key];
-        if (is_array($v)) {
-            array_push($v, $value);
-        } else {
-            $this->table[$key] = array($value);
+        /**
+         * @var \ArrayObject $xs
+         */
+        if (!$this->dict->contains($key)) {
+            $this->dict->put($key, new \ArrayObject());
         }
+        $xs = $this->dict->get($key);
+        $xs->append($value);
     }
 }
 

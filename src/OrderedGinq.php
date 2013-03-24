@@ -23,7 +23,6 @@ use Ginq\Predicate\PredicateParser;
 use Ginq\Comparer\CompoundComparer;
 use Ginq\Util\IteratorUtil;
 use Ginq\Comparer\ReverseComparer;
-use Ginq\Comparer\DefaultComparer;
 use Ginq\Comparer\ProjectionComparer;
 use Ginq\Comparer\ComparerParser;
 
@@ -38,7 +37,7 @@ class OrderedGinq extends Ginq
      * @param \Iterator $it
      * @param \Ginq\Core\Comparer $comparer
      */
-    protected function __construct($it, $comparer)
+    public function __construct($it, $comparer)
     {
         $this->comparer = $comparer;
         parent::__construct($it);
@@ -50,16 +49,6 @@ class OrderedGinq extends Ginq
     public function getIterator()
     {
         return self::$gen->orderBy($this->it, $this->comparer);
-    }
-
-    /**
-     * @param array|Iterator|IteratorAggregate|Traversable $xs
-     * @param Comparer $comparer
-     * @return OrderedGinq
-     */
-    public static function create($xs, $comparer)
-    {
-        return new OrderedGinq($xs, $comparer);
     }
 
     /**
@@ -76,7 +65,7 @@ class OrderedGinq extends Ginq
         $comparer = ComparerParser::parse($comparer);
         $comparer = new ProjectionComparer($orderingKeySelector, $comparer);
         $comparer = new CompoundComparer($this->comparer, $comparer);
-        return OrderedGinq::create($this->getIterator(), $comparer);
+        return new OrderedGinq($this->getIterator(), $comparer);
     }
 
     /**
@@ -94,7 +83,7 @@ class OrderedGinq extends Ginq
         $comparer = new ProjectionComparer($orderingKeySelector, $comparer);
         $comparer = new ReverseComparer($comparer);
         $comparer = new CompoundComparer($this->comparer, $comparer);
-        return OrderedGinq::create($this->getIterator(), $comparer);
+        return new OrderedGinq($this->getIterator(), $comparer);
     }
 }
 

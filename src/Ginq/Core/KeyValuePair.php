@@ -14,36 +14,28 @@
  * @package    Ginq
  */
 
-namespace Ginq\Comparer;
+namespace Ginq\Core;
 
-use Ginq\Core\Comparer;
-
-class DelegateComparer extends Comparer
+class KeyValuePair
 {
     /**
-     * @var \Closure
+     * @var mixed
      */
-    private $fn;
+    public $key;
 
     /**
-     * @param \Closure $fn
+     * @var mixed
      */
-    public function __construct($fn)
-    {
-        $this->fn = $fn;
-    }
+    public $value;
 
     /**
-     * @param mixed $v0 - left value (sort key)
-     * @param mixed $v1 - right value (sort key)
-     * @param mixed $k0 - left key
-     * @param mixed $k1 - right key
-     * @return int
+     * @param mixed $key
+     * @param mixed $value
      */
-    public function compare($v0, $v1, $k0, $k1)
+    public function __construct($key, $value)
     {
-        $fn = $this->fn;
-        return $fn($v0, $v1, $k0, $k1);
+        $this->key = $key;
+        $this->value = $value;
     }
 }
 

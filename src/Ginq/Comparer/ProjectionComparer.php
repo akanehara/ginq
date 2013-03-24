@@ -19,7 +19,7 @@ namespace Ginq\Comparer;
 use Ginq\Core\Comparer;
 use Ginq\Core\Selector;
 
-class ProjectionComparer implements Comparer
+class ProjectionComparer extends Comparer
 {
     /**
      * @var Selector

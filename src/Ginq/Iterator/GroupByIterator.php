@@ -19,6 +19,7 @@ namespace Ginq\Iterator;
 use Ginq\Core\Lookup;
 use Ginq\Core\Selector;
 use Ginq\Selector\DelegateSelector;
+use Ginq\Selector\IdentityKeySelector;
 use Ginq\Util\IteratorUtil;
 
 /**
@@ -73,17 +74,24 @@ class GroupByIterator implements \Iterator
 
     public function current()
     {
-        $group = new SelectIterator(
-            $this->group->current(),
+        /**
+         * @var \Ginq\Core\KeyValuePair $pair
+         */
+        $pair = $this->group->current();
+        $group = new SelectIterator($pair->value,
             $this->elementSelector,
-            new DelegateSelector(function($v, $k) { return $k; })
+            IdentityKeySelector::getInstance()
         );
-        return $this->groupSelector->select($group, $this->group->key());
+        return $this->groupSelector->select($group, $pair->key);
     }
 
-    public function key() 
+    public function key()
     {
-        return $this->group->key();
+        /**
+         * @var \Ginq\Core\KeyValuePair $pair
+         */
+        $pair = $this->group->current();
+        return $pair->key;
     }
 
     public function next()
@@ -97,7 +105,7 @@ class GroupByIterator implements \Iterator
         $this->i = 0;
         $this->it->rewind();
         $this->group = Lookup::from(
-            $this->it, $this->groupingKeySelector
+            $this->it,$this->groupingKeySelector
         )->getIterator();
     }
 

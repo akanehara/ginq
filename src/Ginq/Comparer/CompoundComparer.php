@@ -18,7 +18,7 @@ namespace Ginq\Comparer;
 
 use Ginq\Core\Comparer;
 
-class CompoundComparer implements Comparer
+class CompoundComparer extends Comparer
 {
     /**
      * @var Comparer

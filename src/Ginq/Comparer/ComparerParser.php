@@ -28,7 +28,7 @@ class ComparerParser
     static public function parse($src)
     {
         if (is_null($src)) {
-            return new DefaultComparer();
+            return new Comparer();
         }
         if ($src instanceof \Closure) {
             return new DelegateComparer($src);

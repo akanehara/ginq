@@ -964,6 +964,64 @@ class GinqTest extends PHPUnit_Framework_TestCase
             2 => 1,
             3 => 3
         ), $xss);
+
+        // array key
+        $movies = array(
+            array('id'=>1, 'title'=>'A Clockwork Orange',
+                    'director' => array('id'=>1, 'name'=>'Stanley Kubrick')),
+            array('id'=>2, 'title'=>'The Terminator',
+                    'director' => array('id'=>3, 'name'=>'James Cameron')),
+            array('id'=>3, 'title'=>'Apocalypse Now',
+                    'director' => array('id'=>2, 'name'=>'Francis Ford Coppola')),
+            array('id'=>4, 'title'=>'Full Metal Jacket',
+                    'director' => array('id'=>1, 'name'=>'Stanley Kubrick')),
+            array('id'=>5, 'title'=>'The Godfather',
+                    'director' => array('id'=>2, 'name'=>'Francis Ford Coppola')),
+        );
+        $actual = Ginq::from($movies)->groupBy('director')
+                ->select(function($gr, $key) {
+                    /**
+                     * @var GroupingGinq $gr
+                     */
+                    return $gr->fold(array(), function($acc, $x) {
+                        $acc[] = $x['title'];
+                        return $acc;
+                    });
+                })->renum()->toArray();
+        $this->assertEquals(array(
+            array('A Clockwork Orange', 'Full Metal Jacket'),
+            array('The Terminator'),
+            array('Apocalypse Now', 'The Godfather'),
+        ), $actual);
+
+        // object key
+        $movies = array(
+            new Movie(1, 'A Clockwork Orange',
+                new Director(1, 'Stanley Kubrick')),
+            new Movie(2, 'The Terminator',
+                new Director(3, 'James Cameron')),
+            new Movie(3, 'Apocalypse Now',
+                new Director(2, 'Francis Ford Coppola')),
+            new Movie(4, 'Full Metal Jacket',
+                new Director(1, 'Stanley Kubrick')),
+            new Movie(5, 'The Godfather',
+                new Director(2, 'Francis Ford Coppola')),
+        );
+        $actual = Ginq::from($movies)->groupBy('director')
+            ->select(function($gr, $key) {
+                /**
+                 * @var GroupingGinq $gr
+                 */
+                return $gr->fold(array(), function($acc, $x) {
+                    $acc[] = $x->title;
+                    return $acc;
+                });
+            })->renum()->toArray();
+        $this->assertEquals(array(
+            array('A Clockwork Orange', 'Full Metal Jacket'),
+            array('The Terminator'),
+            array('Apocalypse Now', 'The Godfather'),
+        ), $actual);
     }
 
     /**
@@ -1101,6 +1159,29 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
  }
+
+class Movie
+{
+    public $id;
+    public $title;
+    public function __construct($id, $title, $director)
+    {
+        $this->id       = $id;
+        $this->title    = $title;
+        $this->director = $director;
+    }
+}
+
+class Director
+{
+    public $id;
+    public $name;
+    public function __construct($id, $name)
+    {
+        $this->id   = $id;
+        $this->name = $name;
+    }
+}
 
 // Call GinqTest::main() if this source file is executed directly.
 if (defined('PHPUnit_MAIN_METHOD') && PHPUnit_MAIN_METHOD == "GinqTest::main") {

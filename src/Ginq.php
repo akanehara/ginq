@@ -18,11 +18,11 @@ use Ginq\Core\Selector;
 use Ginq\Comparer\ComparerParser;
 use Ginq\Core\JoinSelector;
 use Ginq\Core\Comparer;
+use Ginq\Core\EqualityComparer;
 use Ginq\Selector\SelectorParser;
 use Ginq\JoinSelector\JoinSelectorParser;
 use Ginq\Predicate\PredicateParser;
 use Ginq\Util\IteratorUtil;
-use Ginq\Comparer\DefaultComparer;
 use Ginq\Comparer\ReverseComparer;
 use Ginq\Comparer\ProjectionComparer;
 
@@ -207,6 +207,40 @@ class Ginq implements IteratorAggregate
     }
 
     // methods.
+
+    /**
+     * default compare
+     *
+     * @params mixed $v0
+     * @params mixed $v1
+     * @params mixed $k0
+     * @params mixed $k1
+     * @return int
+     */ 
+    public static function compare($v0, $v1, $k0, $k1) {
+        return Comparer::getDefault()->compare($v0, $v1, $k0, $k1);
+    }
+
+    /**
+     * default equality comparing
+     *
+     * @params mixed $x
+     * @params mixed $y
+     * @return bool
+     */ 
+    public static function equals($x, $y) {
+        return EqualityComparer::getDefault()->equals($x, $y);
+    }
+
+    /**
+     * default hash function
+     *
+     * @params mixed $x
+     * @return string
+     */
+    public static function hash($x) {
+        return EqualityComparer::getDefault()->hash($x);
+    }
 
     /**
      * @deprecated
@@ -811,7 +845,7 @@ class Ginq implements IteratorAggregate
             $this->getIterator(),
             SelectorParser::parse($groupingKeySelector),
             SelectorParser::parse($elementSelector),
-            SelectorParser::parse(function ($xs, $k) { return Ginq::from($xs); })
+            SelectorParser::parse(function ($xs, $key) { return new GroupingGinq($xs, $key); })
         ));
     }
 
@@ -828,7 +862,7 @@ class Ginq implements IteratorAggregate
         $orderingKeySelector = SelectorParser::parse($orderingKeySelector);
         $comparer = ComparerParser::parse($comparer);
         $comparer = new ProjectionComparer($orderingKeySelector, $comparer);
-        return OrderedGinq::create($this->getIterator(), $comparer);
+        return new OrderedGinq($this->getIterator(), $comparer);
     }
 
     /**
@@ -845,7 +879,7 @@ class Ginq implements IteratorAggregate
         $comparer = ComparerParser::parse($comparer);
         $comparer = new ProjectionComparer($orderingKeySelector, $comparer);
         $comparer = new ReverseComparer($comparer);
-        return OrderedGinq::create($this->getIterator(), $comparer);
+        return new OrderedGinq($this->getIterator(), $comparer);
     }
 
     /**
@@ -941,4 +975,5 @@ Ginq::_registerAutoloadFunction();
 Ginq::useIterator();
 
 require_once "OrderedGinq.php";
+require_once "GroupingGinq.php";
 

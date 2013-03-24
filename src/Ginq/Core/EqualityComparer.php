@@ -16,40 +16,38 @@
 
 namespace Ginq\Core;
 
-class Comparer
+class EqualityComparer
 {
     /**
-     * @var Comparer
+     * @var EqualityComparer
      */
     static private $inst;
 
     /**
-     * @return Comparer
+     * @return EqualityComparer
      */
-    static final public function getDefault() {
+    static final public function getDefault()
+    {
         if (is_null(self::$inst)) {
-            self::$inst = new Comparer();
+            self::$inst = new EqualityComparer();
         }
         return self::$inst;
     }
 
-    /**
-     * @param mixed $v0 - left value (sort key)
-     * @param mixed $v1 - right value (sort key)
-     * @param mixed $k0 - left key
-     * @param mixed $k1 - right key
-     * @return int
-     */
-    public function compare($v0, $v1, $k0, $k1)
+    public function equals($x, $y)
     {
-        if (is_string($v0) && is_string($v1)) {
-            return strcmp($v0, $v1);
+        if (is_object($x) && is_object($y)) {
+            return $x == $y;
         }
-        if (is_numeric($v0) && is_numeric($v1)) {
-            if ($v0 == $v1) return 0;
-            return ($v0 < $v1) ? -1 : 1;
-        }
-        return 0;
+        /* if (is_array($x) && is_array($y)) {
+            return $x === $y;
+        } */
+        return $x === $y;
+    }
+
+    public function hash($v)
+    {
+        return sha1(serialize($v));
     }
 }
 
