@@ -25,6 +25,8 @@ use Ginq\Predicate\PredicateParser;
 use Ginq\Util\IteratorUtil;
 use Ginq\Comparer\ReverseComparer;
 use Ginq\Comparer\ProjectionComparer;
+use Ginq\OrderedGinq;
+use Ginq\GroupingGinq;
 
 /**
  * Ginq
@@ -973,7 +975,3 @@ class Ginq implements IteratorAggregate
 Ginq::_registerAutoloadFunction();
 
 Ginq::useIterator();
-
-require_once "OrderedGinq.php";
-require_once "GroupingGinq.php";
-
