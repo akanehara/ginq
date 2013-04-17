@@ -14,6 +14,8 @@
  * @package    Ginq
  */
 
+namespace Ginq;
+
 use Ginq\Core\Selector;
 use Ginq\Core\JoinSelector;
 use Ginq\Core\Comparer;
@@ -26,7 +28,7 @@ use Ginq\Comparer\ReverseComparer;
 use Ginq\Comparer\ProjectionComparer;
 use Ginq\Comparer\ComparerParser;
 
-class GroupingGinq extends Ginq
+class GroupingGinq extends \Ginq
 {
     /**
      * @var mixed
