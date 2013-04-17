@@ -14,6 +14,8 @@
  * @package    Ginq
  */
 
+namespace Ginq;
+
 use Ginq\Core\Selector;
 use Ginq\Core\JoinSelector;
 use Ginq\Core\Comparer;
@@ -26,7 +28,7 @@ use Ginq\Comparer\ReverseComparer;
 use Ginq\Comparer\ProjectionComparer;
 use Ginq\Comparer\ComparerParser;
 
-class OrderedGinq extends Ginq
+class OrderedGinq extends \Ginq
 {
     /**
      * @var Comparer
@@ -59,7 +61,7 @@ class OrderedGinq extends Ginq
     public function thenBy($orderingKeySelector = null, $comparer = null)
     {
         if (is_null($orderingKeySelector)) {
-            $orderingKeySelector = Ginq::VALUE_OF;
+            $orderingKeySelector = \Ginq::VALUE_OF;
         }
         $orderingKeySelector = SelectorParser::parse($orderingKeySelector);
         $comparer = ComparerParser::parse($comparer);
@@ -76,7 +78,7 @@ class OrderedGinq extends Ginq
     public function thenByDesc($orderingKeySelector = null, $comparer = null)
     {
         if (is_null($orderingKeySelector)) {
-            $orderingKeySelector = Ginq::VALUE_OF;
+            $orderingKeySelector = \Ginq::VALUE_OF;
         }
         $orderingKeySelector = SelectorParser::parse($orderingKeySelector);
         $comparer = ComparerParser::parse($comparer);
