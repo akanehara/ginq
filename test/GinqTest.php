@@ -267,6 +267,44 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $actual = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
                     ->count(function($x) { return $x % 2 == 0; });
         $this->assertEquals(5, $actual);
+
+        $actual = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
+                    ->count(function($v, $k) { return $k != 0; });
+        $this->assertEquals(9, $actual);
+    }
+
+    /**
+     * testSum().
+     */
+    public function testSum()
+    {
+        $actual = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))->sum();
+        $this->assertEquals(55, $actual);
+
+        $actual = Ginq::from(array("apple", "orange", "grape"))
+                    ->sum(function($x) { return strlen($x); });
+        $this->assertEquals(16, $actual);
+
+        $actual = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
+                    ->sum(function($v, $k) { return $k; });
+        $this->assertEquals(45, $actual);
+    }
+
+    /**
+     * testAverage().
+     */
+    public function testAverage()
+    {
+        $actual = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))->average();
+        $this->assertEquals(5.5, $actual);
+
+        $actual = Ginq::from(array("apple", "orange", "grape"))
+            ->average(function($x) { return strlen($x); });
+        $this->assertEquals(16/3, $actual);
+
+        $actual = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
+            ->average(function($v, $k) { return $k; });
+        $this->assertEquals(4.5, $actual);
     }
 
     /**

@@ -439,6 +439,40 @@ class Ginq implements IteratorAggregate
     }
 
     /**
+     * @param \Closure|string|null $selector ($value, $key)
+     */
+    public function sum($selector = null)
+    {
+        if (is_null($selector)) {
+            $selector = Ginq::VALUE_OF;
+        }
+        $s = SelectorParser::parse($selector);
+        return $this->foldLeft(0,
+            function ($acc, $v, $k) use($s) {
+                return $acc + $s->select($v, $k);
+            }
+        );
+    }
+
+    /**
+     * @param \Closure|string|null $selector ($value, $key)
+     */
+    public function average($selector = null)
+    {
+        if (is_null($selector)) {
+            $selector = Ginq::VALUE_OF;
+        }
+        $s = SelectorParser::parse($selector);
+        $sum   = 0;
+        $count = 0;
+        foreach ($this as $k => $v) {
+            $count++;
+            $sum += $s->select($v, $k);
+        }
+        return $sum / $count;
+    }
+
+    /**
      * @param mixed $default
      * @return mixed
      */
