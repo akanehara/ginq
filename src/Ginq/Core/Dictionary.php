@@ -16,8 +16,6 @@
 
 namespace Ginq\Core;
 
-use \Ginq\Iterator\RenumIterator;
-
 class Dictionary implements \IteratorAggregate
 {
     /**
