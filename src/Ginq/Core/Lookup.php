@@ -31,19 +31,23 @@ class Lookup implements \IteratorAggregate
      */
     private $dict;
 
-    protected function __construct($equalityComparer)
+    /**
+     * @param EqualityComparer $eqComparer
+     */
+    protected function __construct($eqComparer)
     {
-        $this->dict = new Dictionary($equalityComparer);
+        $this->dict = new Dictionary($eqComparer);
     }
 
     /**
      * @param array|\Iterator|\IteratorAggregate|\Traversable $xs
      * @param Selector $keySelector
+     * @param EqualityComparer $eqComparer
      * @return Lookup
      */
-    public static function from($xs, $keySelector, $equalityComparer = null)
+    public static function from($xs, $keySelector, $eqComparer)
     {
-        $lookup = new self($equalityComparer);
+        $lookup = new self($eqComparer);
         foreach ($xs as $k => $v) {
             $lookup->put($keySelector->select($v, $k), $v);
         }

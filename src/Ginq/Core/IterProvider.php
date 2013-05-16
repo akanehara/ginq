@@ -151,10 +151,14 @@ interface IterProvider
      * @param Selector $innerKeySelector
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
-     * @internal param \Ginq\Core\Selector $outerKeySelector
+     * @param EqualityComparer $eqComparer
      * @return \Iterator
      */
-    public function join($outer, $inner, $outerKeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector);
+    public function join(
+            $outer, $inner,
+            $outerKeySelector, $innerKeySelector,
+            $valueJoinSelector, $keyJoinSelector,
+            $eqComparer);
 
     /**
      * @param array|\Traversable $xs
@@ -170,9 +174,10 @@ interface IterProvider
      * @param Selector $groupingKeySelector
      * @param Selector $elementSelector
      * @param Selector $groupSelector
+     * @param EqualityComparer $eqComparer
      * @return \Iterator
      */
-    public function groupBy($xs, $groupingKeySelector, $elementSelector, $groupSelector);
+    public function groupBy($xs, $groupingKeySelector, $elementSelector, $groupSelector, $eqComparer);
 
     /**
      * @param array|\Traversable $xs

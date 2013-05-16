@@ -18,7 +18,7 @@ namespace Ginq\Iterator;
 
 use Ginq\Core\Lookup;
 use Ginq\Core\Selector;
-use Ginq\Selector\DelegateSelector;
+use Ginq\Core\EqualityComparer;
 use Ginq\Selector\IdentityKeySelector;
 use Ginq\Util\IteratorUtil;
 
@@ -63,13 +63,15 @@ class GroupByIterator implements \Iterator
      * @param Selector $groupingKeySelector
      * @param Selector $elementSelector
      * @param Selector $groupSelector
+     * @param EqualityComparer $groupSelector
      */
-    public function __construct($xs, $groupingKeySelector, $elementSelector, $groupSelector)
+    public function __construct($xs, $groupingKeySelector, $elementSelector, $groupSelector, $eqComparer)
     {
         $this->it = IteratorUtil::iterator($xs);
         $this->groupingKeySelector = $groupingKeySelector;
         $this->elementSelector = $elementSelector;
         $this->groupSelector   = $groupSelector;
+        $this->eqComparer      = $eqComparer;
     }
 
     public function current()
@@ -105,7 +107,9 @@ class GroupByIterator implements \Iterator
         $this->i = 0;
         $this->it->rewind();
         $this->group = Lookup::from(
-            $this->it,$this->groupingKeySelector
+            $this->it,
+            $this->groupingKeySelector,
+            $this->eqComparer
         )->getIterator();
     }
 

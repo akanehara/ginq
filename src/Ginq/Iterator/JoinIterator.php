@@ -60,17 +60,24 @@ class JoinIterator implements \Iterator
     protected $keyJoinSelector;
 
     /**
+     * @var EqualityComparer
+     */
+    protected $eqComparer;
+
+    /**
      * @param array|\Traversable $outer
      * @param array|\Traversable $inner
      * @param Selector $outerKeySelector
      * @param Selector $innerKeySelector
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
+     * @param EqualityComparer $eqComparer
      */
     public function __construct(
         $outer, $inner,
         $outerKeySelector, $innerKeySelector,
-        $valueJoinSelector, $keyJoinSelector)
+        $valueJoinSelector, $keyJoinSelector,
+        $eqComparer)
     {
         $this->outer = IteratorUtil::iterator($outer);
         $this->inner = IteratorUtil::iterator($inner);
@@ -78,6 +85,7 @@ class JoinIterator implements \Iterator
         $this->innerKeySelector = $innerKeySelector;
         $this->valueJoinSelector = $valueJoinSelector;
         $this->keyJoinSelector = $keyJoinSelector;
+        $this->eqComparer = $eqComparer;
     }
 
     public function current()
@@ -103,7 +111,7 @@ class JoinIterator implements \Iterator
     public function rewind()
     {
         $outerKeySelector = $this->outerKeySelector;
-        $lookup = Lookup::from($this->inner, $this->innerKeySelector);
+        $lookup = Lookup::from($this->inner, $this->innerKeySelector, $this->eqComparer);
         $this->it = new SelectManyWithJoinIterator(
             $this->outer,
             SelectorParser::parse(

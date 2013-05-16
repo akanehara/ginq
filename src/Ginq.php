@@ -841,11 +841,13 @@ class Ginq implements IteratorAggregate
         $innerKeySelector = SelectorParser::parse($innerKeySelector);
         $valueJoinSelector = JoinSelectorParser::parse($valueJoinSelector);
         $keyJoinSelector = JoinSelectorParser::parse($keyJoinSelector);
+        $eqComparer = EqualityComparer::getDefault();
         return self::from(self::$gen->join(
             $this->getIterator(),
             IteratorUtil::iterator($inner),
             $outerKeySelector, $innerKeySelector,
-            $valueJoinSelector, $keyJoinSelector
+            $valueJoinSelector, $keyJoinSelector,
+            $eqComparer
         ));
     }
 
@@ -878,11 +880,15 @@ class Ginq implements IteratorAggregate
         if (is_null($elementSelector)) {
             $elementSelector = SelectorParser::VALUE_OF;
         }
+        $eqComparer = EqualityComparer::getDefault();
         return self::from(self::$gen->groupBy(
             $this->getIterator(),
             SelectorParser::parse($groupingKeySelector),
             SelectorParser::parse($elementSelector),
-            SelectorParser::parse(function ($xs, $key) { return new GroupingGinq($xs, $key); })
+            SelectorParser::parse(function ($xs, $key) {
+                return new GroupingGinq($xs, $key);
+            }),
+            $eqComparer
         ));
     }
 

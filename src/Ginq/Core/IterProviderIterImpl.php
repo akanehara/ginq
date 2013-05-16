@@ -222,11 +222,20 @@ class IterProviderIterImpl implements IterProvider
      * @param Selector $innerKeySelector
      * @param JoinSelector $valueJoinSelector
      * @param JoinSelector $keyJoinSelector
-     * @return \Ginq\Iterator\JoinIterator|\Iterator
+     * @param EqualityComparer $eqComparer
+     * @return \Ginq\Iterator\JoinIterator
      */
-    public function join($outer, $inner, $outerKeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector)
+    public function join(
+            $outer, $inner,
+            $outerKeySelector, $innerKeySelector,
+            $valueJoinSelector, $keyJoinSelector,
+            $eqComparer)
     {
-        return new JoinIterator($outer, $inner, $outerKeySelector, $innerKeySelector, $valueJoinSelector, $keyJoinSelector);
+        return new JoinIterator(
+            $outer, $inner,
+            $outerKeySelector, $innerKeySelector,
+            $valueJoinSelector, $keyJoinSelector,
+            $eqComparer);
     }
 
     /**
@@ -246,11 +255,12 @@ class IterProviderIterImpl implements IterProvider
      * @param Selector $keySelector
      * @param Selector $elementSelector
      * @param Selector $groupSelector
+     * @param EqualityComparer $eqComparer
      * @return \Ginq\Iterator\GroupByIterator
      */
-    public function groupBy($xs, $keySelector, $elementSelector, $groupSelector)
+    public function groupBy($xs, $keySelector, $elementSelector, $groupSelector, $eqComparer)
     {
-        return new GroupByIterator($xs, $keySelector, $elementSelector, $groupSelector);
+        return new GroupByIterator($xs, $keySelector, $elementSelector, $groupSelector, $eqComparer);
     }
 
     /**

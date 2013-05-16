@@ -21,7 +21,7 @@ class Dictionary implements \IteratorAggregate
     /**
      * @var EqualityComparer
      */
-    protected $comparer;
+    protected $eqComparer;
 
     /**
      * @var array
@@ -34,14 +34,14 @@ class Dictionary implements \IteratorAggregate
     protected $values;
 
     /**
-     * @param EqualityComparer $equalityComparer
+     * @param EqualityComparer $eqComparer
      */
-    public function __construct($equalityComparer = null)
+    public function __construct($eqComparer = null)
     {
-        if (is_null($equalityComparer)) {
-            $equalityComparer = EqualityComparer::getDefault();
+        if (is_null($eqComparer)) {
+            $eqComparer = EqualityComparer::getDefault();
         }
-        $this->comparer = $equalityComparer;
+        $this->eqComparer = $eqComparer;
         $this->keys = array();
         $this->values = array();
     }
@@ -57,7 +57,7 @@ class Dictionary implements \IteratorAggregate
      */
     public function contains($key)
     {
-        $hash = $this->comparer->hash($key);
+        $hash = $this->eqComparer->hash($key);
         return array_key_exists($hash, $this->values);
     }
 
@@ -67,7 +67,7 @@ class Dictionary implements \IteratorAggregate
      */
     public function get($key, $default = null)
     {
-        $hash = $this->comparer->hash($key);
+        $hash = $this->eqComparer->hash($key);
         if (array_key_exists($hash, $this->values)) {
             return $this->values[$hash];
         } else {
@@ -81,7 +81,7 @@ class Dictionary implements \IteratorAggregate
      */
     public function put($key, $value)
     {
-        $hash = $this->comparer->hash($key);
+        $hash = $this->eqComparer->hash($key);
         if (!array_key_exists($hash, $this->values)) {
             $this->keys[] = $key;
         }
