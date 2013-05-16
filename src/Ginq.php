@@ -926,6 +926,18 @@ class Ginq implements IteratorAggregate
     }
 
     /**
+     * @param EqualityComparer $eqComparer
+     * @return Ginq
+     */
+    public function distinct($eqComparer = null)
+    {
+        if (is_null($eqComparer)) {
+            $eqComparer = EqualityComparer::getDefault();
+        }
+        return self::from(self::$gen->distinct($this->getIterator(), $eqComparer));
+    }
+
+    /**
      * @return Ginq
      */
     public function memoize()

@@ -16,6 +16,7 @@
 
 namespace Ginq\Core;
 
+use Ginq\Iterator\DistinctIterator;
 use Ginq\Iterator\ZeroIterator;
 use Ginq\Iterator\RangeIterator;
 use Ginq\Iterator\RangeInfIterator;
@@ -271,6 +272,16 @@ class IterProviderIterImpl implements IterProvider
     public function orderBy($xs, $comparer)
     {
         return new OrderedIterator($xs, $comparer);
+    }
+
+    /**
+     * @param array|\Traversable $xs
+     * @param EqualityComparer $eqComparer
+     * @return \Iterator
+     */
+    public function distinct($xs, $eqComparer)
+    {
+       return new DistinctIterator($xs, $eqComparer);
     }
 
     /**

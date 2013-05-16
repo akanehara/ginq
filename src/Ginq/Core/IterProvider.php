@@ -188,6 +188,13 @@ interface IterProvider
 
     /**
      * @param array|\Traversable $xs
+     * @param EqualityComparer $eqComparer
+     * @return \Iterator
+     */
+    public function distinct($xs, $eqComparer);
+
+    /**
+     * @param array|\Traversable $xs
      * @return \Iterator
      */
     public function memoize($xs);

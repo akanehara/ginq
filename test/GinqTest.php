@@ -1172,6 +1172,16 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testDistinct().
+     */
+    public function testDistinct()
+    {
+        $xs = Ginq::from(array(5, 7, 7, 8, 2, 1, 7, 5))
+                ->distinct()->renum()->toArray();
+        $this->assertEquals(array(5, 7, 8, 2, 1), $xs);
+    }
+
+    /**
      * testMemoize().
      */
     public function testMemoize()
