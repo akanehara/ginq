@@ -65,151 +65,6 @@ class Ginq implements IteratorAggregate
         $this->it = $it;
     }
 
-    // aliases.
-
-    /**
-     * @deprecated Alias method to renum().
-     */
-    public function sequence()
-    {
-        return $this->renum();
-    }
-
-    /**
-     * @deprecated Alias method to renum().
-     * @return Ginq
-     */
-    public function rehash()
-    {
-        return $this->renum();
-    }
-
-    /**
-     * Alias method to select().
-     *
-     * @param Closure|string|int|Selector      $valueSelector
-     * @param Closure|string|int|Selector|null $keySelector
-     * @return Ginq
-     */
-    public function map($valueSelector, $keySelector = null)
-    {
-        return $this->select($valueSelector, $keySelector);
-    }
-
-    /**
-     * Alias method to where().
-     *
-     * @param string|callable $predicate ($value, $key)
-     * @return Ginq
-     */
-    public function filter($predicate)
-    {
-        return $this->where($predicate);
-    }
-
-    /**
-     * Alias method to filter().
-     * @deprecated
-     * @param Closure|string|int|Selector      $valueSelector
-     * @param Closure|string|int|Selector|null $keySelector
-     * @return Ginq
-     */
-    public function collect($valueSelector, $keySelector = null)
-    {
-        return $this->filter($valueSelector, $keySelector);
-    }
-
-    /**
-     * Alias method to foldLeft().
-     *
-     * @param mixed    $accumulator
-     * @param callable $operator ($accumulator, $value, $key)
-     * @return mixed
-     */
-    public function fold($accumulator, $operator)
-    {
-        return $this->foldLeft($accumulator, $operator);
-    }
-
-    /**
-     * Alias method to reduceLeft().
-     *
-     * @param callable $operator ($accumulator, $value, $key)
-     * @return mixed
-     */
-    public function reduce($operator)
-    {
-        return $this->reduceLeft($operator);
-    }
-
-    /**
-     * Alias method to contains().
-     *
-     * @param mixed $value
-     * @return bool
-     */
-    public function has($value)
-    {
-        return $this->contains($value);
-    }
-
-    /**
-     * Alias method to containsKey().
-     *
-     * @param mixed $key
-     * @return bool
-     */
-    public function hasKey($key)
-    {
-        return $this->containsKey($key);
-    }
-
-    /**
-     * Alias method to first().
-     *
-     * @param mixed $default
-     * @return mixed
-     */
-    public function head($default = null)
-    {
-        return $this->first($default);
-    }
-
-    /**
-     * Alias method to rest().
-     *
-     * @param array|Traversable $default
-     * @return Ginq
-     */
-    public function tail($default = array())
-    {
-        return $this->rest($default);
-    }
-
-    /**
-     * Alias method to drop().
-     *
-     * @param int $n
-     * @return Ginq
-     */
-    public function skip($n)
-    {
-        return $this->drop($n);
-    }
-
-    /**
-     * Alias method to dropWhile().
-     *
-     * @param string|callable $predicate
-     * @return Ginq
-     */
-    public function skipWhile($predicate)
-    {
-        return $this->dropWhile($predicate);
-    }
-
-    // methods.
-
     /**
      * default compare
      *
@@ -267,128 +122,65 @@ class Ginq implements IteratorAggregate
     }
 
     /**
+     * @param callable|null  $combiner (existV, v, k) -> v
      * @return array
      */
-    public function toArray()
+    public function toArray($combiner = null)
     {
-        $arr = array();
-        foreach ($this->getIterator() as $k => $v) {
-            $arr[$k] = $v;
+        if (is_null($combiner)) {
+            return IteratorUtil::toArray($this->getIterator());
+        } else {
+            return IteratorUtil::toArrayWithCombine($this->getIterator(), $combiner);
         }
-        return $arr;
+    }
+
+    /**
+     * @param int|null       $depth
+     * @param callable|null  $combiner (existV, v, k) -> v
+     * @return array
+     */
+    public function toArrayRec($depth = null, $combiner = null)
+    {
+        if (is_null($combiner)) {
+            return IteratorUtil::toArrayRec($this->getIterator(), $depth);
+        } else {
+            return IteratorUtil::toArrayRecWithCombine($this->getIterator(), $depth, $combiner);
+        }
+    }
+
+
+    /**
+     * @return array
+     */
+    public function toList()
+    {
+        return IteratorUtil::toList($this->getIterator());
+    }
+
+    /**
+     * @param null|int $depth
+     * @return array
+     */
+    public function toListRec($depth = null)
+    {
+        return IteratorUtil::toListRec($this->getIterator(), $depth);
     }
 
     /**
      * @return array
      */
-    public function toArrayRec()
+    public function toAList()
     {
-        $arr = array();
-        foreach ($this->getIterator() as $k => $v) {
-            if ($v instanceof \Iterator || $v instanceof \IteratorAggregate) {
-                $arr[$k] = self::from($v)->toArrayRec();
-            } else {
-                $arr[$k] = $v;
-            }
-        }
-        return $arr;
+        return IteratorUtil::toAList($this->getIterator());
     }
 
     /**
+     * @param null|int $depth
      * @return array
      */
-    public function toAssoc()
+    public function toAListRec($depth = null)
     {
-        $alist = array();
-        foreach ($this->getIterator() as $k => $v) {
-            array_push($alist, array($k, $v));
-        }
-        return $alist;
-    }
-
-    /**
-     * @return array
-     */
-    public function toAssocRec()
-    {
-        $alist = array();
-        foreach ($this->getIterator() as $k => $v) {
-            if ($v instanceof \Iterator || $v instanceof \IteratorAggregate) {
-                array_push($alist, array($k, self::from($v)->toAssocRec()));
-            } else {
-                array_push($alist, array($k, $v));
-            }
-        }
-        return $alist;
-    }
-
-    /**
-     * @param Closure|string|int|Selector|null $keySelector   ($value, $key)
-     * @param Closure|string|int|Selector|null $valueSelector ($value, $key)
-     * @return array
-     */
-    public function toDictionary($keySelector = null, $valueSelector = null)
-    {
-        if (is_null($keySelector)) {
-            $keySelector = Ginq::KEY_OF;
-        }
-        if (is_null($valueSelector)) {
-            $valueSelector = Ginq::VALUE_OF;
-        }
-        $keySelector = SelectorParser::parse($keySelector);
-        $valueSelector = SelectorParser::parse($valueSelector);
-        return $this->fold(
-            array(),
-            function($acc, $v0, $k0) use ($keySelector, $valueSelector) {
-                $k1 = $keySelector->select($v0, $k0);
-                $v1 = $valueSelector->select($v0, $k0);
-                if ($v1 instanceof \Iterator || $v1 instanceof \IteratorAggregate) {
-                    $v1 = Ginq::from($v1)->toArrayRec();
-                }
-                $acc[$k1] = $v1;
-                return $acc;
-            }
-        );
-    }
-
-    /**
-     * @param callable                         $combiner      ($exist, $value, $key)
-     * @param Closure|string|int|Selector|null $keySelector   ($value, $kay)
-     * @param Closure|string|int|Selector|null $valueSelector ($value, $key)
-     * @return array
-     */
-    public function toDictionaryWith($combiner, $keySelector = null, $valueSelector = null)
-    {
-        if (is_null($valueSelector)) {
-            $valueSelector = Ginq::VALUE_OF;
-        }
-        if (is_null($keySelector)) {
-            $keySelector = Ginq::KEY_OF;
-        }
-
-        /**
-         * @var Selector $valueSelector
-         * @var Selector $keySelector
-         */
-        $valueSelector = SelectorParser::parse($valueSelector);
-        $keySelector = SelectorParser::parse($keySelector);
-
-        return $this->fold(
-            array(),
-            function($acc, $v0, $k0) use ($combiner, $keySelector, $valueSelector) {
-                $k1 = $keySelector->select($v0, $k0);
-                $v1 = $valueSelector->select($v0, $k0);
-                if ($v1 instanceof \Iterator || $v1 instanceof \IteratorAggregate) {
-                    $v1 = Ginq::from($v1)->toArrayRec();
-                }
-                if (array_key_exists($k1, $acc)) {
-                    $acc[$k1] = $combiner($acc[$k1], $v1, $k1);
-                } else {
-                    $acc[$k1] = $v1;
-                }
-                return $acc;
-            }
-        );
+        return IteratorUtil::toAListRec($this->getIterator(), $depth);
     }
 
     /**
@@ -545,7 +337,7 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param mixed $accumulator
-     * @param callable $operator ($accumulator, $value, $key)
+     * @param callable $operator (acc, v, k) -> acc
      * @return mixed
      */
     public function foldLeft($accumulator, $operator)
@@ -559,7 +351,7 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param mixed $accumulator
-     * @param callable $operator ($accumulator, $value, $key)
+     * @param callable $operator (acc, v, k) -> acc
      * @return mixed
      */
     public function foldRight($accumulator, $operator)
@@ -812,7 +604,7 @@ class Ginq implements IteratorAggregate
 
     /**
      * @deprecated
-     * @param Closure|string|int|Selector $manySelector
+     * @param Closure|string|int|Selector     $manySelector
      * @param Closure|JoinSelector|int|null   $valueJoinSelector
      * @param Closure|JoinSelector|int|null   $keyJoinSelector
      * @return Ginq
