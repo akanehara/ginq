@@ -562,14 +562,6 @@ class GinqTest extends PHPUnit_Framework_TestCase
                     ->renum()
                     ->toArray();
         $this->assertEquals($expected, $actual);
-
-        // key reunmbering use Ginq::COUNTER
-        $expected = array(2,4,6,8,10,12,14,16,18,20);
-        $actual = Ginq::range(1,20)
-                    ->where(function($x) { return $x % 2 == 0; })
-                    ->select(null, Ginq::COUNTER)
-                    ->toArray();
-        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -877,9 +869,8 @@ class GinqTest extends PHPUnit_Framework_TestCase
             'id', 'owner',
             function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
-            },
-            Ginq::COUNTER
-        )->toArray();
+            }
+        )->toList();
         $this->assertEquals(
             array(
                  array('Taro', '03-1234-5678')
@@ -924,12 +915,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             array(0, "1 - red"),
             array(1, "2 - green"),
-            array(0, "3 - red"),
-            array(1, "4 - green"),
-            array(0, "5 - red"),
-            array(1, "6 - green"),
-            array(0, "7 - red"),
-            array(1, "8 - green")
+            array(2, "3 - red"),
+            array(3, "4 - green"),
+            array(4, "5 - red"),
+            array(5, "6 - green"),
+            array(6, "7 - red"),
+            array(7, "8 - green")
         ), $xs);
     }
 

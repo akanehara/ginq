@@ -139,11 +139,11 @@ class SelectManyWithJoinIterator implements \Iterator
         if ($this->valid()) {
             $innerV = $this->inner->current();
             $innerK = $this->inner->key();
-            $this->v = $this->valueJoinSelector->joinSelect(
+            $this->v = $this->valueJoinSelector->select(
                 $this->outerV, $innerV,
                 $this->outerK, $innerK
             );
-            $this->k = $this->keyJoinSelector->joinSelect(
+            $this->k = $this->keyJoinSelector->select(
                 $this->outerV, $innerV,
                 $this->outerK, $innerK
             );

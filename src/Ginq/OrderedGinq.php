@@ -19,6 +19,8 @@ namespace Ginq;
 use Ginq\Core\Selector;
 use Ginq\Core\JoinSelector;
 use Ginq\Core\Comparer;
+use Ginq\Selector\KeySelector;
+use Ginq\Selector\ValueSelector;
 use Ginq\Selector\SelectorParser;
 use Ginq\JoinSelector\JoinSelectorParser;
 use Ginq\Predicate\PredicateParser;
@@ -60,10 +62,7 @@ class OrderedGinq extends \Ginq
      */
     public function thenBy($compareKeySelector = null, $comparer = null)
     {
-        if (is_null($compareKeySelector)) {
-            $compareKeySelector = \Ginq::VALUE_OF;
-        }
-        $compareKeySelector = SelectorParser::parse($compareKeySelector);
+        $compareKeySelector = SelectorParser::parse($compareKeySelector,ValueSelector::getInstance());
         $comparer = ComparerParser::parse($comparer);
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new CompoundComparer($this->comparer, $comparer);
@@ -77,10 +76,7 @@ class OrderedGinq extends \Ginq
      */
     public function thenByDesc($compareKeySelector = null, $comparer = null)
     {
-        if (is_null($compareKeySelector)) {
-            $compareKeySelector = \Ginq::VALUE_OF;
-        }
-        $compareKeySelector = SelectorParser::parse($compareKeySelector);
+        $compareKeySelector = SelectorParser::parse($compareKeySelector, ValueSelector::getInstance());
         $comparer = ComparerParser::parse($comparer);
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new ReverseComparer($comparer);

@@ -19,9 +19,14 @@ use Ginq\Comparer\ComparerParser;
 use Ginq\Core\JoinSelector;
 use Ginq\Core\Comparer;
 use Ginq\Core\EqualityComparer;
+use Ginq\JoinSelector\KeyJoinSelector;
+use Ginq\JoinSelector\ValueJoinSelector;
+use Ginq\Selector\KeySelector;
+use Ginq\Selector\ProjectionSelector;
 use Ginq\Selector\SelectorParser;
 use Ginq\JoinSelector\JoinSelectorParser;
 use Ginq\Predicate\PredicateParser;
+use Ginq\Selector\ValueSelector;
 use Ginq\Util\IteratorUtil;
 use Ginq\Comparer\ReverseComparer;
 use Ginq\Comparer\ProjectionComparer;
@@ -35,11 +40,6 @@ use Ginq\GroupingGinq;
  */
 class Ginq implements IteratorAggregate
 {
-
-    const COUNTER = SelectorParser::COUNTER;
-    const VALUE_OF = SelectorParser::VALUE_OF;
-    const KEY_OF = SelectorParser::KEY_OF;
-
     /**
      * @var array|Traversable
      */
@@ -215,6 +215,7 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param \Closure|string|null $predicate ($value, $key)
+     * @return int
      */
     public function count($predicate = null)
     {
@@ -232,13 +233,11 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param \Closure|string|null $selector ($value, $key)
+     * @return int
      */
     public function sum($selector = null)
     {
-        if (is_null($selector)) {
-            $selector = Ginq::VALUE_OF;
-        }
-        $s = SelectorParser::parse($selector);
+        $s = SelectorParser::parse($selector, ValueSelector::getInstance());
         return $this->foldLeft(0,
             function ($acc, $v, $k) use($s) {
                 return $acc + $s->select($v, $k);
@@ -248,13 +247,11 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param \Closure|string|null $selector ($value, $key)
+     * @return float
      */
     public function average($selector = null)
     {
-        if (is_null($selector)) {
-            $selector = Ginq::VALUE_OF;
-        }
-        $s = SelectorParser::parse($selector);
+        $s = SelectorParser::parse($selector, ValueSelector::getInstance());
         $sum   = 0;
         $count = 0;
         foreach ($this as $k => $v) {
@@ -488,16 +485,10 @@ class Ginq implements IteratorAggregate
      */
     public function select($valueSelector = null, $keySelector = null)
     {
-        if (is_null($valueSelector)) {
-            $valueSelector = Ginq::VALUE_OF;
-        }
-        if (is_null($keySelector)) {
-            $keySelector = Ginq::KEY_OF;
-        }
         return self::from(self::$gen->select(
             $this->getIterator(),
-            SelectorParser::parse($valueSelector),
-            SelectorParser::parse($keySelector)
+            SelectorParser::parse($valueSelector, ValueSelector::getInstance()),
+            SelectorParser::parse($keySelector, KeySelector::getInstance())
         ));
     }
 
@@ -585,19 +576,13 @@ class Ginq implements IteratorAggregate
         if (is_null($resultValueSelector) && is_null($resultKeySelector)) {
             return self::from(self::$gen->selectMany(
                 $this->getIterator(),
-                SelectorParser::parse($manySelector)));
+                SelectorParser::parse($manySelector, ValueSelector::getInstance())));
         } else {
-            if (is_null($resultValueSelector)) {
-                $resultValueSelector = function($v0, $v1, $k0, $k1) { return $v1; };
-            }
-            if (is_null($resultKeySelector)) {
-                $resultKeySelector = function($v0, $v1, $k0, $k1) { return $k1; };
-            }
             return self::from(self::$gen->selectManyWithJoin(
                 $this->getIterator(),
-                SelectorParser::parse($manySelector),
-                JoinSelectorParser::parse($resultValueSelector),
-                JoinSelectorParser::parse($resultKeySelector)
+                SelectorParser::parse($manySelector, ValueSelector::getInstance()),
+                JoinSelectorParser::parse($resultValueSelector, ValueJoinSelector::getInstance()),
+                JoinSelectorParser::parse($resultKeySelector, KeyJoinSelector::getInstance())
             ));
         }
     }
@@ -626,19 +611,14 @@ class Ginq implements IteratorAggregate
             $outerCompareKeySelector, $innerCompareKeySelector,
             $resultValueSelector, $resultKeySelector = null)
     {
-        if (is_null($resultKeySelector)) {
-            $resultKeySelector = function($v0, $v1, $k0, $k1) { return $k0; };
-        }
-        $outerCompareKeySelector = SelectorParser::parse($outerCompareKeySelector);
-        $innerCompareKeySelector = SelectorParser::parse($innerCompareKeySelector);
-        $resultValueSelector = JoinSelectorParser::parse($resultValueSelector);
-        $resultKeySelector = JoinSelectorParser::parse($resultKeySelector);
         $eqComparer = EqualityComparer::getDefault();
         return self::from(self::$gen->join(
             $this->getIterator(),
             IteratorUtil::iterator($inner),
-            $outerCompareKeySelector, $innerCompareKeySelector,
-            $resultValueSelector, $resultKeySelector,
+            SelectorParser::parse($outerCompareKeySelector, ValueSelector::getInstance()),
+            SelectorParser::parse($innerCompareKeySelector, ValueSelector::getInstance()),
+            JoinSelectorParser::parse($resultValueSelector, ValueJoinSelector::getInstance()),
+            JoinSelectorParser::parse($resultKeySelector,   KeyJoinSelector::getInstance()),
             $eqComparer
         ));
     }
@@ -651,14 +631,11 @@ class Ginq implements IteratorAggregate
      */
     public function zip($rhs, $resultValueSelector, $resultKeySelector = null)
     {
-        if (is_null($resultKeySelector)) {
-            $resultKeySelector = function($v0, $v1, $k0, $k1) { return $k0; };
-        }
         return self::from(self::$gen->zip(
             $this->getIterator(),
             IteratorUtil::iterator($rhs),
-            JoinSelectorParser::parse($resultValueSelector),
-            JoinSelectorParser::parse($resultKeySelector)
+            JoinSelectorParser::parse($resultValueSelector, ValueJoinSelector::getInstance()),
+            JoinSelectorParser::parse($resultKeySelector,   KeyJoinSelector::getInstance())
         ));
     }
 
@@ -669,17 +646,12 @@ class Ginq implements IteratorAggregate
      */
     public function groupBy($compareKeySelector, $elementSelector = null)
     {
-        if (is_null($elementSelector)) {
-            $elementSelector = SelectorParser::VALUE_OF;
-        }
         $eqComparer = EqualityComparer::getDefault();
         return self::from(self::$gen->groupBy(
             $this->getIterator(),
-            SelectorParser::parse($compareKeySelector),
-            SelectorParser::parse($elementSelector),
-            SelectorParser::parse(function ($xs, $key) {
-                return new GroupingGinq($xs, $key);
-            }),
+            SelectorParser::parse($compareKeySelector, ValueSelector::getInstance()),
+            SelectorParser::parse($elementSelector, ValueSelector::getInstance()),
+            new ProjectionSelector(function ($xs, $key) { return new GroupingGinq($xs, $key); }),
             $eqComparer
         ));
     }
@@ -691,10 +663,7 @@ class Ginq implements IteratorAggregate
      */
     public function orderBy($compareKeySelector = null, $comparer = null)
     {
-        if (is_null($compareKeySelector)) {
-            $compareKeySelector = Ginq::VALUE_OF;
-        }
-        $compareKeySelector = SelectorParser::parse($compareKeySelector);
+        $compareKeySelector = SelectorParser::parse($compareKeySelector, ValueSelector::getInstance());
         $comparer = ComparerParser::parse($comparer);
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         return new OrderedGinq($this->getIterator(), $comparer);
@@ -707,10 +676,7 @@ class Ginq implements IteratorAggregate
      */
     public function orderByDesc($compareKeySelector = null, $comparer = null)
     {
-        if (is_null($compareKeySelector)) {
-            $compareKeySelector = Ginq::VALUE_OF;
-        }
-        $compareKeySelector = SelectorParser::parse($compareKeySelector);
+        $compareKeySelector = SelectorParser::parse($compareKeySelector, ValueSelector::getInstance());
         $comparer = ComparerParser::parse($comparer);
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new ReverseComparer($comparer);

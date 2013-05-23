@@ -14,32 +14,35 @@
  * @package    Ginq
  */
 
-namespace Ginq\Selector;
+namespace Ginq\JoinSelector;
 
-class IdentityValueSelector implements \Ginq\Core\Selector
+class ValueJoinSelector implements \Ginq\Core\JoinSelector
 {
     /**
-     * @var IdentityValueSelector
+     * @var ValueJoinSelector
      */
     static private $inst;
 
     /**
-     * @return IdentityValueSelector
+     * @return ValueJoinSelector
      */
     static public function getInstance() {
         if (is_null(self::$inst)) {
-            self::$inst = new IdentityValueSelector();
+            self::$inst = new self();
         }
         return self::$inst;
     }
 
     /**
-     * @param mixed $v value
-     * @param mixed $k key
-     * @return mixed selected
+     * @param mixed $v0
+     * @param mixed $v1
+     * @param mixed $k0
+     * @param mixed $k1
+     * @return mixed
      */
-    public function select($v, $k)
+    public function select($v0, $v1, $k0, $k1)
     {
-        return $v;
+        return $v1;
     }
 }
+

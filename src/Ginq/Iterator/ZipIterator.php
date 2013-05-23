@@ -105,8 +105,8 @@ class ZipIterator implements \Iterator
         $v1 = $this->it1->current();
         $k0 = $this->it0->key();
         $k1 = $this->it1->key();
-        $this->v = $this->valueJoinSelector->joinSelect($v0, $v1, $k0, $k1);
-        $this->k = $this->keyJoinSelector->joinSelect($v0, $v1, $k0, $k1);
+        $this->v = $this->valueJoinSelector->select($v0, $v1, $k0, $k1);
+        $this->k = $this->keyJoinSelector->select($v0, $v1, $k0, $k1);
     }
 }
 

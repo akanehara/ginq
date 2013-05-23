@@ -16,19 +16,21 @@
 
 namespace Ginq\JoinSelector;
 
-class ProjectionJoinSelector implements \Ginq\Core\JoinSelector
+class KeyJoinSelector implements \Ginq\Core\JoinSelector
 {
     /**
-     * @var callable
+     * @var KeyJoinSelector
      */
-    private $func;
+    static private $inst;
 
     /**
-     * @param \Closure $func
+     * @return KeyJoinSelector
      */
-    public function __construct($func)
-    {
-        $this->func = $func;
+    static public function getInstance() {
+        if (is_null(self::$inst)) {
+            self::$inst = new self();
+        }
+        return self::$inst;
     }
 
     /**
@@ -40,7 +42,7 @@ class ProjectionJoinSelector implements \Ginq\Core\JoinSelector
      */
     public function select($v0, $v1, $k0, $k1)
     {
-        $f = $this->func;
-        return $f($v0, $v1, $k0, $k1);
+        return $k1;
     }
 }
+

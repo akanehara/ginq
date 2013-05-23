@@ -20,35 +20,24 @@ use Ginq\Core\Selector;
 
 class SelectorParser
 {
-    const COUNTER  = 1;
-    const VALUE_OF = 2;
-    const KEY_OF   = 3;
-
     /**
      * @param \Closure|string|int|Selector $src
-     * @return Selector
+     * @param $default
      * @throws \InvalidArgumentException
+     * @return Selector
      */
-    public static function parse($src)
+    public static function parse($src, $default)
     {
+        if (is_null($src)) {
+            return $default;
+        }
+
         if (is_string($src)) {
             return new PropertySelector($src);
         }
 
         if (is_callable($src)) {
             return new ProjectionSelector($src);
-        }
-
-        if (is_int($src)) {
-            switch ($src)
-            {
-                case self::COUNTER:
-                    return new CountSelector(0);
-                case self::VALUE_OF:
-                    return IdentityValueSelector::getInstance();
-                case self::KEY_OF:
-                    return IdentityKeySelector::getInstance();
-            }
         }
 
         if ($src instanceof Selector) {

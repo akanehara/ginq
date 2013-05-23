@@ -24,11 +24,16 @@ class JoinSelectorParser
 {
     /**
      * @param \Closure|JoinSelector|int $src
-     * @return JoinSelector
+     * @param $default
      * @throws \InvalidArgumentException
+     * @return JoinSelector
      */
-    public static function parse($src)
+    public static function parse($src, $default)
     {
+        if (is_null($src)) {
+            return $default;
+        }
+
         if ($src instanceof \Closure) {
             return new ProjectionJoinSelector($src);
         }

@@ -25,6 +25,6 @@ interface JoinSelector
      * @param mixed $k1 key1
      * @return mixed selected
      */
-    public function joinSelect($v0, $v1, $k0, $k1);
+    public function select($v0, $v1, $k0, $k1);
 }
 

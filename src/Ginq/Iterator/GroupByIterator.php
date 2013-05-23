@@ -19,7 +19,7 @@ namespace Ginq\Iterator;
 use Ginq\Core\Lookup;
 use Ginq\Core\Selector;
 use Ginq\Core\EqualityComparer;
-use Ginq\Selector\IdentityKeySelector;
+use Ginq\Selector\KeySelector;
 use Ginq\Util\IteratorUtil;
 
 /**
@@ -82,7 +82,7 @@ class GroupByIterator implements \Iterator
         $pair = $this->group->current();
         $group = new SelectIterator($pair->value,
             $this->elementSelector,
-            IdentityKeySelector::getInstance()
+            KeySelector::getInstance()
         );
         return $this->groupSelector->select($group, $pair->key);
     }

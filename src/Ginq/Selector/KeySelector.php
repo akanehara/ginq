@@ -16,19 +16,19 @@
 
 namespace Ginq\Selector;
 
-class IdentityKeySelector implements \Ginq\Core\Selector
+class KeySelector implements \Ginq\Core\Selector
 {
     /**
-     * @var IdentityKeySelector
+     * @var KeySelector
      */
     static private $inst;
 
     /**
-     * @return IdentityKeySelector
+     * @return KeySelector
      */
     static public function getInstance() {
         if (is_null(self::$inst)) {
-            self::$inst = new IdentityKeySelector();
+            self::$inst = new self();
         }
         return self::$inst;
     }

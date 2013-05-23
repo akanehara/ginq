@@ -14,33 +14,32 @@
  * @package    Ginq
  */
 
-namespace Ginq\JoinSelector;
+namespace Ginq\Selector;
 
-class ProjectionJoinSelector implements \Ginq\Core\JoinSelector
+class ValueSelector implements \Ginq\Core\Selector
 {
     /**
-     * @var callable
+     * @var ValueSelector
      */
-    private $func;
+    static private $inst;
 
     /**
-     * @param \Closure $func
+     * @return ValueSelector
      */
-    public function __construct($func)
-    {
-        $this->func = $func;
+    static public function getInstance() {
+        if (is_null(self::$inst)) {
+            self::$inst = new ValueSelector();
+        }
+        return self::$inst;
     }
 
     /**
-     * @param mixed $v0
-     * @param mixed $v1
-     * @param mixed $k0
-     * @param mixed $k1
-     * @return mixed
+     * @param mixed $v value
+     * @param mixed $k key
+     * @return mixed selected
      */
-    public function select($v0, $v1, $k0, $k1)
+    public function select($v, $k)
     {
-        $f = $this->func;
-        return $f($v0, $v1, $k0, $k1);
+        return $v;
     }
 }
