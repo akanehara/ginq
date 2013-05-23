@@ -138,46 +138,46 @@ interface IterProvider
     /**
      * @param array|\Traversable $xs
      * @param Selector $manySelector
-     * @param JoinSelector $valueJoinSelector
-     * @param JoinSelector $keyJoinSelector
+     * @param JoinSelector $resultValueSelector
+     * @param JoinSelector $resultKeySelector
      * @return \Iterator
      */
-    public function selectManyWithJoin($xs, $manySelector, $valueJoinSelector, $keyJoinSelector);
+    public function selectManyWithJoin($xs, $manySelector, $resultValueSelector, $resultKeySelector);
 
     /**
      * @param array|\Traversable $outer
      * @param array|\Traversable $inner
-     * @param Selector $outerKeySelector
-     * @param Selector $innerKeySelector
-     * @param JoinSelector $valueJoinSelector
-     * @param JoinSelector $keyJoinSelector
+     * @param Selector $outerCompareKeySelector
+     * @param Selector $innerCompareKeySelector
+     * @param JoinSelector $resultValueSelector
+     * @param JoinSelector $resultKeySelector
      * @param EqualityComparer $eqComparer
      * @return \Iterator
      */
     public function join(
             $outer, $inner,
-            $outerKeySelector, $innerKeySelector,
-            $valueJoinSelector, $keyJoinSelector,
+            $outerCompareKeySelector, $innerCompareKeySelector,
+            $resultValueSelector, $resultKeySelector,
             $eqComparer);
 
     /**
      * @param array|\Traversable $xs
      * @param array|\Traversable $ys
-     * @param JoinSelector $valueJoinSelector
-     * @param JoinSelector $keyJoinSelector
+     * @param JoinSelector $resultValueSelector
+     * @param JoinSelector $resultKeySelector
      * @return \Iterator
      */
-    public function zip($xs, $ys, $valueJoinSelector, $keyJoinSelector);
+    public function zip($xs, $ys, $resultValueSelector, $resultKeySelector);
 
     /**
      * @param array|\Traversable $xs
-     * @param Selector $groupingKeySelector
+     * @param Selector $compareKeySelector
      * @param Selector $elementSelector
      * @param Selector $groupSelector
      * @param EqualityComparer $eqComparer
      * @return \Iterator
      */
-    public function groupBy($xs, $groupingKeySelector, $elementSelector, $groupSelector, $eqComparer);
+    public function groupBy($xs, $compareKeySelector, $elementSelector, $groupSelector, $eqComparer);
 
     /**
      * @param array|\Traversable $xs

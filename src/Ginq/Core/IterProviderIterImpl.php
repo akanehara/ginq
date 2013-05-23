@@ -207,48 +207,48 @@ class IterProviderIterImpl implements IterProvider
     /**
      * @param array|\Traversable $xs
      * @param Selector $manySelector
-     * @param JoinSelector $valueJoinSelector
-     * @param JoinSelector $keyJoinSelector
+     * @param JoinSelector $resultValueSelector
+     * @param JoinSelector $resultKeySelector
      * @return \Ginq\Iterator\SelectManyWithJoinIterator
      */
-    public function selectManyWithJoin($xs, $manySelector, $valueJoinSelector, $keyJoinSelector)
+    public function selectManyWithJoin($xs, $manySelector, $resultValueSelector, $resultKeySelector)
     {
-        return new SelectManyWithJoinIterator($xs, $manySelector, $valueJoinSelector, $keyJoinSelector);
+        return new SelectManyWithJoinIterator($xs, $manySelector, $resultValueSelector, $resultKeySelector);
     }
 
     /**
      * @param array|\Traversable $outer
      * @param array|\Traversable $inner
-     * @param Selector $outerKeySelector
-     * @param Selector $innerKeySelector
-     * @param JoinSelector $valueJoinSelector
-     * @param JoinSelector $keyJoinSelector
+     * @param Selector $outerCompareKeySelector
+     * @param Selector $innerCompareKeySelector
+     * @param JoinSelector $resultValueSelector
+     * @param JoinSelector $resultKeySelector
      * @param EqualityComparer $eqComparer
      * @return \Ginq\Iterator\JoinIterator
      */
     public function join(
             $outer, $inner,
-            $outerKeySelector, $innerKeySelector,
-            $valueJoinSelector, $keyJoinSelector,
+            $outerCompareKeySelector, $innerCompareKeySelector,
+            $resultValueSelector, $resultKeySelector,
             $eqComparer)
     {
         return new JoinIterator(
             $outer, $inner,
-            $outerKeySelector, $innerKeySelector,
-            $valueJoinSelector, $keyJoinSelector,
+            $outerCompareKeySelector, $innerCompareKeySelector,
+            $resultValueSelector, $resultKeySelector,
             $eqComparer);
     }
 
     /**
      * @param array|\Traversable $xs
      * @param array|\Traversable $ys
-     * @param JoinSelector $valueJoinSelector
-     * @param JoinSelector $keyJoinSelector
+     * @param JoinSelector $resultValueSelector
+     * @param JoinSelector $resultKeySelector
      * @return \Ginq\Iterator\ZipIterator
      */
-    public function zip($xs, $ys, $valueJoinSelector, $keyJoinSelector)
+    public function zip($xs, $ys, $resultValueSelector, $resultKeySelector)
     {
-        return new ZipIterator($xs, $ys, $valueJoinSelector, $keyJoinSelector);
+        return new ZipIterator($xs, $ys, $resultValueSelector, $resultKeySelector);
     }
 
     /**

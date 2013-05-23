@@ -54,35 +54,35 @@ class OrderedGinq extends \Ginq
     }
 
     /**
-     * @param Closure|string|int|Selector|null $orderingKeySelector
+     * @param Closure|string|int|Selector|null $compareKeySelector
      * @param Closure|Comparer|null $comparer
      * @return OrderedGinq
      */
-    public function thenBy($orderingKeySelector = null, $comparer = null)
+    public function thenBy($compareKeySelector = null, $comparer = null)
     {
-        if (is_null($orderingKeySelector)) {
-            $orderingKeySelector = \Ginq::VALUE_OF;
+        if (is_null($compareKeySelector)) {
+            $compareKeySelector = \Ginq::VALUE_OF;
         }
-        $orderingKeySelector = SelectorParser::parse($orderingKeySelector);
+        $compareKeySelector = SelectorParser::parse($compareKeySelector);
         $comparer = ComparerParser::parse($comparer);
-        $comparer = new ProjectionComparer($orderingKeySelector, $comparer);
+        $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new CompoundComparer($this->comparer, $comparer);
         return new OrderedGinq($this->getIterator(), $comparer);
     }
 
     /**
-     * @param Closure|string|int|Selector|null $orderingKeySelector
+     * @param Closure|string|int|Selector|null $compareKeySelector
      * @param Closure|Comparer|null $comparer
      * @return OrderedGinq
      */
-    public function thenByDesc($orderingKeySelector = null, $comparer = null)
+    public function thenByDesc($compareKeySelector = null, $comparer = null)
     {
-        if (is_null($orderingKeySelector)) {
-            $orderingKeySelector = \Ginq::VALUE_OF;
+        if (is_null($compareKeySelector)) {
+            $compareKeySelector = \Ginq::VALUE_OF;
         }
-        $orderingKeySelector = SelectorParser::parse($orderingKeySelector);
+        $compareKeySelector = SelectorParser::parse($compareKeySelector);
         $comparer = ComparerParser::parse($comparer);
-        $comparer = new ProjectionComparer($orderingKeySelector, $comparer);
+        $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new ReverseComparer($comparer);
         $comparer = new CompoundComparer($this->comparer, $comparer);
         return new OrderedGinq($this->getIterator(), $comparer);
