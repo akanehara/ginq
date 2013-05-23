@@ -14,29 +14,33 @@
  * @package    Ginq
  */
 
-namespace Ginq\Predicate;
+namespace Ginq\JoinSelector;
 
-class DelegatePredicate implements \Ginq\Core\Predicate
+class ProjectionJoinSelector implements \Ginq\Core\JoinSelector
 {
     /**
-     * @var \Closure
+     * @var callable
      */
     private $func;
 
+    /**
+     * @param \Closure $func
+     */
     public function __construct($func)
     {
         $this->func = $func;
     }
 
     /**
-     * @param mixed $v
-     * @param mixed $k
-     * @return bool
+     * @param mixed $v0
+     * @param mixed $v1
+     * @param mixed $k0
+     * @param mixed $k1
+     * @return mixed
      */
-    public function predicate($v, $k)
+    public function joinSelect($v0, $v1, $k0, $k1)
     {
         $f = $this->func;
-        return $f($v, $k);
+        return $f($v0, $v1, $k0, $k1);
     }
 }
-

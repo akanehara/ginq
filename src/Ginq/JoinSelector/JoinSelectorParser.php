@@ -30,7 +30,7 @@ class JoinSelectorParser
     public static function parse($src)
     {
         if ($src instanceof \Closure) {
-            return new DelegateJoinSelector($src);
+            return new ProjectionJoinSelector($src);
         }
 
         if (is_int($src)) {

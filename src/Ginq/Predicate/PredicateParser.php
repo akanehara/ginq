@@ -27,7 +27,7 @@ class PredicateParser
         }
 
         if ($src instanceof \Closure) {
-            return new \Ginq\Predicate\DelegatePredicate($src);
+            return new \Ginq\Predicate\ProjectionPredicate($src);
         }
 
         $type = gettype($src);

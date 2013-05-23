@@ -36,7 +36,7 @@ class SelectorParser
         }
 
         if (is_callable($src)) {
-            return new DelegateSelector($src);
+            return new ProjectionSelector($src);
         }
 
         if (is_int($src)) {

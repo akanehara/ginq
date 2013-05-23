@@ -16,7 +16,7 @@
 
 namespace Ginq\Selector;
 
-class DelegateSelector implements \Ginq\Core\Selector
+class ProjectionSelector implements \Ginq\Core\Selector
 {
     /**
      * @var callable
