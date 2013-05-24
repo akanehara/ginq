@@ -16,7 +16,9 @@
 
 namespace Ginq\Selector;
 
-class KeySelector implements \Ginq\Core\Selector
+use Ginq\Core\Selector;
+
+class KeySelector implements Selector
 {
     /**
      * @var KeySelector

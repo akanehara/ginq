@@ -16,7 +16,9 @@
 
 namespace Ginq\Selector;
 
-class ProjectionSelector implements \Ginq\Core\Selector
+use Ginq\Core\Selector;
+
+class ProjectionSelector implements Selector
 {
     /**
      * @var callable

@@ -16,7 +16,6 @@
 
 namespace Ginq\Iterator;
 
-use \Ginq\Core\Selector;
 use \Ginq\Core\JoinSelector;
 use \Ginq\Util\IteratorUtil;
 

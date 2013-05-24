@@ -17,8 +17,6 @@
 namespace Ginq\JoinSelector;
 
 use Ginq\Core\JoinSelector;
-use Ginq\Selector\SelectorParser;
-use Ginq\Selector\CountSelector;
 
 class JoinSelectorParser
 {
@@ -36,14 +34,6 @@ class JoinSelectorParser
 
         if ($src instanceof \Closure) {
             return new ProjectionJoinSelector($src);
-        }
-
-        if (is_int($src)) {
-            switch ($src)
-            {
-                case SelectorParser::COUNTER:
-                    return new CountSelector(0);
-            }
         }
 
         if ($src instanceof JoinSelector) {

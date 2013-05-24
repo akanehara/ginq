@@ -62,7 +62,8 @@ class Dictionary implements \IteratorAggregate
     }
 
     /**
-     * @param mixed $key
+     * @param mixed      $key
+     * @param mixed|null $default
      * @return mixed|null
      */
     public function get($key, $default = null)

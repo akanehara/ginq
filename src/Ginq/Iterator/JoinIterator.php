@@ -20,7 +20,6 @@ use Ginq\Core\EqualityComparer;
 use Ginq\Core\Lookup;
 use Ginq\Core\Selector;
 use Ginq\Selector\ProjectionSelector;
-use Ginq\Selector\SelectorParser;
 use Ginq\Core\JoinSelector;
 use Ginq\Util\IteratorUtil;
 

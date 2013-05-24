@@ -16,7 +16,9 @@
 
 namespace Ginq\Selector;
 
-class PropertySelector implements \Ginq\Core\Selector
+use Ginq\Core\Selector;
+
+class PropertySelector implements Selector
 {
     /**
      * @var string

@@ -67,32 +67,29 @@ class Ginq implements IteratorAggregate
 
     /**
      * default compare
-     *
-     * @params mixed $v0
-     * @params mixed $v1
-     * @params mixed $k0
-     * @params mixed $k1
+     * @param mixed $v0
+     * @param mixed $v1
+     * @param mixed $k0
+     * @param mixed $k1
      * @return int
-     */ 
+     */
     public static function compare($v0, $v1, $k0, $k1) {
         return Comparer::getDefault()->compare($v0, $v1, $k0, $k1);
     }
 
     /**
      * default equality comparing
-     *
-     * @params mixed $x
-     * @params mixed $y
+     * @param mixed $x
+     * @param mixed $y
      * @return bool
-     */ 
+     */
     public static function equals($x, $y) {
         return EqualityComparer::getDefault()->equals($x, $y);
     }
 
     /**
      * default hash function
-     *
-     * @params mixed $x
+     * @param mixed $x
      * @return string
      */
     public static function hash($x) {

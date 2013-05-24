@@ -16,7 +16,9 @@
 
 namespace Ginq\JoinSelector;
 
-class ProjectionJoinSelector implements \Ginq\Core\JoinSelector
+use Ginq\Core\JoinSelector;
+
+class ProjectionJoinSelector implements JoinSelector
 {
     /**
      * @var callable

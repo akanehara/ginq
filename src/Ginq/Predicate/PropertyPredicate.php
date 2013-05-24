@@ -16,7 +16,9 @@
 
 namespace Ginq\Predicate;
 
-class PropertyPredicate implements \Ginq\Core\Predicate
+use Ginq\Core\Predicate;
+
+class PropertyPredicate implements Predicate
 {
     /**
      * @var string

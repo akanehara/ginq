@@ -16,7 +16,9 @@
 
 namespace Ginq\Selector;
 
-class ValueSelector implements \Ginq\Core\Selector
+use Ginq\Core\Selector;
+
+class ValueSelector implements Selector
 {
     /**
      * @var ValueSelector

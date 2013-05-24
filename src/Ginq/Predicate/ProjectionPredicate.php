@@ -16,7 +16,9 @@
 
 namespace Ginq\Predicate;
 
-class ProjectionPredicate implements \Ginq\Core\Predicate
+use Ginq\Core\Predicate;
+
+class ProjectionPredicate implements Predicate
 {
     /**
      * @var \Closure

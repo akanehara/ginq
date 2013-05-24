@@ -17,13 +17,10 @@
 namespace Ginq;
 
 use Ginq\Core\Selector;
-use Ginq\Core\JoinSelector;
 use Ginq\Core\Comparer;
 use Ginq\Selector\KeySelector;
 use Ginq\Selector\ValueSelector;
 use Ginq\Selector\SelectorParser;
-use Ginq\JoinSelector\JoinSelectorParser;
-use Ginq\Predicate\PredicateParser;
 use Ginq\Comparer\CompoundComparer;
 use Ginq\Util\IteratorUtil;
 use Ginq\Comparer\ReverseComparer;
@@ -56,8 +53,8 @@ class OrderedGinq extends \Ginq
     }
 
     /**
-     * @param Closure|string|int|Selector|null $compareKeySelector
-     * @param Closure|Comparer|null $comparer
+     * @param \Closure|string|int|Selector|null $compareKeySelector
+     * @param \Closure|Comparer|null $comparer
      * @return OrderedGinq
      */
     public function thenBy($compareKeySelector = null, $comparer = null)
@@ -70,8 +67,8 @@ class OrderedGinq extends \Ginq
     }
 
     /**
-     * @param Closure|string|int|Selector|null $compareKeySelector
-     * @param Closure|Comparer|null $comparer
+     * @param \Closure|string|int|Selector|null $compareKeySelector
+     * @param \Closure|Comparer|null $comparer
      * @return OrderedGinq
      */
     public function thenByDesc($compareKeySelector = null, $comparer = null)

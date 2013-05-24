@@ -16,7 +16,9 @@
 
 namespace Ginq\JoinSelector;
 
-class ValueJoinSelector implements \Ginq\Core\JoinSelector
+use Ginq\Core\JoinSelector;
+
+class ValueJoinSelector implements JoinSelector
 {
     /**
      * @var ValueJoinSelector

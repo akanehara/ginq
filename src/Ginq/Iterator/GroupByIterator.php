@@ -63,7 +63,7 @@ class GroupByIterator implements \Iterator
      * @param Selector $groupingKeySelector
      * @param Selector $elementSelector
      * @param Selector $groupSelector
-     * @param EqualityComparer $groupSelector
+     * @param EqualityComparer $eqComparer
      */
     public function __construct($xs, $groupingKeySelector, $elementSelector, $groupSelector, $eqComparer)
     {

@@ -16,7 +16,9 @@
 
 namespace Ginq\JoinSelector;
 
-class KeyJoinSelector implements \Ginq\Core\JoinSelector
+use Ginq\Core\JoinSelector;
+
+class KeyJoinSelector implements JoinSelector
 {
     /**
      * @var KeyJoinSelector

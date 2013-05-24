@@ -16,7 +16,6 @@
 
 namespace Ginq\Iterator;
 
-use Ginq\Core\Selector;
 use Ginq\Core\Comparer;
 use Ginq\Util\IteratorUtil;
 

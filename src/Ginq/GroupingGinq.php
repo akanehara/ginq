@@ -16,17 +16,8 @@
 
 namespace Ginq;
 
-use Ginq\Core\Selector;
-use Ginq\Core\JoinSelector;
 use Ginq\Core\Comparer;
-use Ginq\Selector\SelectorParser;
-use Ginq\JoinSelector\JoinSelectorParser;
-use Ginq\Predicate\PredicateParser;
-use Ginq\Comparer\CompoundComparer;
 use Ginq\Util\IteratorUtil;
-use Ginq\Comparer\ReverseComparer;
-use Ginq\Comparer\ProjectionComparer;
-use Ginq\Comparer\ComparerParser;
 
 class GroupingGinq extends \Ginq
 {
@@ -37,7 +28,8 @@ class GroupingGinq extends \Ginq
 
     /**
      * @param \Iterator $it
-     * @param \Ginq\Core\Comparer $comparer
+     * @param mixed     $key
+     * @internal param \Ginq\Core\Comparer $comparer
      */
     public function __construct($it, $key)
     {
