@@ -592,8 +592,6 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
     /**
      * testSelect().
-     *
-     * @expectedException InvalidArgumentException
      */
     public function testSelect()
     {
@@ -622,13 +620,18 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array('Taro','Atsushi','Junko'), $xs);
 
         // key mapping
-        $xs = Ginq::from(1,2,3,4,5)
+        $xs = Ginq::from(array(1,2,3,4,5))
             ->select(null, function($v, $k) { return $k * $k; })
             ->toArray();
         $this->assertEquals(array(0=>1,1=>2,4=>3,9=>4,16=>5), $xs);
 
         // invalid selector
-        Ginq::from(array(1,2,3,4,5))->select(8);
+        try {
+            Ginq::from(array(1,2,3,4,5))->select(8);
+            $this->fail();
+        } catch (InvalidArgumentException $e) {
+            $this->assertTrue(true);
+        }
     }
 
     /**
