@@ -105,7 +105,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param callable|null  $combiner (existV, v, k) -> v
+     * @param callable|null  $combiner (existV, v, k) -> mixed
      * @return array
      */
     public function toArray($combiner = null)
@@ -119,7 +119,7 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param int|null       $depth
-     * @param callable|null  $combiner (existV, v, k) -> v
+     * @param callable|null  $combiner (existV, v, k) -> mixed
      * @return array
      */
     public function toArrayRec($depth = null, $combiner = null)
@@ -167,7 +167,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param string|callable $predicate ($value, $key)
+     * @param string|callable $predicate (v, k) -> bool
      * @return bool
      */
     public function any($predicate)
@@ -182,7 +182,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param string|callable $predicate ($value, $key)
+     * @param string|callable $predicate (v, k) -> bool
      * @return bool
      */
     public function all($predicate)
@@ -197,7 +197,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|null $predicate ($value, $key)
+     * @param \Closure|string|null $predicate (v, k) -> bool
      * @return int
      */
     public function count($predicate = null)
@@ -215,7 +215,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|null $selector ($value, $key)
+     * @param \Closure|string|null $selector (v, k) -> int
      * @return int
      */
     public function sum($selector = null)
@@ -488,7 +488,7 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param mixed $accumulator
-     * @param callable $operator (acc, v, k) -> acc
+     * @param callable $operator (acc, v, k) -> mixed
      * @return mixed
      */
     public function foldRight($accumulator, $operator)
@@ -501,7 +501,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param \Closure $operator ($accumulator, $value, $key)
+     * @param \Closure $operator (acc, v, k) -> mixed
      * @return mixed
      * @throws LengthException
      */
@@ -522,7 +522,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param \Closure $operator ($accumulator, $value, $key)
+     * @param \Closure $operator (acc, v, k) -> mixed
      * @return mixed
      * @throws LengthException
      */
@@ -543,6 +543,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
+     * empty
      * @return Ginq
      */
     public static function zero()
@@ -551,9 +552,9 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param number $start
+     * @param number      $start
      * @param number|null $stop
-     * @param number|int $step
+     * @param number|int  $step
      * @throws InvalidArgumentException
      * @return Ginq
      */
@@ -620,8 +621,8 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param Closure|string|int|Selector|null $valueSelector
-     * @param Closure|string|int|Selector|null $keySelector
+     * @param \Closure|string|int|Selector|null $valueSelector (v, k) -> mixed
+     * @param \Closure|string|int|Selector|null $keySelector   (v, k) -> mixed
      * @return Ginq
      */
     public function select($valueSelector = null, $keySelector = null)
@@ -634,7 +635,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param string|callable $predicate
+     * @param string|callable $predicate (v, k) -> bool
      * @return Ginq
      */
     public function where($predicate)
@@ -672,7 +673,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param string|callable $predicate
+     * @param string|callable $predicate (v, k) -> bool
      * @return Ginq
      */
     public function takeWhile($predicate)
@@ -684,7 +685,7 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param string|callable $predicate
+     * @param string|callable $predicate (v, k) -> bool
      * @return Ginq
      */
     public function dropWhile($predicate)
@@ -707,9 +708,9 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param Closure|string|int|Selector $manySelector
-     * @param Closure|JoinSelector|int|null   $resultValueSelector
-     * @param Closure|JoinSelector|int|null   $resultKeySelector
+     * @param Closure|string|Selector     $manySelector (v, k) -> array|Traversable
+     * @param Closure|JoinSelector|null   $resultValueSelector (v0, v1, k0, k1) -> mixed
+     * @param Closure|JoinSelector|null   $resultKeySelector (v0, v1, k0, k1) -> mixed
      * @return Ginq
      */
     public function selectMany($manySelector, $resultValueSelector = null, $resultKeySelector = null)
@@ -730,9 +731,9 @@ class Ginq implements IteratorAggregate
 
     /**
      * @deprecated
-     * @param Closure|string|int|Selector     $manySelector
-     * @param Closure|JoinSelector|int|null   $resultValueSelector
-     * @param Closure|JoinSelector|int|null   $resultKeySelector
+     * @param Closure|string|int|Selector     $manySelector (v, k) -> array|Traversable
+     * @param Closure|JoinSelector|int|null   $resultValueSelector (v0, v1, k0, k1) -> mixed
+     * @param Closure|JoinSelector|int|null   $resultKeySelector (v0, v1, k0, k1) -> mixed
      * @return Ginq
      */
     public function selectManyWith($manySelector, $resultValueSelector = null, $resultKeySelector = null)
@@ -742,10 +743,10 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param array|Traversable $inner
-     * @param \Closure|string|int|Selector   $outerCompareKeySelector
-     * @param \Closure|string|int|Selector   $innerCompareKeySelector
-     * @param \Closure|JoinSelector|int      $resultValueSelector
-     * @param \Closure|JoinSelector|int|null $resultKeySelector
+     * @param \Closure|string|int|Selector   $outerCompareKeySelector (v, k) -> comparable
+     * @param \Closure|string|int|Selector   $innerCompareKeySelector (v, k) -> comparable
+     * @param \Closure|JoinSelector|int      $resultValueSelector (v0, v1, k0, k1) -> mixedd
+     * @param \Closure|JoinSelector|int|null $resultKeySelector (v0, v1, k0, k1) -> mixedd
      * @return Ginq
      */
     public function join($inner,
@@ -765,8 +766,8 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param array|Traversable    $rhs
-     * @param Closure|JoinSelector|int      $resultValueSelector
-     * @param Closure|JoinSelector|int|null $resultKeySelector
+     * @param Closure|JoinSelector|int      $resultValueSelector (v0, v1, k0, k1) -> mixed
+     * @param Closure|JoinSelector|int|null $resultKeySelector (v0, v1, k0, k1) -> mixed
      * @return Ginq
      */
     public function zip($rhs, $resultValueSelector, $resultKeySelector = null)
@@ -780,8 +781,8 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param Closure|string|int|Selector      $compareKeySelector
-     * @param Closure|string|int|Selector|null $elementSelector
+     * @param Closure|string|int|Selector      $compareKeySelector (v, k) -> mixed
+     * @param Closure|string|int|Selector|null $elementSelector (v, k) -> mixed
      * @return Ginq
      */
     public function groupBy($compareKeySelector, $elementSelector = null)
