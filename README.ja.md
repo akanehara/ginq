@@ -8,8 +8,6 @@
 
 **Ginq** の多くの機能は、その結果を実際に取り出すまで処理を実行しません。この **遅延実行** という性質は、さまざまなメリットをもたらしてくれます。
 
-機能が足りない？ **Ginq** にはプラグイン機構があるので、欲しい機能を自分で追加することができます。ぜひビルトインで搭載すべきだ、と思えるカッコいいプラグインができたら、ぜひ知らせてください！
-
 ## 使い方
 
 ```php
@@ -42,11 +40,10 @@ foreach ($xs in $x) { echo "$x "; }
 
 欲しい結果が得られました！
 
-今度は`toArray()`を使って配列を得ましょう。
-`where()`によってキーが不連続になっているので、`renum()`で採番し直してやります。
+今度は`toList()`を使って配列を得ましょう。
 
 ```php
-$xs->renum()->toArray();
+$xs->toList();
 ```
 
 ```
@@ -87,7 +84,7 @@ function ($v, [$k]) { return $v * $v ; }
 
 ### 結合セレクタ
 
-**結合セレクタ** は２つの要素を１つにまとめるセレクタの一種で、`join()` や `zip()` などで使われます。
+**結合セレクタ** は左右２つの要素を１つにまとめるセレクタの一種で、`join()` や `zip()` などで使われます。
 
 ```php
 function ($v0, $v1, [$k0, $k1]) { return array($v0, $v1) ; }
@@ -100,12 +97,12 @@ function ($v0, $v1, [$k0, $k1]) { return array($v0, $v1) ; }
 さて、2つの並びを要素ごとに綴じ合わせる、`zip()`の例を見てみましょう。
 
 ```php
-$persons = array("おまえ", "こいつ", "べるの");
-$weapons = array("どうのつるぎ", "くさりがま", "ひのきのぼう");
+$foods  = array("お肉", "パスタ", "サラダ");
+$spices = array("タイム", "バジル", "ディル");
 
-$xs = Ginq::from($persons)
-        ->zip($weapons, function($p, $w) {
-            return "$p は $w をそうびした！";
+$xs = Ginq::from($foods)
+        ->zip($spices, function($f, $s) {
+            return "$fに$s！";
         })
         ;
 
@@ -113,9 +110,9 @@ foreach ($xs in $x) { echo "$x\n"; }
 ```
 
 ```
-おまえ は どうのつるぎ をそうびした！
-こいつ は くさりがま をそうびした！
-べるの は ひのきのぼう をそうびした！
+お肉にタイム！
+パスタにバジル！
+サラダにティル！
 ```
 
 ## 述語とセレクタのショートカット
@@ -147,46 +144,7 @@ Ginq::from($xs)->select(
 
 と同じ意味をもちます。
 
-試してみましょう！
-
-```php
-$persons = array(
-    array('name' => 'おまえ', 'age'=> 14),
-    array('name' => 'こいつ', 'age'=> 13),
-    array('name' => 'べるの', 'age'=> 12)
-);
-
-$xs = Ginq::from($persons)->select('name');
-
-foreach ($xs in $x) { echo "$x "; }
-```
-
-```
-おまえ こいつ べるの
-```
-
-述語でも同じようにはたらきます。
-
-```php
-$persons = array(
-    array('name' => 'おまえ', 'alive'=> True, ),
-    array('name' => 'こいつ', 'alive'=> False, ),
-    array('name' => 'べるの', 'alive'=> True, )
-);
-
-$xs = Ginq::from($persons)->where('isPlayer');
-
-foreach ($xs in $x) { echo "$x "; }
-```
-
-```
-おまえ べるの
-```
-
 ## もっと複雑な例
-
-
 
 ## リファレンス
 
-## プラグイン
