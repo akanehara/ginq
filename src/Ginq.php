@@ -229,48 +229,206 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|null $selector ($value, $key)
+     * @param \Closure|string|null $selector (v, k) -> number
+     * @throws RuntimeException
      * @return float
      */
     public function average($selector = null)
     {
-        $s = SelectorParser::parse($selector, ValueSelector::getInstance());
+        $it = $this->getIterator();
+        if (!$it->valid()) {
+            throw new RuntimeException("Sequence is empty");
+        }
+        $selector = SelectorParser::parse($selector, ValueSelector::getInstance());
         $sum   = 0;
         $count = 0;
         foreach ($this as $k => $v) {
             $count++;
-            $sum += $s->select($v, $k);
+            $sum += $selector->select($v, $k);
         }
         return $sum / $count;
+    }
+
+    /**
+     * @param \Closure|string|null $selector (v, k) -> comparable
+     * @throws RuntimeException
+     * @return mixed
+     */
+    public function min($selector = null)
+    {
+        $it = $this->getIterator();
+        if (!$it->valid()) {
+            throw new RuntimeException("Sequence is empty");
+        }
+        $comparer = Comparer::getDefault();
+        $selector = SelectorParser::parse($selector, ValueSelector::getInstance());
+        $min = $selector->select($it->current(), $it->key());
+        $it->next();
+        while ($it->valid()) {
+            $x = $selector->select($it->current(), $it->key());
+            if ($comparer->compare($x, $min) < 0) $min = $x;
+            $it->next();
+        }
+        return $min;
+    }
+
+    /**
+     * @param \Closure|string|null $selector (v, k) -> comparable
+     * @throws RuntimeException
+     * @return mixed
+     */
+    public function max($selector = null)
+    {
+        $it = $this->getIterator();
+        if (!$it->valid()) {
+            throw new RuntimeException("Sequence is empty");
+        }
+        $comparer = Comparer::getDefault();
+        $selector = SelectorParser::parse($selector, ValueSelector::getInstance());
+        $max = $selector->select($it->current(), $it->key());
+        $it->next();
+        while ($it->valid()) {
+            $x = $selector->select($it->current(), $it->key());
+            if (0 < $comparer->compare($x, $max)) $max = $x;
+            $it->next();
+        }
+        return $max;
+    }
+
+    /**
+     * @param callable|null $predicate (v, k) -> bool
+     * @return mixed
+     * @throws RuntimeException
+     */
+    public function first($predicate = null)
+    {
+        if (is_null($predicate)) {
+            $it = $this->getIterator();
+            $it->rewind();
+            if ($it->valid()) {
+                return $it->current();
+            } else {
+                throw new RuntimeException("Sequence is empty");
+            }
+        } else {
+            foreach ($this->getIterator() as $k => $v) {
+                if ($predicate($v, $k)) {
+                    return $v;
+                }
+            }
+            throw new RuntimeException("No items matched the predicate");
+        }
+    }
+
+    /**
+     * @param mixed         $default
+     * @param callable|null $predicate (v, k) -> bool
+     * @return mixed
+     */
+    public function firstOrElse($default, $predicate = null)
+    {
+        if (is_null($predicate)) {
+            $it = $this->getIterator();
+            $it->rewind();
+            if ($it->valid()) {
+                return $it->current();
+            } else {
+                return $default;
+            }
+        } else {
+            foreach ($this->getIterator() as $k => $v) {
+                if ($predicate($v, $k)) {
+                    return $v;
+                }
+            }
+            return $default;
+        }
     }
 
     /**
      * @param mixed $default
      * @return mixed
      */
-    public function first($default = null)
+    public function elseIfZero($default)
     {
         $it = $this->getIterator();
         $it->rewind();
         if ($it->valid()) {
-            return $it->current();
+            return $this;
         } else {
-            return $default;
+            return self::from(self::$gen->repeat($default, 1));
         }
     }
 
     /**
-     * @param array|Traversable $default
-     * @return Ginq
+     * @param callable|null $predicate (v, k) -> bool
+     * @return mixed
+     * @throws RuntimeException
      */
-    public function rest($default = array())
+    public function last($predicate = null)
     {
-        $it = $this->getIterator();
-        $it->rewind();
-        if ($it->valid()) {
-            return $this->drop(1);
+        if (is_null($predicate)) {
+            $last  = null;
+            $found = false;
+            foreach ($this->getIterator() as $k => $v) {
+                 $last = $v;
+                 $found = true;
+            }
+            if ($found) {
+                return $last;
+            } else {
+                throw new RuntimeException("Sequence is empty");
+            }
         } else {
-            return self::from($default);
+            $last  = null;
+            $found = false;
+            foreach ($this->getIterator() as $k => $v) {
+                if ($predicate($v, $k)) {
+                    $last = $v;
+                    $found = true;
+                }
+            }
+            if ($found) {
+                return $last;
+            } else {
+                throw new RuntimeException("No items matched the predicate");
+            }
+        }
+    }
+
+    /**
+     * @param $default
+     * @param callable|null $predicate (v, k) -> bool
+     * @return mixed
+     */
+    public function lastOrElse($default, $predicate = null)
+    {
+        if (is_null($predicate)) {
+            $last  = null;
+            $found = false;
+            foreach ($this->getIterator() as $k => $v) {
+                $last = $v;
+                $found = true;
+            }
+            if ($found) {
+                return $last;
+            } else {
+                return $default;
+            }
+        } else {
+            $last  = null;
+            $found = false;
+            foreach ($this->getIterator() as $k => $v) {
+                if ($predicate($v, $k)) {
+                    $last = $v;
+                    $found = true;
+                }
+            }
+            if ($found) {
+                return $last;
+            } else {
+                return $default;
+            }
         }
     }
 
@@ -302,24 +460,21 @@ class Ginq implements IteratorAggregate
         );
     }
 
+
+
     /**
-     * @param callable $predicate ($value, $key)
-     * @param mixed $default
+     * @param mixed $accumulator
+     * @param callable $operator (acc, v, k) -> mixed
      * @return mixed
      */
-    public function find($predicate, $default = null)
+    public function aggregate($accumulator, $operator)
     {
-        foreach ($this->getIterator() as $k => $v) {
-            if ($predicate($v, $k)) {
-                return $v;
-            }
-        }
-        return $default;
+        return $this->foldLeft($accumulator, $operator);
     }
 
     /**
      * @param mixed $accumulator
-     * @param callable $operator (acc, v, k) -> acc
+     * @param callable $operator (acc, v, k) -> mixed
      * @return mixed
      */
     public function foldLeft($accumulator, $operator)
@@ -743,7 +898,7 @@ class Ginq implements IteratorAggregate
             ->where(function ($m) {
                 /** @var $m \ReflectionMethod  */
                 /** @var $p \ReflectionParameter */
-                $p = Ginq::from($m->getParameters())->first(false);
+                $p = Ginq::from($m->getParameters())->firstOrElse(false);
                 if ($p === false) return false;
 
                 $c = $p->getClass();

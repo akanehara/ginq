@@ -1,4 +1,6 @@
 <?php
+use Ginq\OrderedGinq;
+
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
 
 class Person
@@ -300,54 +302,211 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testMin().
+     */
+    public function testMin()
+    {
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))->min();
+        $this->assertEquals(1, $actual);
+
+        $data = array(
+            array('name'=>'Abe Shinji',     'score'=> 2990),
+            array('name'=>'Suzuki Taro',    'score'=>10200),
+            array('name'=>'Yamada Taro',    'score'=>  680),
+            array('name'=>'Tamura Akira',   'score'=> 5840),
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950),
+            array('name'=>'Yamada Rindai',  'score'=> 6680),
+            array('name'=>'Suzuka Youichi', 'score'=> 6780),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950),
+        );
+        $actual = Ginq::from($data)->min('score');
+        $this->assertEquals(680, $actual);
+    }
+
+    /**
+     * testMax().
+     */
+    public function testMax()
+    {
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))->max();
+        $this->assertEquals(9, $actual);
+
+        $data = array(
+            array('name'=>'Abe Shinji',     'score'=> 2990),
+            array('name'=>'Suzuki Taro',    'score'=>10200),
+            array('name'=>'Yamada Taro',    'score'=>  680),
+            array('name'=>'Tamura Akira',   'score'=> 5840),
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950),
+            array('name'=>'Yamada Rindai',  'score'=> 6680),
+            array('name'=>'Suzuka Youichi', 'score'=> 6780),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950),
+        );
+        $actual = Ginq::from($data)->max('score');
+        $this->assertEquals(10200, $actual);
+    }
+
+    /**
      * testFirst().
      */
     public function testFirst()
     {
-        // without default value (just)
-        $x = Ginq::from(array('apple', 'orange', 'grape'))
-                ->first();
-        $this->assertEquals($x, 'apple');
+        $person = array(
+            array('id'=>1, 'firstname'=>'Taro',    'lastname'=>'Suzuki'),
+            array('id'=>2, 'firstname'=>'Ichiro',  'lastname'=>'Yamada'),
+            array('id'=>3, 'firstname'=>'Koich',   'lastname'=>'Takana'),
+            array('id'=>4, 'firstname'=>'Takashi', 'lastname'=>'Yamada'),
+            array('id'=>5, 'firstname'=>'Hiroshi', 'lastname'=>'Kawaguchi'),
+        );
 
-        // without default value (nothing)
-        $x = Ginq::zero()->first();
-        $this->assertEquals($x, null);
+        $yamada = function($x) { return $x['lastname'] == "Yamada"; };
+        $kato   = function($x) { return $x['lastname'] == "Kato"; };
 
-        // with default value (just)
-        $x = Ginq::from(array('apple', 'orange', 'grape'))
-                ->first('none');
-        $this->assertEquals($x, 'apple');
+        // not found
+        try {
+            Ginq::zero()->first();
+            $this->fail();
+        } catch (RuntimeException $e) {
+            $this->assertTrue(true);
+        }
 
-        // with default value (nothing)
-        $x = Ginq::zero()->first('none');
-        $this->assertEquals($x, 'none');
+        // not found (with predicate)
+        try {
+            Ginq::from($person)->first($kato);
+            $this->fail();
+        } catch (RuntimeException $e) {
+            $this->assertTrue(true);
+        }
+
+        // found
+        $actual = Ginq::from($person)->first();
+        $this->assertEquals(array('id'=>1, 'firstname'=>'Taro',    'lastname'=>'Suzuki'), $actual);
+
+        // fond (with predicate)
+        $actual = Ginq::from($person)->first($yamada);
+        $this->assertEquals(array('id'=>2, 'firstname'=>'Ichiro',  'lastname'=>'Yamada'), $actual);
     }
 
     /**
-     * testRest
-     *
-     * @expectedException InvalidArgumentException
+     * testFirstOrElse().
      */
-    public function testRest()
+    public function testFirstOrElse()
     {
-        // without default value (just)
-        $xs = Ginq::from(array(1,2,3,4,5))->rest()->toArray();
-        $this->assertEquals(array(1=>2,2=>3,3=>4,4=>5), $xs);
+        $person = array(
+            array('id'=>1, 'firstname'=>'Taro',    'lastname'=>'Suzuki'),
+            array('id'=>2, 'firstname'=>'Ichiro',  'lastname'=>'Yamada'),
+            array('id'=>3, 'firstname'=>'Koich',   'lastname'=>'Takana'),
+            array('id'=>4, 'firstname'=>'Takashi', 'lastname'=>'Yamada'),
+            array('id'=>5, 'firstname'=>'Hiroshi', 'lastname'=>'Kawaguchi'),
+        );
 
-        // without default value (nothing)
-        $xs = Ginq::zero()->rest()->toArray();
-        $this->assertEquals(array(), $xs);
+        $yamada = function($x) { return $x['lastname'] == "Yamada"; };
+        $kato   = function($x) { return $x['lastname'] == "Kato"; };
 
-        // with default value (just)
-        $xs = Ginq::from(array(1,2,3,4,5))->rest(array(42))->toArray();
-        $this->assertEquals(array(1=>2,2=>3,3=>4,4=>5), $xs);
+        // empty
+        $actual = Ginq::zero()->firstOrElse('none');
+        $this->assertEquals('none', $actual);
 
-        // with default value (nothing)
-        $xs = Ginq::zero()->rest(array(42))->toArray();
-        $this->assertEquals(array(42), $xs);
+        // not found (with predicate)
+        $actual = Ginq::from($person)->firstOrElse('none', $kato);
+        $this->assertEquals('none', $actual);
 
-        // invalid default value.
-        $xs = Ginq::zero()->rest(42);
+        // found
+        $actual = Ginq::from($person)->firstOrElse('none');
+        $this->assertEquals(array('id'=>1, 'firstname'=>'Taro', 'lastname'=>'Suzuki'), $actual);
+
+        // fond (with predicate)
+        $actual = Ginq::from($person)->firstOrElse('none', $yamada);
+        $this->assertEquals(array('id'=>2, 'firstname'=>'Ichiro',  'lastname'=>'Yamada'), $actual);
+    }
+
+    /**
+     * testLast().
+     */
+    public function testLast()
+    {
+        $person = array(
+            array('id'=>1, 'firstname'=>'Taro',    'lastname'=>'Suzuki'),
+            array('id'=>2, 'firstname'=>'Ichiro',  'lastname'=>'Yamada'),
+            array('id'=>3, 'firstname'=>'Koich',   'lastname'=>'Takana'),
+            array('id'=>4, 'firstname'=>'Takashi', 'lastname'=>'Yamada'),
+            array('id'=>5, 'firstname'=>'Hiroshi', 'lastname'=>'Kawaguchi'),
+        );
+
+        $yamada = function($x) { return $x['lastname'] == "Yamada"; };
+        $kato   = function($x) { return $x['lastname'] == "Kato"; };
+
+        // not found
+        try {
+            Ginq::zero()->last();
+            $this->fail();
+        } catch (RuntimeException $e) {
+            $this->assertTrue(true);
+        }
+
+        // not found (with predicate)
+        try {
+            Ginq::from($person)->last($kato);
+            $this->fail();
+        } catch (RuntimeException $e) {
+            $this->assertTrue(true);
+        }
+
+        // found
+        $actual = Ginq::from($person)->last();
+        $this->assertEquals(array('id'=>5, 'firstname'=>'Hiroshi', 'lastname'=>'Kawaguchi'), $actual);
+
+        // fond (with predicate)
+        $actual = Ginq::from($person)->last($yamada);
+        $this->assertEquals(array('id'=>4, 'firstname'=>'Takashi', 'lastname'=>'Yamada'), $actual);
+
+    }
+
+    /**
+     * testLastOrElse().
+     */
+    public function testLastOrElse()
+    {
+        $person = array(
+            array('id'=>1, 'firstname'=>'Taro',    'lastname'=>'Suzuki'),
+            array('id'=>2, 'firstname'=>'Ichiro',  'lastname'=>'Yamada'),
+            array('id'=>3, 'firstname'=>'Koich',   'lastname'=>'Takana'),
+            array('id'=>4, 'firstname'=>'Takashi', 'lastname'=>'Yamada'),
+            array('id'=>5, 'firstname'=>'Hiroshi', 'lastname'=>'Kawaguchi'),
+        );
+
+        $yamada = function($x) { return $x['lastname'] == "Yamada"; };
+        $kato   = function($x) { return $x['lastname'] == "Kato"; };
+
+        // empty
+        $actual = Ginq::zero()->lastOrElse('none');
+        $this->assertEquals('none', $actual);
+
+        // not found (with predicate)
+        $actual = Ginq::from($person)->lastOrElse('none', $kato);
+        $this->assertEquals('none', $actual);
+
+        // found
+        $actual = Ginq::from($person)->lastOrElse('none');
+        $this->assertEquals(array('id'=>5, 'firstname'=>'Hiroshi', 'lastname'=>'Kawaguchi'), $actual);
+
+        // fond (with predicate)
+        $actual = Ginq::from($person)->lastOrElse('none', $yamada);
+        $this->assertEquals(array('id'=>4, 'firstname'=>'Takashi', 'lastname'=>'Yamada'), $actual);
+    }
+
+    /**
+     * testElseIfZero().
+     */
+    public function testElseIf()
+    {
+        $actual = Ginq::zero()->elseIfZero(null)->toAList();
+        $this->assertEquals(array(array(0, null)), $actual);
+
+        $actual = Ginq::zero()->elseIfZero('')->toAList();
+        $this->assertEquals(array(array(0, '')), $actual);
+
+        $actual = Ginq::zero()->elseIfZero(-1)->toAList();
+        $this->assertEquals(array(array(0, -1)), $actual);
     }
 
     /**
@@ -382,30 +541,6 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * testFind
-     */
-    public function testFind() {
-        $isOrange = function($x, $k) { return $x == "orange"; };
-
-        // without default value (just)
-        $x = Ginq::from(array('apple', 'orange', 'grape'))
-                ->find($isOrange);
-        $this->assertEquals($x, 'orange');
-
-        // without default value (nothing)
-        $x = Ginq::zero()->find($isOrange);
-        $this->assertEquals($x, null);
-
-        // with default value (just)
-        $x = Ginq::from(array('apple', 'orange', 'grape'))
-                ->find($isOrange, 'none');
-        $this->assertEquals($x, 'orange');
-
-        // with default value (nothing)
-        $x = Ginq::zero()->find($isOrange, 'none');
-        $this->assertEquals($x, 'none');
-    }
 
     /**
      * testFold
