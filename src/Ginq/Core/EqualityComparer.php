@@ -34,15 +34,22 @@ class EqualityComparer
         return self::$inst;
     }
 
-    public function equals($x, $y)
+    /**
+     * @param mixed      $v0 - left value
+     * @param mixed      $v1 - right value
+     * @param mixed|null $k0 - left key
+     * @param mixed|null $k1 - right key
+     * @return bool
+     */
+    public function equals($v0, $v1, $k0 = null, $k1 = null)
     {
-        if (is_object($x) && is_object($y)) {
-            return $x == $y;
+        if (is_object($v0) && is_object($v1)) {
+            return $v0 == $v1;
         }
         /* if (is_array($x) && is_array($y)) {
             return $x === $y;
         } */
-        return $x === $y;
+        return $v0 === $v1;
     }
 
     public function hash($v)

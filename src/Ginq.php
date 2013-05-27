@@ -68,14 +68,12 @@ class Ginq implements IteratorAggregate
 
     /**
      * default compare
-     * @param mixed $v0
-     * @param mixed $v1
-     * @param mixed $k0
-     * @param mixed $k1
+     * @param mixed $x
+     * @param mixed $y
      * @return int
      */
-    public static function compare($v0, $v1, $k0, $k1) {
-        return Comparer::getDefault()->compare($v0, $v1, $k0, $k1);
+    public static function compare($x, $y) {
+        return Comparer::getDefault()->compare($x, $y);
     }
 
     /**
@@ -295,9 +293,10 @@ class Ginq implements IteratorAggregate
      */
     public function contains($value)
     {
+        $eqComparer = EqualityComparer::getDefault();
         return $this->any(
-            function ($v, $k) use ($value) {
-                return $v == $value;
+            function ($v, $k) use ($value, $eqComparer) {
+                return $eqComparer->equals($v, $value);
             }
         );
     }
@@ -308,9 +307,10 @@ class Ginq implements IteratorAggregate
      */
     public function containsKey($key)
     {
+        $eqComparer = EqualityComparer::getDefault();
         return $this->any(
-            function ($v, $k) use ($key) {
-                return $k == $key;
+            function ($v, $k) use ($key, $eqComparer) {
+                return $eqComparer->equals($k, $key);
             }
         );
     }
@@ -609,7 +609,6 @@ class Ginq implements IteratorAggregate
             $outerCompareKeySelector, $innerCompareKeySelector,
             $resultValueSelector, $resultKeySelector = null)
     {
-        $eqComparer = EqualityComparer::getDefault();
         return self::from(self::$gen->join(
             $this->getIterator(),
             IteratorUtil::iterator($inner),
@@ -617,7 +616,7 @@ class Ginq implements IteratorAggregate
             SelectorParser::parse($innerCompareKeySelector, ValueSelector::getInstance()),
             JoinSelectorParser::parse($resultValueSelector, ValueJoinSelector::getInstance()),
             JoinSelectorParser::parse($resultKeySelector,   KeyJoinSelector::getInstance()),
-            $eqComparer
+            EqualityComparerParser::parse(null, EqualityComparer::getDefault())
         ));
     }
 
@@ -644,53 +643,50 @@ class Ginq implements IteratorAggregate
      */
     public function groupBy($compareKeySelector, $elementSelector = null)
     {
-        $eqComparer = EqualityComparer::getDefault();
         return self::from(self::$gen->groupBy(
             $this->getIterator(),
             SelectorParser::parse($compareKeySelector, ValueSelector::getInstance()),
             SelectorParser::parse($elementSelector, ValueSelector::getInstance()),
-            new ProjectionSelector(function ($xs, $key) { return new GroupingGinq($xs, $key); }),
-            $eqComparer
+            new DelegateSelector(function ($xs, $key) { return new GroupingGinq($xs, $key); }),
+            EqualityComparerParser::parse(null, EqualityComparer::getDefault())
+        ));
         ));
     }
 
     /**
-     * @param Closure|string|int|Selector|null $compareKeySelector
-     * @param Closure|Comparer|null $comparer
+     * @param Closure|string|int|Selector|null $compareKeySelector (v, k) -> comparable
      * @return OrderedGinq
      */
-    public function orderBy($compareKeySelector = null, $comparer = null)
+    public function orderBy($compareKeySelector = null)
     {
         $compareKeySelector = SelectorParser::parse($compareKeySelector, ValueSelector::getInstance());
-        $comparer = ComparerParser::parse($comparer);
+        $comparer = ComparerParser::parse(null, Comparer::getDefault());
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         return new OrderedGinq($this->getIterator(), $comparer);
     }
 
     /**
-     * @param Closure|string|int|Selector|null $compareKeySelector
-     * @param Closure|Comparer|null $comparer
+     * @param Closure|string|int|Selector|null $compareKeySelector (v, k) -> comparable
      * @return OrderedGinq
      */
-    public function orderByDesc($compareKeySelector = null, $comparer = null)
+    public function orderByDesc($compareKeySelector = null)
     {
         $compareKeySelector = SelectorParser::parse($compareKeySelector, ValueSelector::getInstance());
-        $comparer = ComparerParser::parse($comparer);
+        $comparer = ComparerParser::parse(null, Comparer::getDefault());
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new ReverseComparer($comparer);
         return new OrderedGinq($this->getIterator(), $comparer);
     }
 
     /**
-     * @param EqualityComparer $eqComparer
      * @return Ginq
      */
-    public function distinct($eqComparer = null)
+    public function distinct()
     {
-        if (is_null($eqComparer)) {
-            $eqComparer = EqualityComparer::getDefault();
-        }
-        return self::from(self::$gen->distinct($this->getIterator(), $eqComparer));
+        return self::from(
+            self::$gen->distinct($this->getIterator(),
+            EqualityComparerParser::parse(null, EqualityComparer::getDefault())
+        ));
     }
 
     /**

@@ -14,23 +14,26 @@
  * @package    Ginq
  */
 
-namespace Ginq\Core;
+namespace Ginq\EqualityComparer;
 
-class Comparer
+use Ginq\Core\EqualityComparer;
+
+class DelegateEqualityComparer extends EqualityComparer
 {
-    /**
-     * @var Comparer
-     */
-    static private $inst;
+    /* @var \Closure */
+    protected $equalsFn;
+
+    /* @var \Closure */
+    protected $hashFn;
 
     /**
-     * @return Comparer
+     * @param \Closure $equalsFn
+     * @param \Closure $hashFn
      */
-    static final public function getDefault() {
-        if (is_null(self::$inst)) {
-            self::$inst = new Comparer();
-        }
-        return self::$inst;
+    public function __construct($equalsFn, $hashFn)
+    {
+        $this->equalsFn = $equalsFn;
+        $this->hashFn   = $hashFn;
     }
 
     /**
@@ -38,18 +41,17 @@ class Comparer
      * @param mixed      $v1 - right value
      * @param mixed|null $k0 - left key
      * @param mixed|null $k1 - right key
-     * @return int
+     * @return bool
      */
-    public function compare($v0, $v1, $k0 = null, $k1 = null)
+    public function equals($v0, $v1, $k0 = null, $k1 = null)
     {
-        if (is_string($v0) && is_string($v1)) {
-            return strcmp($v0, $v1);
-        }
-        if (is_numeric($v0) && is_numeric($v1)) {
-            if ($v0 == $v1) return 0;
-            return ($v0 < $v1) ? -1 : 1;
-        }
-        return 0;
+        $f = $this->equalsFn;
+        return $f($v0, $v1);
+    }
+
+    public function hash($v)
+    {
+        $f = $this->hashFn;
+        return $f($v);
     }
 }
-

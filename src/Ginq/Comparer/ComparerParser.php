@@ -22,13 +22,14 @@ class ComparerParser
 {
     /**
      * @param \Closure|Comparer $src
+     * @param Comparer $default
      * @throws \InvalidArgumentException
      * @return \Ginq\Core\Comparer
      */
-    static public function parse($src)
+    static public function parse($src, $default)
     {
         if (is_null($src)) {
-            return new Comparer();
+            return $default;
         }
         if ($src instanceof \Closure) {
             return new DelegateComparer($src);

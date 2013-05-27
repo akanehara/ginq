@@ -54,13 +54,12 @@ class OrderedGinq extends \Ginq
 
     /**
      * @param \Closure|string|int|Selector|null $compareKeySelector
-     * @param \Closure|Comparer|null $comparer
      * @return OrderedGinq
      */
-    public function thenBy($compareKeySelector = null, $comparer = null)
+    public function thenBy($compareKeySelector = null)
     {
         $compareKeySelector = SelectorParser::parse($compareKeySelector,ValueSelector::getInstance());
-        $comparer = ComparerParser::parse($comparer);
+        $comparer = ComparerParser::parse(null, Comparer::getDefault());
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new CompoundComparer($this->comparer, $comparer);
         return new OrderedGinq($this->getIterator(), $comparer);
@@ -68,13 +67,12 @@ class OrderedGinq extends \Ginq
 
     /**
      * @param \Closure|string|int|Selector|null $compareKeySelector
-     * @param \Closure|Comparer|null $comparer
      * @return OrderedGinq
      */
-    public function thenByDesc($compareKeySelector = null, $comparer = null)
+    public function thenByDesc($compareKeySelector = null)
     {
         $compareKeySelector = SelectorParser::parse($compareKeySelector, ValueSelector::getInstance());
-        $comparer = ComparerParser::parse($comparer);
+        $comparer = ComparerParser::parse(null, Comparer::getDefault());
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new ReverseComparer($comparer);
         $comparer = new CompoundComparer($this->comparer, $comparer);
