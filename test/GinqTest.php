@@ -82,7 +82,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array(4, 5)
         );
         $actual = Ginq::from(array(1,2,3,4,5))->toAList();
-        $this->assertEquals($actual, $expected);
+        $this->assertEquals($expected, $actual);
 
         $expected = array(
             array(0, 2),
@@ -95,7 +95,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             function($v, $k) { return $v+1; },
             function($v, $k) { return $k*$k; }
         )->toAList();
-        $this->assertEquals($actual, $expected);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -131,7 +131,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             new ArrayObject(array(4,5,6)),
             Ginq::from(array(7,8,9))
         ))->toAListRec();
-        $this->assertEquals($actual, $expected);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -200,7 +200,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             new ArrayObject(array(4,5,6)),
             Ginq::from(array(7,8,9))
         ))->toArrayRec();
-        $this->assertEquals($actual, $expected);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
