@@ -22,7 +22,7 @@ class SelectorParser
 {
     /**
      * @param \Closure|string|int|Selector $src
-     * @param $default
+     * @param Selector $default
      * @throws \InvalidArgumentException
      * @return Selector
      */
@@ -37,7 +37,7 @@ class SelectorParser
         }
 
         if (is_callable($src)) {
-            return new ProjectionSelector($src);
+            return new DelegateSelector($src);
         }
 
         if ($src instanceof Selector) {

@@ -14,31 +14,28 @@
  * @package    Ginq
  */
 
-namespace Ginq\Selector;
+namespace Ginq\Predicate;
 
-use Ginq\Core\Selector;
+use Ginq\Core\Predicate;
 
-class ProjectionSelector implements Selector
+class DelegatePredicate implements Predicate
 {
     /**
-     * @var callable
+     * @var \Closure
      */
     private $func;
 
-    /**
-     * @param \Closure $func  ($v, $k)
-     */
     public function __construct($func)
     {
         $this->func = $func;
     }
 
     /**
-     * @param mixed $v value
-     * @param mixed $k key
-     * @return mixed
+     * @param mixed $v
+     * @param mixed $k
+     * @return bool
      */
-    public function select($v, $k)
+    public function predicate($v, $k)
     {
         $f = $this->func;
         return $f($v, $k);

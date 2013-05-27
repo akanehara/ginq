@@ -33,7 +33,7 @@ class JoinSelectorParser
         }
 
         if ($src instanceof \Closure) {
-            return new ProjectionJoinSelector($src);
+            return new DelegateJoinSelector($src);
         }
 
         if ($src instanceof JoinSelector) {

@@ -25,7 +25,7 @@ class PredicateParser
         }
 
         if ($src instanceof \Closure) {
-            return new ProjectionPredicate($src);
+            return new DelegatePredicate($src);
         }
 
         $type = gettype($src);

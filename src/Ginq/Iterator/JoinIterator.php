@@ -19,7 +19,7 @@ namespace Ginq\Iterator;
 use Ginq\Core\EqualityComparer;
 use Ginq\Core\Lookup;
 use Ginq\Core\Selector;
-use Ginq\Selector\ProjectionSelector;
+use Ginq\Selector\DelegateSelector;
 use Ginq\Core\JoinSelector;
 use Ginq\Util\IteratorUtil;
 
@@ -115,7 +115,7 @@ class JoinIterator implements \Iterator
         $lookup = Lookup::from($this->inner, $this->innerKeySelector, $this->eqComparer);
         $this->it = new SelectManyWithJoinIterator(
             $this->outer,
-            new ProjectionSelector(
+            new DelegateSelector(
                 function ($v, $k) use (&$lookup, $outerKeySelector) {
                     return $lookup->get($outerKeySelector->select($v, $k));
                 }
