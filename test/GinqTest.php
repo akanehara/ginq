@@ -502,8 +502,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testRepeat()
     {
-        // infinite repeat
+        // infinite
         $xs = Ginq::repeat("foo")->take(3)->toArray();
+        $this->assertEquals(array("foo","foo","foo"), $xs);
+
+        // finite
+        $xs = Ginq::repeat("foo", 3)->toArray();
         $this->assertEquals(array("foo","foo","foo"), $xs);
     }
 

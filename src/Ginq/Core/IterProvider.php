@@ -49,9 +49,10 @@ interface IterProvider
 
     /**
      * @param mixed $x
+     * @param int|null $count
      * @return \Iterator
      */
-    public function repeat($x);
+    public function repeat($x, $count);
 
     /**
      * @param array|\Traversable $xs

@@ -33,11 +33,17 @@ class RepeatIterator implements \Iterator
     private $x;
 
     /**
+     * @var int|null
+     */
+    private $count;
+
+    /**
      * @param mixed $x
      */
-    public function __construct($x)
+    public function __construct($x, $count)
     {
         $this->x = $x;
+        $this->count = $count;
     }
 
     public function current()
@@ -62,6 +68,10 @@ class RepeatIterator implements \Iterator
 
     public function valid()
     {
-        return true;
+        if (is_null($this->count)) {
+            return true;
+        } else {
+            return $this->i < $this->count;
+        }
     }
 }

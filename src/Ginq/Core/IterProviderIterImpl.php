@@ -79,11 +79,12 @@ class IterProviderIterImpl implements IterProvider
 
     /**
      * @param mixed $x
+     * @param int|null $count
      * @return \Ginq\Iterator\RepeatIterator
      */
-    public function repeat($x)
+    public function repeat($x, $count)
     {
-        return new RepeatIterator($x);
+        return new RepeatIterator($x, $count);
     }
 
     /**

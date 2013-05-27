@@ -417,11 +417,12 @@ class Ginq implements IteratorAggregate
 
     /**
      * @param mixed $element
+     * @param null|int   $count
      * @return Ginq
      */
-    public static function repeat($element)
+    public static function repeat($element, $count = null)
     {
-        return self::from(self::$gen->repeat($element));
+        return self::from(self::$gen->repeat($element, $count));
     }
 
     /**
