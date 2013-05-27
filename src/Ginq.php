@@ -637,6 +637,28 @@ class Ginq implements IteratorAggregate
             new DelegateSelector(function ($xs, $key) { return new GroupingGinq($xs, $key); }),
             EqualityComparerParser::parse(null, EqualityComparer::getDefault())
         ));
+    }
+
+    /**
+     * @param array|Traversable $inner
+     * @param \Closure|string|int|Selector   $outerCompareKeySelector (v, k) -> comparable
+     * @param \Closure|string|int|Selector   $innerCompareKeySelector (v, k) -> comparable
+     * @param \Closure|JoinSelector|int      $resultValueSelector (outer, inners, outerKey, innerKey) -> mixed
+     * @param \Closure|JoinSelector|int|null $resultKeySelector   (outer, ineers, outerKey, innerKey) -> mixed
+     * @return Ginq
+     */
+    public function groupJoin($inner,
+            $outerCompareKeySelector, $innerCompareKeySelector,
+            $resultValueSelector, $resultKeySelector = null)
+    {
+        return self::from(self::$gen->groupJoin(
+            $this->getIterator(),
+            IteratorUtil::iterator($inner),
+            SelectorParser::parse($outerCompareKeySelector, ValueSelector::getInstance()),
+            SelectorParser::parse($innerCompareKeySelector, ValueSelector::getInstance()),
+            JoinSelectorParser::parse($resultValueSelector, ValueJoinSelector::getInstance()),
+            JoinSelectorParser::parse($resultKeySelector,   KeyJoinSelector::getInstance()),
+            EqualityComparerParser::parse(null, EqualityComparer::getDefault())
         ));
     }
 

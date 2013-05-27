@@ -904,6 +904,73 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testGroupJoin().
+     */
+    public function testGroupJoin()
+    {
+        $persons = array(
+             array('id' => 1, 'name' => 'Taro')
+            ,array('id' => 2, 'name' => 'Atsushi')
+            ,array('id' => 3, 'name' => 'Junko')
+            ,array('id' => 4, 'name' => 'Hiroshi')
+        );
+
+        $phones = array(
+             array('id' => 1, 'owner' => 1, 'phone' => '03-1234-5678')
+            ,array('id' => 2, 'owner' => 1, 'phone' => '090-8421-9061')
+            ,array('id' => 3, 'owner' => 2, 'phone' => '050-1198-4458')
+            ,array('id' => 4, 'owner' => 3, 'phone' => '06-1111-3333')
+            ,array('id' => 5, 'owner' => 3, 'phone' => '090-9898-1314')
+            ,array('id' => 6, 'owner' => 3, 'phone' => '050-6667-2231')
+        );
+
+        $actual = Ginq::from($persons)->groupJoin($phones,
+            'id', 'owner',
+            function($person, $phones, $outerKey, $innerKey) {
+                /* @var OrderedGinq $phones */
+                return array($person['name'], $phones->count());
+            }
+        )->toList();
+        $this->assertEquals(
+             array(
+                 array('Taro',    2)
+                ,array('Atsushi', 1)
+                ,array('Junko',   3)
+                ,array('Hiroshi', 0)
+            ), $actual
+        );
+
+        // left outer join
+        $actual = Ginq::from($persons)->groupJoin($phones,
+            'id', 'owner',
+            function($person, $phones, $outerKey, $innerKey) {
+                /* @var OrderedGinq $phones */
+                return array('name'=>$person['name'], 'phones'=>$phones->elseIfZero(null));
+            }
+        )
+        ->selectMany(
+            function($person) { return $person['phones'];},
+            function($person, $phone) {
+                return array($person['name'], $phone['phone']);
+            }
+        )
+        ->toList()
+        ;
+        $this->assertEquals(
+            array(
+                 array('Taro',    '03-1234-5678')
+                ,array('Taro',    '090-8421-9061')
+                ,array('Atsushi', '050-1198-4458')
+                ,array('Junko',   '06-1111-3333')
+                ,array('Junko',   '090-9898-1314')
+                ,array('Junko',   '050-6667-2231')
+                ,array('Hiroshi', null)
+            ),
+            $actual
+        );
+    }
+
+    /**
      * testZip().
      */
     public function testZip()

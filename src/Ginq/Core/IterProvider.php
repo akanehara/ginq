@@ -161,6 +161,22 @@ interface IterProvider
             $eqComparer);
 
     /**
+     * @param array|\Traversable $outer
+     * @param array|\Traversable $inner
+     * @param Selector $outerCompareKeySelector
+     * @param Selector $innerCompareKeySelector
+     * @param JoinSelector $resultValueSelector
+     * @param JoinSelector $resultKeySelector
+     * @param EqualityComparer $eqComparer
+     * @return \Iterator
+     */
+    public function groupJoin(
+        $outer, $inner,
+        $outerCompareKeySelector, $innerCompareKeySelector,
+        $resultValueSelector, $resultKeySelector,
+        $eqComparer);
+
+    /**
      * @param array|\Traversable $xs
      * @param array|\Traversable $ys
      * @param JoinSelector $resultValueSelector

@@ -17,6 +17,7 @@
 namespace Ginq\Core;
 
 use Ginq\Iterator\DistinctIterator;
+use Ginq\Iterator\GroupJoinIterator;
 use Ginq\Iterator\ZeroIterator;
 use Ginq\Iterator\RangeIterator;
 use Ginq\Iterator\RangeInfIterator;
@@ -233,6 +234,29 @@ class IterProviderIterImpl implements IterProvider
             $eqComparer)
     {
         return new JoinIterator(
+            $outer, $inner,
+            $outerCompareKeySelector, $innerCompareKeySelector,
+            $resultValueSelector, $resultKeySelector,
+            $eqComparer);
+    }
+
+    /**
+     * @param array|\Traversable $outer
+     * @param array|\Traversable $inner
+     * @param Selector $outerCompareKeySelector
+     * @param Selector $innerCompareKeySelector
+     * @param JoinSelector $resultValueSelector
+     * @param JoinSelector $resultKeySelector
+     * @param EqualityComparer $eqComparer
+     * @return \Iterator
+     */
+    public function groupJoin(
+        $outer, $inner,
+        $outerCompareKeySelector, $innerCompareKeySelector,
+        $resultValueSelector, $resultKeySelector,
+        $eqComparer)
+    {
+        return new GroupJoinIterator(
             $outer, $inner,
             $outerCompareKeySelector, $innerCompareKeySelector,
             $resultValueSelector, $resultKeySelector,
