@@ -34,13 +34,13 @@ class ReverseComparer extends Comparer
     }
 
     /**
-     * @param mixed $v0 - left value (sort key)
-     * @param mixed $v1 - right value (sort key)
-     * @param mixed $k0 - left key
-     * @param mixed $k1 - right key
+     * @param mixed      $v0 - left value
+     * @param mixed      $v1 - right value
+     * @param mixed|null $k0 - left key
+     * @param mixed|null $k1 - right key
      * @return int
      */
-    public function compare($v0, $v1, $k0, $k1)
+    public function compare($v0, $v1, $k0 = null, $k1 = null)
     {
         // flip
         return $this->comparer->compare($v1, $v0, $k1, $k0);
