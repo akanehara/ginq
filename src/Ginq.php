@@ -96,19 +96,6 @@ class Ginq implements IteratorAggregate
     }
 
     /**
-     * @deprecated
-     * @param int $start
-     * @return callable
-     */
-    public static function seq($start = 0)
-    {
-        $i = $start;
-        return function() use (&$i) {
-            return $i++;
-        };
-    }
-
-    /**
      * Overridden interface of IteratorAggregate.
      * @return \Iterator
      */
