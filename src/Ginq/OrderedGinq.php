@@ -62,7 +62,7 @@ class OrderedGinq extends \Ginq
         $comparer = ComparerParser::parse(null, Comparer::getDefault());
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new CompoundComparer($this->comparer, $comparer);
-        return new OrderedGinq($this->getIterator(), $comparer);
+        return new OrderedGinq($this->it, $comparer);
     }
 
     /**
@@ -76,7 +76,7 @@ class OrderedGinq extends \Ginq
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new ReverseComparer($comparer);
         $comparer = new CompoundComparer($this->comparer, $comparer);
-        return new OrderedGinq($this->getIterator(), $comparer);
+        return new OrderedGinq($this->it, $comparer);
     }
 }
 
