@@ -856,6 +856,20 @@ class Ginq implements IteratorAggregate
     }
 
     /**
+     * @param array|Traversable $rhs
+     * @return Ginq
+     */
+    public function union($rhs)
+    {
+        return self::from(
+            self::$gen->union(
+                $this->getIterator(),
+                $rhs,
+                EqualityComparerParser::parse(null, EqualityComparer::getDefault())
+            ));
+    }
+
+    /**
      * @return Ginq
      */
     public function memoize()
