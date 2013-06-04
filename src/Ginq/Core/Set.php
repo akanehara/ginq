@@ -65,6 +65,21 @@ class Set
     }
 
     /**
+     * @param mixed $x
+     * @return bool
+     */
+    public function remove($x)
+    {
+        $hash = $this->eqComparer->hash($x);
+        if (array_key_exists($hash, $this->elements)) {
+            unset($this->elements[$hash]);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * @return \Traversable
      */
     public function getIterator()
