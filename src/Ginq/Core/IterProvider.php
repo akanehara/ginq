@@ -228,6 +228,14 @@ interface IterProvider
 
     /**
      * @param array|\Traversable $xs
+     * @param array|\Traversable $ys
+     * @param EqualityComparer $eqComparer
+     * @return \Iterator
+     */
+    public function except($xs, $ys, $eqComparer);
+
+    /**
+     * @param array|\Traversable $xs
      * @return \Iterator
      */
     public function memoize($xs);

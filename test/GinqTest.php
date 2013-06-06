@@ -1389,6 +1389,21 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testExcept().
+     */
+    public function testExcept()
+    {
+        $xs = Ginq::from(array(1,2,3,4,5))->except(array(3,4,5,6,7))->toList();
+        $this->assertEquals(array(1, 2), $xs);
+
+        $xs = Ginq::from(array(1,2,3,4,5))->except(array(3,4,5))->toList();
+        $this->assertEquals(array(1, 2), $xs);
+
+        $xs = Ginq::from(array(1,2,3,4,5))->except(array(1,3,5,9))->toList();
+        $this->assertEquals(array(2, 4), $xs);
+    }
+
+    /**
      * testMemoize().
      */
     public function testMemoize()

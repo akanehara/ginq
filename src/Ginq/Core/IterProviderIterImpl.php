@@ -17,6 +17,7 @@
 namespace Ginq\Core;
 
 use Ginq\Iterator\DistinctIterator;
+use Ginq\Iterator\ExceptIterator;
 use Ginq\Iterator\GroupJoinIterator;
 use Ginq\Iterator\IntersectIterator;
 use Ginq\Iterator\UnionIterator;
@@ -331,6 +332,17 @@ class IterProviderIterImpl implements IterProvider
     public function intersect($xs, $ys, $eqComparer)
     {
         return new IntersectIterator($xs, $ys, $eqComparer);
+    }
+
+    /**
+     * @param array|\Traversable $xs
+     * @param array|\Traversable $ys
+     * @param EqualityComparer $eqComparer
+     * @return \Iterator
+     */
+    public function except($xs, $ys, $eqComparer)
+    {
+        return new ExceptIterator($xs, $ys, $eqComparer);
     }
 
     /**
