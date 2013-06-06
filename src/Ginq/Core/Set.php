@@ -31,12 +31,19 @@ class Set
     protected $elements;
 
     /**
-     * @var EqualityComparer $equalityComparer
+     * @param $eqComparer
+     * @param \Traversable $elements
+     * @internal param \Ginq\Core\EqualityComparer $equalityComparer
      */
-    public function __construct($eqComparer)
+    public function __construct($eqComparer, $elements=null)
     {
         $this->eqComparer = $eqComparer;
         $this->elements = array();
+        if (!is_null($elements)) {
+            foreach ($elements as $e) {
+                $this->add($e);
+            }
+        }
     }
 
     /**

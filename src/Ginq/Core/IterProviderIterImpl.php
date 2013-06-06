@@ -18,6 +18,7 @@ namespace Ginq\Core;
 
 use Ginq\Iterator\DistinctIterator;
 use Ginq\Iterator\GroupJoinIterator;
+use Ginq\Iterator\IntersectIterator;
 use Ginq\Iterator\UnionIterator;
 use Ginq\Iterator\ZeroIterator;
 use Ginq\Iterator\RangeIterator;
@@ -319,6 +320,17 @@ class IterProviderIterImpl implements IterProvider
     public function union($xs, $ys, $eqComparer)
     {
         return new UnionIterator($xs, $ys, $eqComparer);
+    }
+
+    /**
+     * @param array|\Traversable $xs
+     * @param array|\Traversable $ys
+     * @param EqualityComparer $eqComparer
+     * @return \Iterator
+     */
+    public function intersect($xs, $ys, $eqComparer)
+    {
+        return new IntersectIterator($xs, $ys, $eqComparer);
     }
 
     /**
