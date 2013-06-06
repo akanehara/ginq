@@ -1404,6 +1404,42 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testSequenceEquals().
+     */
+    public function testSequenceEquals()
+    {
+        $actual = Ginq::from(array(1,2,3,4,5))->sequenceEquals(array(1,2,3,4,5));
+        $this->assertEquals(true, $actual);
+
+        $actual = Ginq::from(array(1,2,3,4,5))->sequenceEquals(array(6,7,8,9));
+        $this->assertEquals(false, $actual);
+
+        $actual = Ginq::from(array(1,2,3,4,5))->sequenceEquals(array(4,5,6,7));
+        $this->assertEquals(false, $actual);
+
+        $apple  = array('id'=>1, 'name'=>'apple');
+        $orange = array('id'=>2, 'name'=>'orange');
+        $grape  = array('id'=>3, 'name'=>'grape');
+        $banana = array('id'=>4, 'name'=>'banana');
+
+        $actual = Ginq::from(array($apple, $orange, $grape))->sequenceEquals(array($apple, $orange, $grape));
+        $this->assertEquals(true, $actual);
+
+        $actual = Ginq::from(array($apple, $orange, $grape))->sequenceEquals(array($orange, $grape, $banana));
+        $this->assertEquals(false, $actual);
+
+        $lhs = Ginq::from(array($apple, $orange, $grape))->select(function($x){return $x;});
+        $rhs = Ginq::from(array($apple, $orange, $grape))->select(function($x){return $x;});
+        $actual = $lhs->sequenceEquals($rhs);
+        $this->assertEquals(true, $actual);
+
+        $lhs = Ginq::from(array($apple, $orange, $grape))->select(function($x){return $x;});
+        $rhs = Ginq::from(array($orange, $grape, $banana))->select(function($x){return $x;});
+        $actual = $lhs->sequenceEquals($rhs);
+        $this->assertEquals(false, $actual);
+    }
+
+    /**
      * testMemoize().
      */
     public function testMemoize()

@@ -897,6 +897,33 @@ class Ginq implements IteratorAggregate
             ));
     }
 
+    public function sequenceEquals($rhs)
+    {
+        $eqComparer = EqualityComparerParser::parse(null, EqualityComparer::getDefault());
+        $lhs = $this->it;
+        $rhs = IteratorUtil::iterator($rhs);
+        if ($lhs instanceof Countable && $rhs instanceof Countable) {
+            if ($lhs->count() !== $rhs->count()) {
+                return false;
+            }
+        }
+        $lhs->rewind(); $rhs->rewind();
+        while ($lhs->valid()) {
+            $v0 = $lhs->current();
+            if ($rhs->valid()) {
+                $v1 = $rhs->current();
+                if (!$eqComparer->equals($v0, $v1)) {
+                    return false;
+                }
+                $rhs->next();
+            } else {
+                return false;
+            }
+            $lhs->next();
+        }
+        return true;
+    }
+
     /**
      * @return Ginq
      */
