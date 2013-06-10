@@ -1439,6 +1439,91 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(false, $actual);
     }
 
+
+    /**
+     * testGetValueAt().
+     */
+    public function testGetValueAt()
+    {
+        $apple  = array('id'=>1, 'name'=>'apple');
+        $orange = array('id'=>2, 'name'=>'orange');
+        $grape  = array('id'=>3, 'name'=>'grape');
+        $banana = array('id'=>4, 'name'=>'banana');
+
+        $xs = Ginq::from(array($apple, $orange, $grape, $banana))->select(function($x){return $x;});
+        $this->assertEquals($grape, $xs->getValueAt(2));
+
+        try {
+            $xs = Ginq::from(array($apple, $orange, $grape, $banana))
+                ->select(function($x){return $x;})
+                ->getValueAt(4);
+            $this->fail();
+        } catch (OutOfRangeException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
+    /**
+     * testGetValueOrElseAt().
+     */
+    public function testGetValueAtOrElse()
+    {
+        $apple  = array('id'=>1, 'name'=>'apple');
+        $orange = array('id'=>2, 'name'=>'orange');
+        $grape  = array('id'=>3, 'name'=>'grape');
+        $banana = array('id'=>4, 'name'=>'banana');
+
+        $xs = Ginq::from(array($apple, $orange, $grape, $banana))->select(function($x){return $x;});
+        $this->assertEquals($grape, $xs->getValueAtOrElse(2, 999));
+
+        $xs = Ginq::from(array($apple, $orange, $grape, $banana))
+            ->select(function($x){return $x;});
+        $this->assertEquals(999, $xs->getValueAtOrElse(4, 999));
+    }
+
+    /**
+     * testGetKeyAt().
+     */
+    public function testGetKeyAt()
+    {
+        $apple  = array('id'=>1, 'name'=>'apple');
+        $orange = array('id'=>2, 'name'=>'orange');
+        $grape  = array('id'=>3, 'name'=>'grape');
+        $banana = array('id'=>4, 'name'=>'banana');
+
+        $xs = Ginq::from(array('one'=>$apple, 'two'=>$orange, 'three'=>$grape, 'four'=>$banana))
+                ->select(function($x){return $x;});
+        $this->assertEquals('three', $xs->getKeyAt(2));
+
+        try {
+            $xs = Ginq::from(array('one'=>$apple, 'two'=>$orange, 'three'=>$grape, 'four'=>$banana))
+                ->select(function($x){return $x;})
+                ->getKeyAt(4);
+            $this->fail();
+        } catch (OutOfRangeException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
+    /**
+     * testGetKeyOrElseAt().
+     */
+    public function testGetKeyAtOrElse()
+    {
+        $apple  = array('id'=>1, 'name'=>'apple');
+        $orange = array('id'=>2, 'name'=>'orange');
+        $grape  = array('id'=>3, 'name'=>'grape');
+        $banana = array('id'=>4, 'name'=>'banana');
+
+        $xs = Ginq::from(array('one'=>$apple, 'two'=>$orange, 'three'=>$grape, 'four'=>$banana))
+            ->select(function($x){return $x;});
+        $this->assertEquals('three', $xs->getKeyAtOrElse(2, 999));
+
+        $xs = Ginq::from(array('one'=>$apple, 'two'=>$orange, 'three'=>$grape, 'four'=>$banana))
+            ->select(function($x){return $x;});
+        $this->assertEquals(999, $xs->getKeyAtOrElse(4, 999));
+    }
+
     /**
      * testMemoize().
      */

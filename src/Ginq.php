@@ -897,6 +897,10 @@ class Ginq implements IteratorAggregate
             ));
     }
 
+    /**
+     * @param $rhs
+     * @return bool
+     */
     public function sequenceEquals($rhs)
     {
         $eqComparer = EqualityComparerParser::parse(null, EqualityComparer::getDefault());
@@ -922,6 +926,112 @@ class Ginq implements IteratorAggregate
             $lhs->next();
         }
         return true;
+    }
+
+    /**
+     * @param int $index
+     * @throws RuntimeException
+     * @throws OutOfRangeException
+     * @return mixed
+     */
+    public function getValueAt($index)
+    {
+        $it = $this->getIterator();
+        if ($it instanceof Countable) {
+            if ($it->count() <= $index) {
+                throw new OutOfRangeException('index out of range.');
+            }
+        }
+        $it->rewind();
+        if (!$it->valid()) {
+            throw new RuntimeException("Sequence is empty");
+        }
+        for ($i = 0; $i < $index; $i++) {
+            $it->next();
+            if (!$it->valid()) {
+                throw new OutOfRangeException('index out of range.');
+            }
+        }
+        return $it->current();
+    }
+
+    /**
+     * @param int $index
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getValueAtOrElse($index, $default)
+    {
+        $it = $this->getIterator();
+        if ($it instanceof Countable) {
+            if ($it->count() <= $index) {
+                return $default;
+            }
+        }
+        $it->rewind();
+        if (!$it->valid()) {
+            return $default;
+        }
+        for ($i = 0; $i < $index; $i++) {
+            $it->next();
+            if (!$it->valid()) {
+                return $default;
+            }
+        }
+        return $it->current();
+    }
+
+    /**
+     * @param int $index
+     * @throws RuntimeException
+     * @throws OutOfRangeException
+     * @return mixed
+     */
+    public function getKeyAt($index)
+    {
+        $it = $this->getIterator();
+        if ($it instanceof Countable) {
+            if ($it->count() <= $index) {
+                throw new OutOfRangeException('index out of range.');
+            }
+        }
+        $it->rewind();
+        if (!$it->valid()) {
+            throw new RuntimeException("Sequence is empty");
+        }
+        for ($i = 0; $i < $index; $i++) {
+            $it->next();
+            if (!$it->valid()) {
+                throw new OutOfRangeException('index out of range.');
+            }
+        }
+        return $it->key();
+    }
+
+    /**
+     * @param int $index
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getKeyAtOrElse($index, $default)
+    {
+        $it = $this->getIterator();
+        if ($it instanceof Countable) {
+            if ($it->count() <= $index) {
+                return $default;
+            }
+        }
+        $it->rewind();
+        if (!$it->valid()) {
+            return $default;
+        }
+        for ($i = 0; $i < $index; $i++) {
+            $it->next();
+            if (!$it->valid()) {
+                return $default;
+            }
+        }
+        return $it->key();
     }
 
     /**
