@@ -1172,7 +1172,8 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $xss = Ginq::from($phones)
                 ->groupBy('owner')
                 ->select(function($gr) use ($count) {
-                    return $gr->foldLeft(0, $count);
+                /* @var Ginq\GroupingGinq $gr  */
+                return $gr->foldLeft(0, $count);
                 })->toArray();
         $this->assertEquals(array(
             1 => 2,
@@ -1195,9 +1196,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
         $actual = Ginq::from($movies)->groupBy('director')
                 ->select(function($gr, $key) {
-                    /**
-                     * @var Ginq\GroupingGinq $gr
-                     */
+                    /* @var Ginq\GroupingGinq $gr */
                     return $gr->foldLeft(array(), function($acc, $x) {
                         $acc[] = $x['title'];
                         return $acc;
@@ -1224,9 +1223,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
         $actual = Ginq::from($movies)->groupBy('director')
             ->select(function($gr, $key) {
-                /**
-                 * @var Ginq\GroupingGinq $gr
-                 */
+                /* @var Ginq\GroupingGinq $gr */
                 return $gr->foldLeft(array(), function($acc, $x) {
                     $acc[] = $x->title;
                     return $acc;
