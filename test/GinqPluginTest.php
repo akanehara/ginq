@@ -1,5 +1,8 @@
 <?php
+
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
+
+use Ginq\GinqContext;
 
 class GinqPluginTest extends PHPUnit_Framework_TestCase
 {
@@ -34,8 +37,15 @@ class GinqPluginTest extends PHPUnit_Framework_TestCase
         Ginq::range(1, 10)->eachEager(function ($v) use(&$sum) {
             $sum += $v;
         });
-
         $this->assertEquals(55, $sum);
+
+        $group_count = 0;
+        Ginq::range(1, 299)
+            ->groupBy(function($x) { return floor($x / 100); })
+            ->eachEager(function ($gr, $k) use(&$group_count) {
+                $group_count += 1;
+            });
+        $this->assertEquals(3, $group_count);
     }
 }
 
@@ -46,7 +56,7 @@ class SamplePlugin
         Ginq::register(get_called_class());
     }
 
-    public static function eachEager(\Ginq $self, $selector) {
+    public static function eachEager(GinqContext $self, $selector) {
         if (is_null($selector)) {
             throw new \InvalidArgumentException('must be passed closure as 2nd argument.');
         }

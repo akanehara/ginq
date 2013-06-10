@@ -19,7 +19,7 @@ namespace Ginq\Iterator;
 use Ginq\Core\EqualityComparer;
 use Ginq\Core\Lookup;
 use Ginq\Core\Selector;
-use Ginq\GroupingGinq;
+use Ginq\GroupingContext;
 use Ginq\Selector\DelegateSelector;
 use Ginq\Core\JoinSelector;
 use Ginq\Util\IteratorUtil;
@@ -138,7 +138,7 @@ class GroupJoinIterator implements \Iterator
             $outerK  = $this->outer->key();
             $compareKey = $this->outerCompareKeySelector->select($outerV, $outerK);
             $inners  = $this->lookup->get($compareKey);
-            $inners = new GroupingGinq(IteratorUtil::iterator($inners), $compareKey);
+            $inners = new GroupingContext(IteratorUtil::iterator($inners), $compareKey);
             $this->v = $this->resultValueSelector->select($outerV, $inners, $outerK, $compareKey);
             $this->k = $this->outer->key();
         }

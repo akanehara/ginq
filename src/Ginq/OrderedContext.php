@@ -27,7 +27,7 @@ use Ginq\Comparer\ReverseComparer;
 use Ginq\Comparer\ProjectionComparer;
 use Ginq\Comparer\ComparerParser;
 
-class OrderedGinq extends \Ginq
+class OrderedContext extends GinqContext
 {
     /**
      * @var Comparer
@@ -54,7 +54,7 @@ class OrderedGinq extends \Ginq
 
     /**
      * @param \Closure|string|int|Selector|null $compareKeySelector
-     * @return OrderedGinq
+     * @return OrderedContext
      */
     public function thenBy($compareKeySelector = null)
     {
@@ -62,12 +62,12 @@ class OrderedGinq extends \Ginq
         $comparer = ComparerParser::parse(null, Comparer::getDefault());
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new CompoundComparer($this->comparer, $comparer);
-        return new OrderedGinq($this->it, $comparer);
+        return new OrderedContext($this->it, $comparer);
     }
 
     /**
      * @param \Closure|string|int|Selector|null $compareKeySelector
-     * @return OrderedGinq
+     * @return OrderedContext
      */
     public function thenByDesc($compareKeySelector = null)
     {
@@ -76,7 +76,7 @@ class OrderedGinq extends \Ginq
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new ReverseComparer($comparer);
         $comparer = new CompoundComparer($this->comparer, $comparer);
-        return new OrderedGinq($this->it, $comparer);
+        return new OrderedContext($this->it, $comparer);
     }
 }
 
