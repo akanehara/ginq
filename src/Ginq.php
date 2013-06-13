@@ -14,9 +14,9 @@
  * @package    Ginq
  */
 
-require_once dirname(__FILE__) . "/Ginq/autoload.php";
+require_once __DIR__ . "/Ginq/autoload.php";
 
-use Ginq\Context;
+use Ginq\Stream;
 
-class Ginq extends Context { }
+class Ginq extends Stream { }
 
