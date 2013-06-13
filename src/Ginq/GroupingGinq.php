@@ -19,7 +19,7 @@ namespace Ginq;
 use Ginq\Core\Comparer;
 use Ginq\Util\IteratorUtil;
 
-class GroupingContext extends Context
+class GroupingGinq extends Ginq
 {
     /**
      * @var mixed

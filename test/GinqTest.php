@@ -1,5 +1,5 @@
 <?php
-use Ginq\OrderedContext;
+use Ginq\OrderingGinq;
 
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
 
@@ -1069,7 +1069,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $actual = Ginq::from($persons)->groupJoin($phones,
             'id', 'owner',
             function($person, $phones, $outerKey, $innerKey) {
-                /* @var OrderedContext $phones */
+                /* @var OrderingGinq $phones */
                 return array($person['name'], $phones->count());
             }
         )->toList();
@@ -1086,7 +1086,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $actual = Ginq::from($persons)->groupJoin($phones,
             'id', 'owner',
             function($person, $phones, $outerKey, $innerKey) {
-                /* @var OrderedContext $phones */
+                /* @var OrderingGinq $phones */
                 return array('name'=>$person['name'], 'phones'=>$phones->elseIfZero(null));
             }
         )
@@ -1172,7 +1172,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $xss = Ginq::from($phones)
                 ->groupBy('owner')
                 ->select(function($gr) use ($count) {
-                /* @var Ginq\GroupingContext $gr  */
+                /* @var Ginq\GroupingGinq $gr  */
                 return $gr->foldLeft(0, $count);
                 })->toArray();
         $this->assertEquals(array(
@@ -1196,7 +1196,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
         $actual = Ginq::from($movies)->groupBy('director')
                 ->select(function($gr, $key) {
-                    /* @var Ginq\GroupingContext $gr */
+                    /* @var Ginq\GroupingGinq $gr */
                     return $gr->foldLeft(array(), function($acc, $x) {
                         $acc[] = $x['title'];
                         return $acc;
@@ -1223,7 +1223,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
         $actual = Ginq::from($movies)->groupBy('director')
             ->select(function($gr, $key) {
-                /* @var Ginq\GroupingContext $gr */
+                /* @var Ginq\GroupingGinq $gr */
                 return $gr->foldLeft(array(), function($acc, $x) {
                     $acc[] = $x->title;
                     return $acc;

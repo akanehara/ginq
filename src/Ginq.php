@@ -16,7 +16,4 @@
 
 require_once __DIR__ . "/Ginq/autoload.php";
 
-use Ginq\Stream;
-
-class Ginq extends Stream { }
-
+class Ginq extends Ginq\Ginq { }
