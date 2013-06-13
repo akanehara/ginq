@@ -732,18 +732,6 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @deprecated
-     * @param \Closure|string|int|Selector     $manySelector (v, k) -> array|Traversable
-     * @param \Closure|JoinSelector|int|null   $resultValueSelector (v0, v1, k0, k1) -> mixed
-     * @param \Closure|JoinSelector|int|null   $resultKeySelector (v0, v1, k0, k1) -> mixed
-     * @return Ginq
-     */
-    public function selectManyWith($manySelector, $resultValueSelector = null, $resultKeySelector = null)
-    {
-        return $this->selectMany($manySelector, $resultValueSelector, $resultKeySelector);
-    }
-
-    /**
      * @param array|\Iterator|\IteratorAggregate $inner
      * @param \Closure|string|int|Selector   $outerCompareKeySelector (v, k) -> comparable
      * @param \Closure|string|int|Selector   $innerCompareKeySelector (v, k) -> comparable
