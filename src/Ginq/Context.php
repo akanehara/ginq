@@ -41,7 +41,7 @@ use Ginq\GroupingContext;
  *
  * @package Ginq
  */
-class GinqContext implements \IteratorAggregate
+class Context implements \IteratorAggregate
 {
     /**
      * @var array|\Iterator
@@ -546,7 +546,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * empty
-     * @return GinqContext
+     * @return Context
      */
     public static function zero()
     {
@@ -558,7 +558,7 @@ class GinqContext implements \IteratorAggregate
      * @param number|null $stop
      * @param number|int  $step
      * @throws \InvalidArgumentException
-     * @return GinqContext
+     * @return Context
      */
     public static function range($start, $stop = null, $step = 1)
     {
@@ -576,7 +576,7 @@ class GinqContext implements \IteratorAggregate
     /**
      * @param mixed $element
      * @param null|int   $count
-     * @return GinqContext
+     * @return Context
      */
     public static function repeat($element, $count = null)
     {
@@ -585,7 +585,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param array|\Iterator|\IteratorAggregate $xs
-     * @return GinqContext
+     * @return Context
      */
     public static function cycle($xs)
     {
@@ -594,7 +594,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param array|\Iterator|\IteratorAggregate $xs
-     * @return GinqContext
+     * @return Context
      */
     public static function from($xs)
     {
@@ -606,7 +606,7 @@ class GinqContext implements \IteratorAggregate
     }
 
     /**
-     * @return GinqContext
+     * @return Context
      */
     public function renum()
     {
@@ -615,7 +615,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param \Closure $fn
-     * @return GinqContext
+     * @return Context
      */
     public function each($fn)
     {
@@ -625,7 +625,7 @@ class GinqContext implements \IteratorAggregate
     /**
      * @param \Closure|string|int|Selector|null $valueSelector (v, k) -> mixed
      * @param \Closure|string|int|Selector|null $keySelector   (v, k) -> mixed
-     * @return GinqContext
+     * @return Context
      */
     public function select($valueSelector = null, $keySelector = null)
     {
@@ -638,7 +638,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param string|callable $predicate (v, k) -> bool
-     * @return GinqContext
+     * @return Context
      */
     public function where($predicate)
     {
@@ -649,7 +649,7 @@ class GinqContext implements \IteratorAggregate
     }
 
     /**
-     * @return GinqContext
+     * @return Context
      */
     public function reverse()
     {
@@ -658,7 +658,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param int $n
-     * @return GinqContext
+     * @return Context
      */
     public function take($n)
     {
@@ -667,7 +667,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param int $n
-     * @return GinqContext
+     * @return Context
      */
     public function drop($n)
     {
@@ -676,7 +676,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param string|callable $predicate (v, k) -> bool
-     * @return GinqContext
+     * @return Context
      */
     public function takeWhile($predicate)
     {
@@ -688,7 +688,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param string|callable $predicate (v, k) -> bool
-     * @return GinqContext
+     * @return Context
      */
     public function dropWhile($predicate)
     {
@@ -699,7 +699,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param array|\Iterator|\IteratorAggregate $rhs
-     * @return GinqContext
+     * @return Context
      */
     public function concat($rhs)
     {
@@ -713,7 +713,7 @@ class GinqContext implements \IteratorAggregate
      * @param \Closure|string|Selector     $manySelector (v, k) -> array|Traversable
      * @param \Closure|JoinSelector|null   $resultValueSelector (v0, v1, k0, k1) -> mixed
      * @param \Closure|JoinSelector|null   $resultKeySelector (v0, v1, k0, k1) -> mixed
-     * @return GinqContext
+     * @return Context
      */
     public function selectMany($manySelector, $resultValueSelector = null, $resultKeySelector = null)
     {
@@ -736,7 +736,7 @@ class GinqContext implements \IteratorAggregate
      * @param \Closure|string|int|Selector     $manySelector (v, k) -> array|Traversable
      * @param \Closure|JoinSelector|int|null   $resultValueSelector (v0, v1, k0, k1) -> mixed
      * @param \Closure|JoinSelector|int|null   $resultKeySelector (v0, v1, k0, k1) -> mixed
-     * @return GinqContext
+     * @return Context
      */
     public function selectManyWith($manySelector, $resultValueSelector = null, $resultKeySelector = null)
     {
@@ -749,7 +749,7 @@ class GinqContext implements \IteratorAggregate
      * @param \Closure|string|int|Selector   $innerCompareKeySelector (v, k) -> comparable
      * @param \Closure|JoinSelector|int      $resultValueSelector (v0, v1, k0, k1) -> mixedd
      * @param \Closure|JoinSelector|int|null $resultKeySelector (v0, v1, k0, k1) -> mixedd
-     * @return GinqContext
+     * @return Context
      */
     public function join($inner,
                          $outerCompareKeySelector, $innerCompareKeySelector,
@@ -770,7 +770,7 @@ class GinqContext implements \IteratorAggregate
      * @param array|\Iterator|\IteratorAggregate    $rhs
      * @param \Closure|JoinSelector|int      $resultValueSelector (v0, v1, k0, k1) -> mixed
      * @param \Closure|JoinSelector|int|null $resultKeySelector (v0, v1, k0, k1) -> mixed
-     * @return GinqContext
+     * @return Context
      */
     public function zip($rhs, $resultValueSelector, $resultKeySelector = null)
     {
@@ -785,7 +785,7 @@ class GinqContext implements \IteratorAggregate
     /**
      * @param \Closure|string|int|Selector      $compareKeySelector (v, k) -> mixed
      * @param \Closure|string|int|Selector|null $elementSelector (v, k) -> mixed
-     * @return GinqContext
+     * @return Context
      */
     public function groupBy($compareKeySelector, $elementSelector = null)
     {
@@ -804,7 +804,7 @@ class GinqContext implements \IteratorAggregate
      * @param \Closure|string|int|Selector   $innerCompareKeySelector (v, k) -> comparable
      * @param \Closure|JoinSelector|int      $resultValueSelector (outer, inners, outerKey, innerKey) -> mixed
      * @param \Closure|JoinSelector|int|null $resultKeySelector   (outer, ineers, outerKey, innerKey) -> mixed
-     * @return GinqContext
+     * @return Context
      */
     public function groupJoin($inner,
                               $outerCompareKeySelector, $innerCompareKeySelector,
@@ -847,7 +847,7 @@ class GinqContext implements \IteratorAggregate
     }
 
     /**
-     * @return GinqContext
+     * @return Context
      */
     public function distinct()
     {
@@ -859,7 +859,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param array|\Iterator|\IteratorAggregate $rhs
-     * @return GinqContext
+     * @return Context
      */
     public function union($rhs)
     {
@@ -873,7 +873,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param array|\Iterator|\IteratorAggregate $rhs
-     * @return GinqContext
+     * @return Context
      */
     public function intersect($rhs)
     {
@@ -887,7 +887,7 @@ class GinqContext implements \IteratorAggregate
 
     /**
      * @param array|\Iterator|\IteratorAggregate $rhs
-     * @return GinqContext
+     * @return Context
      */
     public function except($rhs)
     {
@@ -1037,7 +1037,7 @@ class GinqContext implements \IteratorAggregate
     }
 
     /**
-     * @return GinqContext
+     * @return Context
      */
     public function memoize()
     {
@@ -1067,7 +1067,7 @@ class GinqContext implements \IteratorAggregate
 
         //echo "$className";
 
-        $funcNames = GinqContext::from($ref->getMethods(\ReflectionMethod::IS_STATIC))
+        $funcNames = Context::from($ref->getMethods(\ReflectionMethod::IS_STATIC))
             ->where(function ($m) {
                 /** @var $m \ReflectionMethod  */
                 return $m->isPublic();
@@ -1075,12 +1075,12 @@ class GinqContext implements \IteratorAggregate
             ->where(function ($m) {
                 /** @var $m \ReflectionMethod  */
                 /** @var $p \ReflectionParameter */
-                $p = GinqContext::from($m->getParameters())->firstOrElse(false);
+                $p = Context::from($m->getParameters())->firstOrElse(false);
                 if ($p === false) return false;
 
                 $c = $p->getClass();
 
-                return ($c->getName() === 'Ginq\GinqContext') or $c->isSubclassOf('Ginq\GinqContext');
+                return ($c->getName() === 'Ginq\Context') or $c->isSubclassOf('Ginq\Context');
             })
             ->select(function ($m) {
                 /** @var $m \ReflectionMethod  */
@@ -1098,6 +1098,6 @@ class GinqContext implements \IteratorAggregate
     }
 }
 
-GinqContext::useIterator();
+Context::useIterator();
 
 

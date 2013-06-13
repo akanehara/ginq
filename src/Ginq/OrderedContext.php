@@ -27,7 +27,7 @@ use Ginq\Comparer\ReverseComparer;
 use Ginq\Comparer\ProjectionComparer;
 use Ginq\Comparer\ComparerParser;
 
-class OrderedContext extends GinqContext
+class OrderedContext extends Context
 {
     /**
      * @var Comparer

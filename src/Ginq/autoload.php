@@ -14,9 +14,17 @@
  * @package    Ginq
  */
 
-require_once dirname(__FILE__) . "/Ginq/autoload.php";
-
-use Ginq\Context;
-
-class Ginq extends Context { }
+spl_autoload_register(function ($class) {
+    $class = ltrim($class, '\\');
+    $pos = strpos($class, '\\');
+    if ($pos === false) {
+        return; // Not in namespace.
+    }
+    $rootNS = substr($class, 0, $pos);
+    if ($rootNS != 'Ginq') {
+        return; // Not in Ginq namespace.
+    }
+    $classPath = '..' . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+    include __DIR__ . DIRECTORY_SEPARATOR . $classPath;
+});
 

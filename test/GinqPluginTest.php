@@ -2,7 +2,7 @@
 
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
 
-use Ginq\GinqContext;
+use Ginq\Context;
 
 class GinqPluginTest extends PHPUnit_Framework_TestCase
 {
@@ -56,7 +56,7 @@ class SamplePlugin
         Ginq::register(get_called_class());
     }
 
-    public static function eachEager(GinqContext $self, $selector) {
+    public static function eachEager(Context $self, $selector) {
         if (is_null($selector)) {
             throw new \InvalidArgumentException('must be passed closure as 2nd argument.');
         }
