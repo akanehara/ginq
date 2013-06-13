@@ -627,6 +627,16 @@ class Ginq implements \IteratorAggregate
      * @param \Closure|string|int|Selector|null $keySelector   (v, k) -> mixed
      * @return Ginq
      */
+    public function map($valueSelector = null, $keySelector = null)
+    {
+        return $this->select($valueSelector, $keySelector);
+    }
+
+    /**
+     * @param \Closure|string|int|Selector|null $valueSelector (v, k) -> mixed
+     * @param \Closure|string|int|Selector|null $keySelector   (v, k) -> mixed
+     * @return Ginq
+     */
     public function select($valueSelector = null, $keySelector = null)
     {
         return self::from(self::$gen->select(
@@ -634,6 +644,15 @@ class Ginq implements \IteratorAggregate
             SelectorParser::parse($valueSelector, ValueSelector::getInstance()),
             SelectorParser::parse($keySelector, KeySelector::getInstance())
         ));
+    }
+
+    /**
+     * @param string|callable $predicate (v, k) -> bool
+     * @return Ginq
+     */
+    public function filter($predicate)
+    {
+        return $this->where($predicate);
     }
 
     /**
@@ -707,6 +726,17 @@ class Ginq implements \IteratorAggregate
             $this->getIterator(),
             self::from(IteratorUtil::iterator($rhs))
         ));
+    }
+
+    /**
+     * @param \Closure|string|Selector     $manySelector (v, k) -> array|Traversable
+     * @param \Closure|JoinSelector|null   $resultValueSelector (v0, v1, k0, k1) -> mixed
+     * @param \Closure|JoinSelector|null   $resultKeySelector (v0, v1, k0, k1) -> mixed
+     * @return Ginq
+     */
+    public function flatMap($manySelector, $resultValueSelector = null, $resultKeySelector = null)
+    {
+        return $this->selectMany($manySelector, $resultValueSelector, $resultKeySelector);
     }
 
     /**
@@ -919,12 +949,24 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
+     * @deprecated
      * @param int $index
      * @throws \RuntimeException
      * @throws \OutOfRangeException
      * @return mixed
      */
     public function getValueAt($index)
+    {
+        return $this->getAt($index);
+    }
+
+    /**
+     * @param int $index
+     * @throws \RuntimeException
+     * @throws \OutOfRangeException
+     * @return mixed
+     */
+    public function getAt($index)
     {
         $it = $this->getIterator();
         if ($it instanceof \Countable) {

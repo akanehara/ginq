@@ -1448,12 +1448,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $banana = array('id'=>4, 'name'=>'banana');
 
         $xs = Ginq::from(array($apple, $orange, $grape, $banana))->select(function($x){return $x;});
-        $this->assertEquals($grape, $xs->getValueAt(2));
+        $this->assertEquals($grape, $xs->getAt(2));
 
         try {
             $xs = Ginq::from(array($apple, $orange, $grape, $banana))
                 ->select(function($x){return $x;})
-                ->getValueAt(4);
+                ->getAt(4);
             $this->fail();
         } catch (OutOfRangeException $e) {
             $this->assertTrue(true);
