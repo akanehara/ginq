@@ -20,6 +20,7 @@ use Ginq\Iterator\DistinctIterator;
 use Ginq\Iterator\ExceptIterator;
 use Ginq\Iterator\GroupJoinIterator;
 use Ginq\Iterator\IntersectIterator;
+use Ginq\Iterator\LazySourceIterator;
 use Ginq\Iterator\UnionIterator;
 use Ginq\Iterator\ZeroIterator;
 use Ginq\Iterator\RangeIterator;
@@ -367,6 +368,15 @@ class IterProviderIterImpl implements IterProvider
     public function memoize($xs)
     {
         return new MemoizeIterator($xs);
+    }
+
+    /**
+     * @param callable $sourceFactory
+     * @return \Iterator
+     */
+    public function lazySource($sourceFactory)
+    {
+        return new LazySourceIterator($sourceFactory);
     }
 }
 

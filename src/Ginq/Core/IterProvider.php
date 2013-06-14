@@ -239,5 +239,11 @@ interface IterProvider
      * @return \Iterator
      */
     public function memoize($xs);
+
+    /**
+     * @param callable $sourceFactory
+     * @return \Iterator
+     */
+    public function lazySource($sourceFactory);
 }
 

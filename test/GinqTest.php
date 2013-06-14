@@ -691,6 +691,35 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testFromLazy().
+     */
+    public function testFromLazy()
+    {
+        // array
+        $arr = Ginq::fromLazy(function(){return array(1,2,3,4,5);})->toArray();
+        $this->assertEquals(array(1,2,3,4,5), $arr);
+
+        // Iterator
+        $arr = Ginq::fromLazy(function(){return new ArrayIterator(array(1,2,3,4,5));})->toArray();
+        $this->assertEquals(array(1,2,3,4,5), $arr);
+
+        // IteratorAggregate
+        $arr = Ginq::fromLazy(function(){return new ArrayObject(array(1,2,3,4,5));})->toArray();
+        $this->assertEquals(array(1,2,3,4,5), $arr);
+
+        // Ginq
+        $arr = Ginq::fromLazy(function(){return Ginq::from(array(1,2,3,4,5));})->toArray();
+        $this->assertEquals(array(1,2,3,4,5), $arr);
+
+        // not callable
+        try {
+            $arr = Ginq::fromLazy(array(1,2,3,4,5))->toArray();
+        } catch (InvalidArgumentException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
+    /**
      * testRenum().
      */
     public function testRenum()

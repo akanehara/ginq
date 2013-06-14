@@ -606,6 +606,20 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
+     * @param \Closure $sourceFactory
+     * @throws \InvalidArgumentException
+     * @return Ginq
+     */
+    public static function fromLazy($sourceFactory)
+    {
+        if (is_callable($sourceFactory)) {
+            return new self(self::$gen->lazySource($sourceFactory));
+        } else {
+            throw new \InvalidArgumentException('$sourceFactory is not callable');
+        }
+    }
+
+    /**
      * @return Ginq
      */
     public function renum()
