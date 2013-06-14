@@ -1,0 +1,27 @@
+{
+    "name": "ginq/ginq",
+    "description": "LINQ to Object inspired DSL for PHP",
+    "version": "0.0.1",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "linq",
+        "generator",
+        "dsl"
+    ],
+    "authors": [
+        {
+            "name": "Atsushi Kanehara",
+            "email": "akanehara@gmail.com"
+        }
+    ],
+    "minimum-stability": "alpha",
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "Ginq": "src/"
+        }
+    }
+}
