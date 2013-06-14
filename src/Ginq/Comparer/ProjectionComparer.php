@@ -24,7 +24,7 @@ class ProjectionComparer extends Comparer
     /**
      * @var Selector
      */
-    private $sortKeySelector;
+    private $compareKeySelector;
 
     /**
      * @var Comparer
@@ -33,7 +33,7 @@ class ProjectionComparer extends Comparer
 
     public function __construct($sortKeySelector, $comparer)
     {
-        $this->sortKeySelector = $sortKeySelector;
+        $this->compareKeySelector = $sortKeySelector;
         $this->comparer = $comparer;
     }
 
@@ -47,7 +47,7 @@ class ProjectionComparer extends Comparer
     public function compare($v0, $v1, $k0 = null, $k1 = null)
     {
         return $this->comparer->compare(
-            $this->sortKeySelector->select($v0, $k0), $this->sortKeySelector->select($v1, $k1), $k0, $k1
+            $this->compareKeySelector->select($v0, $k0), $this->compareKeySelector->select($v1, $k1), $k0, $k1
         );
     }
 }
