@@ -1495,9 +1495,9 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
 
     /**
-     * testGetValueAt().
+     * testGetAt().
      */
-    public function testGetValueAt()
+    public function testGetAt()
     {
         $apple  = array('id'=>1, 'name'=>'apple');
         $orange = array('id'=>2, 'name'=>'orange');
@@ -1518,9 +1518,9 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * testGetValueOrElseAt().
+     * testGetOrElseAt().
      */
-    public function testGetValueAtOrElse()
+    public function testGetAtOrElse()
     {
         $apple  = array('id'=>1, 'name'=>'apple');
         $orange = array('id'=>2, 'name'=>'orange');
@@ -1528,11 +1528,11 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $banana = array('id'=>4, 'name'=>'banana');
 
         $xs = Ginq::from(array($apple, $orange, $grape, $banana))->select(function($x){return $x;});
-        $this->assertEquals($grape, $xs->getValueAtOrElse(2, 999));
+        $this->assertEquals($grape, $xs->getAtOrElse(2, 999));
 
         $xs = Ginq::from(array($apple, $orange, $grape, $banana))
             ->select(function($x){return $x;});
-        $this->assertEquals(999, $xs->getValueAtOrElse(4, 999));
+        $this->assertEquals(999, $xs->getAtOrElse(4, 999));
     }
 
     /**

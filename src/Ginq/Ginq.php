@@ -924,7 +924,7 @@ class Ginq implements \IteratorAggregate
     public function sequenceEquals($rhs)
     {
         $eqComparer = EqualityComparerParser::parse(null, EqualityComparer::getDefault());
-        $lhs = $this->it;
+        $lhs = $this->getIterator();
         $rhs = IteratorUtil::iterator($rhs);
         if ($lhs instanceof \Countable && $rhs instanceof \Countable) {
             if ($lhs->count() !== $rhs->count()) {
@@ -988,11 +988,22 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
+     * @deprecated
      * @param int $index
      * @param mixed $default
      * @return mixed
      */
     public function getValueAtOrElse($index, $default)
+    {
+        return $this->getAtOrElse($index, $default);
+    }
+
+    /**
+     * @param int $index
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getAtOrElse($index, $default)
     {
         $it = $this->getIterator();
         if ($it instanceof \Countable) {
