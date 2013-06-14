@@ -730,6 +730,18 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testMap().
+     */
+    public function testMap()
+    {
+        // selector function
+        $xs = Ginq::from(array(1,2,3,4,5))
+            ->map(function($x, $k) { return $x * $x; })
+            ->toArray();
+        $this->assertEquals(array(1,4,9,16,25), $xs);
+    }
+
+    /**
      * testSelect().
      */
     public function testSelect()
@@ -771,6 +783,17 @@ class GinqTest extends PHPUnit_Framework_TestCase
         } catch (InvalidArgumentException $e) {
             $this->assertTrue(true);
         }
+    }
+
+    /**
+     * testFilter().
+     */
+    public function testFilter()
+    {
+        $xs = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
+            ->filter(function($x, $k) { return ($x % 2) == 0; })
+            ->toArray();
+        $this->assertEquals(array(1=>2,3=>4,5=>6,7=>8,9=>10), $xs);
     }
 
     /**
@@ -880,6 +903,46 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testFlatMap().
+     */
+    public function testFlatMap()
+    {
+        $phoneBook = array(
+            array(
+                'name'   => 'Taro',
+                'phones' => array(
+                    '03-1234-5678',
+                    '090-8421-9061'
+                )
+            ),
+            array(
+                'name'   => 'Atsushi',
+                'phones' => array(
+                    '050-1198-4458'
+                )
+            ),
+            array(
+                'name'   => 'Junko',
+                'phones' => array(
+                    '06-1111-3333',
+                    '090-9898-1314',
+                    '050-6667-2231'
+                )
+            )
+        );
+
+        $phones = Ginq::from($phoneBook)->flatMap('phones')->toAList();
+        $this->assertEquals(array(
+            array(0, '03-1234-5678'),
+            array(1, '090-8421-9061'),
+            array(0, '050-1198-4458'),
+            array(0, '06-1111-3333'),
+            array(1, '090-9898-1314'),
+            array(2, '050-6667-2231')
+        ), $phones);
+    }
+
+    /**
      * testSelectMany().
      */
     public function testSelectMany()
@@ -917,12 +980,6 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array(1, '090-9898-1314'),
             array(2, '050-6667-2231')
         ), $phones);
-    }
-
-    /**
-     * testSelectManyWith().
-     */
-    public function testSelectManyWithJoin() {
 
         $phoneBook = array(
             array(
