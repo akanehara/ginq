@@ -30,6 +30,7 @@ use Ginq\Selector\SelectorParser;
 use Ginq\JoinSelector\JoinSelectorParser;
 use Ginq\Predicate\PredicateParser;
 use Ginq\Selector\ValueSelector;
+use Ginq\Util\FuncUtil;
 use Ginq\Util\IteratorUtil;
 use Ginq\Comparer\ReverseComparer;
 use Ginq\Comparer\ProjectionComparer;
@@ -69,7 +70,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * default compare
+     * default compare function
      * @param mixed $x
      * @param mixed $y
      * @return int
@@ -79,7 +80,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * default equality comparing
+     * default equality compare function
      * @param mixed $x
      * @param mixed $y
      * @return bool
@@ -323,8 +324,8 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param mixed         $default
-     * @param callable|null $predicate (v, k) -> bool
+     * @param mixed|\Closure $default
+     * @param callable|null  $predicate (v, k) -> bool
      * @return mixed
      */
     public function firstOrElse($default, $predicate = null)
@@ -335,7 +336,7 @@ class Ginq implements \IteratorAggregate
             if ($it->valid()) {
                 return $it->current();
             } else {
-                return $default;
+                return FuncUtil::applyOrItself($default);
             }
         } else {
             foreach ($this->getIterator() as $k => $v) {
@@ -343,13 +344,13 @@ class Ginq implements \IteratorAggregate
                     return $v;
                 }
             }
-            return $default;
+            return FuncUtil::applyOrItself($default);
         }
     }
 
     /**
-     * @param mixed $default
-     * @return mixed
+     * @param mixed|\Closure $default
+     * @return Ginq
      */
     public function elseIfZero($default)
     {
@@ -358,7 +359,11 @@ class Ginq implements \IteratorAggregate
         if ($it->valid()) {
             return $this;
         } else {
-            return self::from(self::$gen->repeat($default, 1));
+            if ($default instanceof \Closure) {
+                return self::from(self::$gen->lazyRepeat($default, 1));
+            } else {
+                return self::from(self::$gen->repeat($default, 1));
+            }
         }
     }
 
@@ -399,8 +404,8 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param $default
-     * @param callable|null $predicate (v, k) -> bool
+     * @param mixed|\Closure $default
+     * @param callable|null  $predicate (v, k) -> bool
      * @return mixed
      */
     public function lastOrElse($default, $predicate = null)
@@ -415,7 +420,7 @@ class Ginq implements \IteratorAggregate
             if ($found) {
                 return $last;
             } else {
-                return $default;
+                return FuncUtil::applyOrItself($default);
             }
         } else {
             $last  = null;
@@ -429,7 +434,7 @@ class Ginq implements \IteratorAggregate
             if ($found) {
                 return $last;
             } else {
-                return $default;
+                return FuncUtil::applyOrItself($default);
             }
         }
     }
@@ -1003,8 +1008,8 @@ class Ginq implements \IteratorAggregate
 
     /**
      * @deprecated
-     * @param int $index
-     * @param mixed $default
+     * @param int            $index
+     * @param mixed|\Closure $default
      * @return mixed
      */
     public function getValueAtOrElse($index, $default)
@@ -1013,8 +1018,8 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param int $index
-     * @param mixed $default
+     * @param int            $index
+     * @param mixed|\Closure $default
      * @return mixed
      */
     public function getAtOrElse($index, $default)
@@ -1022,17 +1027,17 @@ class Ginq implements \IteratorAggregate
         $it = $this->getIterator();
         if ($it instanceof \Countable) {
             if ($it->count() <= $index) {
-                return $default;
+                return FuncUtil::applyOrItself($default, $index);
             }
         }
         $it->rewind();
         if (!$it->valid()) {
-            return $default;
+            return FuncUtil::applyOrItself($default, $index);
         }
         for ($i = 0; $i < $index; $i++) {
             $it->next();
             if (!$it->valid()) {
-                return $default;
+                return FuncUtil::applyOrItself($default, $index);
             }
         }
         return $it->current();
@@ -1066,8 +1071,8 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param int $index
-     * @param mixed $default
+     * @param int            $index
+     * @param mixed|\Closure $default
      * @return mixed
      */
     public function getKeyAtOrElse($index, $default)
@@ -1075,17 +1080,17 @@ class Ginq implements \IteratorAggregate
         $it = $this->getIterator();
         if ($it instanceof \Countable) {
             if ($it->count() <= $index) {
-                return $default;
+                return FuncUtil::applyOrItself($default, $index);
             }
         }
         $it->rewind();
         if (!$it->valid()) {
-            return $default;
+            return FuncUtil::applyOrItself($default, $index);
         }
         for ($i = 0; $i < $index; $i++) {
             $it->next();
             if (!$it->valid()) {
-                return $default;
+                return FuncUtil::applyOrItself($default, $index);
             }
         }
         return $it->key();

@@ -20,6 +20,7 @@ use Ginq\Iterator\DistinctIterator;
 use Ginq\Iterator\ExceptIterator;
 use Ginq\Iterator\GroupJoinIterator;
 use Ginq\Iterator\IntersectIterator;
+use Ginq\Iterator\LazyRepeatIterator;
 use Ginq\Iterator\LazySourceIterator;
 use Ginq\Iterator\UnionIterator;
 use Ginq\Iterator\ZeroIterator;
@@ -104,6 +105,16 @@ class IterProviderIterImpl implements IterProvider
     public function repeat($x, $count)
     {
         return new RepeatIterator($x, $count);
+    }
+
+    /**
+     * @param /Closure $valueFactory
+     * @param int|null $count
+     * @return \Ginq\Iterator\RepeatIterator
+     */
+    public function lazyRepeat($valueFactory, $count)
+    {
+        return new LazyRepeatIterator($valueFactory, $count);
     }
 
     /**

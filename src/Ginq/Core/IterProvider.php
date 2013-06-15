@@ -55,6 +55,13 @@ interface IterProvider
     public function repeat($x, $count);
 
     /**
+     * @param /Closure $valueFactory
+     * @param int|null $count
+     * @return \Ginq\Iterator\RepeatIterator
+     */
+    public function lazyRepeat($valueFactory, $count);
+
+    /**
      * @param array|\Traversable $xs
      * @return \Iterator
      */

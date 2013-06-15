@@ -407,7 +407,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('none', $actual);
 
         // not found (with predicate)
-        $actual = Ginq::from($person)->firstOrElse('none', $kato);
+        $actual = Ginq::from($person)->firstOrElse(function(){return 'none';}, $kato);
         $this->assertEquals('none', $actual);
 
         // found
@@ -482,7 +482,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('none', $actual);
 
         // not found (with predicate)
-        $actual = Ginq::from($person)->lastOrElse('none', $kato);
+        $actual = Ginq::from($person)->lastOrElse(function(){return 'none';}, $kato);
         $this->assertEquals('none', $actual);
 
         // found
@@ -502,11 +502,14 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $actual = Ginq::zero()->elseIfZero(null)->toAList();
         $this->assertEquals(array(array(0, null)), $actual);
 
-        $actual = Ginq::zero()->elseIfZero('')->toAList();
+        $actual = Ginq::zero()->elseIfZero(function(){return '';})->toAList();
         $this->assertEquals(array(array(0, '')), $actual);
 
         $actual = Ginq::zero()->elseIfZero(-1)->toAList();
         $this->assertEquals(array(array(0, -1)), $actual);
+
+        $actual = Ginq::repeat(999, 1)->elseIfZero(function(){return -1;})->toAList();
+        $this->assertEquals(array(array(0, 999)), $actual);
     }
 
     /**
@@ -1558,10 +1561,11 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         $xs = Ginq::from(array($apple, $orange, $grape, $banana))->select(function($x){return $x;});
         $this->assertEquals($grape, $xs->getAtOrElse(2, 999));
+        $this->assertEquals($grape, $xs->getAtOrElse(2, function($i){return $i;}));
 
-        $xs = Ginq::from(array($apple, $orange, $grape, $banana))
-            ->select(function($x){return $x;});
+        $xs = Ginq::from(array($apple, $orange, $grape, $banana))->select(function($x){return $x;});
         $this->assertEquals(999, $xs->getAtOrElse(4, 999));
+        $this->assertEquals(4, $xs->getAtOrElse(4, function($i){return $i;}));
     }
 
     /**
@@ -1601,10 +1605,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $xs = Ginq::from(array('one'=>$apple, 'two'=>$orange, 'three'=>$grape, 'four'=>$banana))
             ->select(function($x){return $x;});
         $this->assertEquals('three', $xs->getKeyAtOrElse(2, 999));
+        $this->assertEquals('three', $xs->getKeyAtOrElse(2, function($i){return $i;}));
 
         $xs = Ginq::from(array('one'=>$apple, 'two'=>$orange, 'three'=>$grape, 'four'=>$banana))
             ->select(function($x){return $x;});
         $this->assertEquals(999, $xs->getKeyAtOrElse(4, 999));
+        $this->assertEquals(4, $xs->getKeyAtOrElse(4, function($i){return $i;}));
     }
 
     /**
