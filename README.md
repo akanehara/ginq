@@ -52,7 +52,7 @@ Most of methods in **Ginq** receive a closure as a argument.
 
 You may not be familiar with closures, but it is very simple things.
 There are just three types of closures in **Ginq**, you can remember simply.
-These are predicate, selector, and connect selector.
+These are predicate, selector, and connection selector.
 
 ###Predicate
 A closure that passed to a method that do select, such as `where()` is called **predicate**.
@@ -68,7 +68,7 @@ You can skip second argument when you don't need it in the process.
 ###Selector
 A closure that passed to a method that do projection, such as `select()` is called **selector**.
 
-Selector is a closure that receive a pair of key and values in the elements and create a new value or key, and then return it.
+Selector is a closure that receive a pair of key and value in the elements and create a new value or key, and then return it.
 
 ```php
 function ($v, [$k]) { return $v * $v ; }
