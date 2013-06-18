@@ -62,8 +62,50 @@ Predicate is a closure that receive a pair of key and values in the elements and
 ```php
 function ($v, [$k]) { return $v % 2 == 0; }
 ```
-You can even numbers when you pass this closure to `where()`.
+You get even numbers when you pass this closure to `where()`.
 You can skip second argument when you don't need it in the process. 
 
 ###Selector
+A closure that passed to a method that do projection, such as `select()` is called **selector**.
+
+Selector is a closure that receive a pair of key and values in the elements and create a new value or key, and then return it.
+
+```php
+function ($v, [$k]) { return $v * $v ; }
+```
+
+You get squared numbers of original when you pass this closure to `select()`.
+
+This function is used to specify the key of grouping with `groupBy()`, the key of sorting with `groupBy()`. 
+
+###Connection Selector
+**Connection Selector** is one of the selector that combine two elements into one, is used with `join()`, `zip()`.
+
+```php
+function ($v0, $v1, [$k0, $k1]) { return array($v0, $v1) ; }
+```
+
+This function receive 4 arguments, two values and two keys, and then create new value or key and return it.
+You can skip arguments when you don't need it in the process. 
+
+These are `zip()` example that combine each elements from two arrays.
+
+```php
+$foods  = array("meat", "pasta", "salada");
+$spices = array("time", "basil", "dill");
+
+$xs = Ginq::from($foods)
+        ->zip($spices, function($f, $s) {
+            return "$f with $sÅI";
+        })
+        ;
+
+foreach ($xs in $x) { echo "$x\n"; }
+```
+
+```
+meat with time!
+pasta with basil!
+salada with dill!
+```
 
