@@ -29,5 +29,29 @@ class FuncUtil
             return $x;
         }
     }
+
+    /**
+     * @param callable $f
+     * @return callable
+     */
+    static public function partial($f)
+    {
+        $args = array_slice(func_get_args(), 1);
+        return function() use ($f, $args) {
+            array_merge($args, func_get_args());
+            return call_user_func_array($f, $args);
+        };
+    }
+
+    /**
+     * g(f(x))
+     * @param callable $g
+     * @param callable $f
+     * @return callable
+     */
+    static public function compose($g, $f)
+    {
+        return function($x) use ($g, $f) { return $g($f($x)); };
+    }
 }
 

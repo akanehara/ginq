@@ -784,7 +784,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
                    ->toArray();
         $this->assertEquals(array(1,4,9,16,25), $xs);
 
-        // key selector string
+        // key selector shortcut
         $data = array(
              array('id' => 1, 'name' => 'Taro',    'city' => 'Takatsuki')
             ,array('id' => 2, 'name' => 'Atsushi', 'city' => 'Ibaraki')
@@ -793,7 +793,16 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $xs = Ginq::from($data)->select("name")->toArray();
         $this->assertEquals(array('Taro','Atsushi','Junko'), $xs);
 
-        // field selector string
+        // index selector shortcut
+        $data = array(
+             array(1, 'Taro',    'Takatsuki')
+            ,array(2, 'Atsushi', 'Ibaraki')
+            ,array(3, 'Junko',   'Sakai')
+        );
+        $xs = Ginq::from($data)->select(2)->toArray();
+        $this->assertEquals(array('Takatsuki','Ibaraki','Sakai'), $xs);
+
+        // field selector shortcut
         $data = array(
              new Person(1, 'Taro',    'Takatsuki')
             ,new Person(2, 'Atsushi', 'Ibaraki')
@@ -801,6 +810,37 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
         $xs = Ginq::from($data)->select("name")->toArray();
         $this->assertEquals(array('Taro','Atsushi','Junko'), $xs);
+
+        // path/to/0
+        $data = [];
+        for ($i=0; $i<3; $i++) {
+            $data[] = ['foo' => ['bar' => [['baz' => "qux$i"]]]];
+        }
+        $xs = Ginq::from($data)->select("foo/bar/0/baz")->toList();
+        $this->assertEquals(array('qux0','qux1','qux2'), $xs);
+
+        // key mapping
+        $xs = Ginq::from(array(1,2,3,4,5))
+            ->select(null, function($v, $k) { return $k * $k; })
+            ->toArray();
+        $this->assertEquals(array(0=>1,1=>2,4=>3,9=>4,16=>5), $xs);
+
+        // field selector shortcut
+        $data = array(
+             new Person(1, 'Taro',    'Takatsuki')
+            ,new Person(2, 'Atsushi', 'Ibaraki')
+            ,new Person(3, 'Junko',   'Sakai')
+        );
+        $xs = Ginq::from($data)->select("name")->toArray();
+        $this->assertEquals(array('Taro','Atsushi','Junko'), $xs);
+
+        // path/to/0
+        $data = [];
+        for ($i=0; $i<3; $i++) {
+            $data[] = ['foo' => ['bar' => [['baz' => "qux$i"]]]];
+        }
+        $xs = Ginq::from($data)->select("foo/bar/0/baz")->toList();
+        $this->assertEquals(array('qux0','qux1','qux2'), $xs);
 
         // key mapping
         $xs = Ginq::from(array(1,2,3,4,5))
@@ -810,7 +850,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         // invalid selector
         try {
-            Ginq::from(array(1,2,3,4,5))->select(8);
+            Ginq::from(array(1,2,3,4,5))->select("//s?");
             $this->fail();
         } catch (InvalidArgumentException $e) {
             $this->assertTrue(true);

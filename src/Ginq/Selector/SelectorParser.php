@@ -17,6 +17,7 @@
 namespace Ginq\Selector;
 
 use Ginq\Core\Selector;
+use Ginq\Util\FuncUtil;
 
 class SelectorParser
 {
@@ -32,8 +33,8 @@ class SelectorParser
             return $default;
         }
 
-        if (is_string($src)) {
-            return new PropertySelector($src);
+        if (is_string($src) || is_int($src)) {
+            return PathSelector::parse($src);
         }
 
         if (is_callable($src)) {
