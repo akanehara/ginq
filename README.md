@@ -109,3 +109,33 @@ pasta with basil!
 salada with dill!
 ```
 
+## Shortcuts of predicate and selector
+
+**Selector** and **predicate** can receive a character string instead of a closure.
+
+They return the value of the field when the element is an object, or return the value of the key when it is an array.
+
+So,
+
+```php
+Ginq::from($xs)->select('name');
+```
+
+The example above is same as two examples below.
+
+```php
+Ginq::from($xs)->select(
+    function ($v, $k) { return $v['name']; }
+);
+```
+
+```php
+Ginq::from($xs)->select(
+    function ($v, $k) { return $v->name; }
+);
+```
+
+## More complex examples
+
+## References
+
