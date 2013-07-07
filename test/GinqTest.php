@@ -163,7 +163,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         // key and value
         $dict = Ginq::from($data)->select(
             function($x, $k) { return "{$x['city']}"; },
-            'name' // it means `function($x, $k) { return $x['name']; }`
+            '[name]' // it means `function($x, $k) { return $x['name']; }`
         )->toArray();
         $this->assertEquals(
             array(
@@ -319,7 +319,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array('name'=>'Suzuka Youichi', 'score'=> 6780),
             array('name'=>'Muraoka Kouhei', 'score'=> 1950),
         );
-        $actual = Ginq::from($data)->min('score');
+        $actual = Ginq::from($data)->min('[score]');
         $this->assertEquals(680, $actual);
     }
 
@@ -341,7 +341,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array('name'=>'Suzuka Youichi', 'score'=> 6780),
             array('name'=>'Muraoka Kouhei', 'score'=> 1950),
         );
-        $actual = Ginq::from($data)->max('score');
+        $actual = Ginq::from($data)->max('[score]');
         $this->assertEquals(10200, $actual);
     }
 
@@ -790,7 +790,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             ,array('id' => 2, 'name' => 'Atsushi', 'city' => 'Ibaraki')
             ,array('id' => 3, 'name' => 'Junko',   'city' => 'Sakai')
         );
-        $xs = Ginq::from($data)->select("name")->toArray();
+        $xs = Ginq::from($data)->select("[name]")->toArray();
         $this->assertEquals(array('Taro','Atsushi','Junko'), $xs);
 
         // index selector shortcut
@@ -799,7 +799,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             ,array(2, 'Atsushi', 'Ibaraki')
             ,array(3, 'Junko',   'Sakai')
         );
-        $xs = Ginq::from($data)->select(2)->toArray();
+        $xs = Ginq::from($data)->select("[2]")->toArray();
         $this->assertEquals(array('Takatsuki','Ibaraki','Sakai'), $xs);
 
         // field selector shortcut
@@ -814,9 +814,9 @@ class GinqTest extends PHPUnit_Framework_TestCase
         // path/to/0
         $data = [];
         for ($i=0; $i<3; $i++) {
-            $data[] = ['foo' => ['bar' => [['baz' => "qux$i"]]]];
+            $data[] = array('foo' => array('bar' => array(array('baz' => "qux$i"))));
         }
-        $xs = Ginq::from($data)->select("foo/bar/0/baz")->toList();
+        $xs = Ginq::from($data)->select("[foo][bar][0][baz]")->toList();
         $this->assertEquals(array('qux0','qux1','qux2'), $xs);
 
         // key mapping
@@ -837,9 +837,9 @@ class GinqTest extends PHPUnit_Framework_TestCase
         // path/to/0
         $data = [];
         for ($i=0; $i<3; $i++) {
-            $data[] = ['foo' => ['bar' => [['baz' => "qux$i"]]]];
+            $data[] = array('foo' => array('bar' => array(array('baz' => "qux$i"))));
         }
-        $xs = Ginq::from($data)->select("foo/bar/0/baz")->toList();
+        $xs = Ginq::from($data)->select("[foo][bar][0][baz]")->toList();
         $this->assertEquals(array('qux0','qux1','qux2'), $xs);
 
         // key mapping
@@ -1003,7 +1003,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             )
         );
 
-        $phones = Ginq::from($phoneBook)->flatMap('phones')->toAList();
+        $phones = Ginq::from($phoneBook)->flatMap('[phones]')->toAList();
         $this->assertEquals(array(
             array(0, '03-1234-5678'),
             array(1, '090-8421-9061'),
@@ -1043,7 +1043,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             )
          );
 
-        $phones = Ginq::from($phoneBook)->selectMany('phones')->toAList();
+        $phones = Ginq::from($phoneBook)->selectMany('[phones]')->toAList();
         $this->assertEquals(array(
             array(0, '03-1234-5678'),
             array(1, '090-8421-9061'),
@@ -1080,7 +1080,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         // without key join selector
         $phones = Ginq::from($phoneBook)
             ->selectMany(
-                'phones',
+                '[phones]',
                 function($v0, $v1, $k0, $k1) {
                     return "{$v0['name']} : $v1";
                 }
@@ -1097,7 +1097,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         $phones = Ginq::from($phoneBook)
             ->selectMany(
-                'phones',
+                '[phones]',
                 function($v0, $v1, $k0, $k1) {
                     return "$v1";
                 },
@@ -1137,7 +1137,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         // key selector string
         $xs = Ginq::from($persons)->join($phones,
-            'id', 'owner',
+            '[id]', '[owner]',
             function($outer, $inner, $outerKey, $innerKey) {
                 return array($outer['name'], $inner['phone']);
             }
@@ -1196,7 +1196,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
 
         $actual = Ginq::from($persons)->groupJoin($phones,
-            'id', 'owner',
+            '[id]', '[owner]',
             function($person, $phones, $outerKey, $innerKey) {
                 /* @var OrderingGinq $phones */
                 return array($person['name'], $phones->count());
@@ -1213,7 +1213,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         // left outer join
         $actual = Ginq::from($persons)->groupJoin($phones,
-            'id', 'owner',
+            '[id]', '[owner]',
             function($person, $phones, $outerKey, $innerKey) {
                 /* @var OrderingGinq $phones */
                 return array('name'=>$person['name'], 'phones'=>$phones->elseIfZero(null));
@@ -1288,7 +1288,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         ), $xss);
 
         $xss = Ginq::from($phones)
-            ->groupBy('owner', 'phone')
+            ->groupBy('[owner]', '[phone]')
             ->toArrayRec();
         $this->assertEquals(array(
             1 => array('03-1234-5678', '090-8421-9061'),
@@ -1299,7 +1299,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $count = function ($acc, $x) { return $acc + 1; };
 
         $xss = Ginq::from($phones)
-                ->groupBy('owner')
+                ->groupBy('[owner]')
                 ->select(function($gr) use ($count) {
                 /* @var Ginq\GroupingGinq $gr  */
                 return $gr->foldLeft(0, $count);
@@ -1323,7 +1323,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array('id'=>5, 'title'=>'The Godfather',
                     'director' => array('id'=>2, 'name'=>'Francis Ford Coppola')),
         );
-        $actual = Ginq::from($movies)->groupBy('director')
+        $actual = Ginq::from($movies)->groupBy('[director]')
                 ->select(function($gr, $key) {
                     /* @var Ginq\GroupingGinq $gr */
                     return $gr->foldLeft(array(), function($acc, $x) {
@@ -1399,7 +1399,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array('name'=>'Yamada Rindai',  'score'=> 6680, 'born'=>1974),
             array('name'=>'Yamada Taro',    'score'=>  680, 'born'=>1986),
         );
-        $xs = Ginq::from($data)->orderBy('name')->renum()->toArray();
+        $xs = Ginq::from($data)->orderBy('[name]')->renum()->toArray();
         $this->assertEquals($expected, $xs);
 
         $expected = array(
@@ -1414,7 +1414,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
         $xs = Ginq::from($data)
             ->orderBy(function($x) { return $x['born']; })
-            ->thenBy('score')
+            ->thenBy('[score]')
             ->renum()->toArray();
         $this->assertEquals($expected, $xs);
 
@@ -1431,8 +1431,8 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array('name'=>'Suzuka Youichi', 'score'=> 6780, 'born'=>1990),
         );
         $xs = Ginq::from($data)
-            ->orderBy('born')
-            ->thenByDesc('score')
+            ->orderBy('[born]')
+            ->thenByDesc('[score]')
             ->renum()->toArray();
         $this->assertEquals($expected, $xs);
 
@@ -1447,8 +1447,8 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array('name'=>'Abe Shinji',     'score'=> 2990, 'born'=>1969),
         );
         $xs = Ginq::from($data)
-            ->orderByDesc('born')
-            ->thenByDesc('score')
+            ->orderByDesc('[born]')
+            ->thenByDesc('[score]')
             ->renum()->toArray();
         $this->assertEquals($expected, $xs);
 
