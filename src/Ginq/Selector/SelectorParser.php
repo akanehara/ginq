@@ -27,13 +27,13 @@ class SelectorParser
      * @throws \InvalidArgumentException
      * @return Selector
      */
-    public static function parse($src, $default)
+    static public function parse($src, $default)
     {
         if (is_null($src)) {
             return $default;
         }
 
-        if (is_string($src) || is_int($src)) {
+        if (is_string($src)) {
             return PathSelector::parse($src);
         }
 
