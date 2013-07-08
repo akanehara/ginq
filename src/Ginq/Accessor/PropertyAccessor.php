@@ -19,7 +19,7 @@ namespace Ginq\Accessor;
 /**
  * Class PropertyAccessor
  *
- *This code references:
+ * This code references:
  * Symfony\Component\PropertyAccess::readProperty
  * https://github.com/symfony/PropertyAccess/blob/master/PropertyAccessor.php
  * Copyright (c) 2004-2013 Fabien Potencier

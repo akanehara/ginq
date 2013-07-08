@@ -20,7 +20,7 @@ class AccessorParser {
 
     /**
      * @param $src
-     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      * @return Accessor
      */
     static public function parse($src)
