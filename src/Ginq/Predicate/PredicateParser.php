@@ -20,14 +20,9 @@ class PredicateParser
 {
     public static function parse($src)
     {
-        if (is_string($src)) {
-            return new PropertyPredicate($src);
-        }
-
         if ($src instanceof \Closure) {
             return new DelegatePredicate($src);
         }
-
         $type = gettype($src);
         throw new \InvalidArgumentException(
             "'predicate' callable expected, got $type");
