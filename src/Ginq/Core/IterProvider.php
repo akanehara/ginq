@@ -248,6 +248,21 @@ interface IterProvider
     public function memoize($xs);
 
     /**
+     * @param array|\Traversable $xs
+     * @param int                $chunkSize
+     * @return \Iterator
+     */
+    public function buffer($xs, $chunkSize);
+
+    /**
+     * @param array|\Traversable $xs
+     * @param int                $chunkSize
+     * @param mixed              $padding
+     * @return \Iterator
+     */
+    public function bufferWithPadding($xs, $chunkSize, $padding);
+
+    /**
      * @param callable $sourceFactory
      * @return \Iterator
      */

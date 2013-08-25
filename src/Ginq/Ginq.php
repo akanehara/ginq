@@ -1104,6 +1104,28 @@ class Ginq implements \IteratorAggregate
         return self::from(self::$gen->memoize($this->getIterator()));
     }
 
+    /**
+     * @param int $chunkSize
+     * @return Ginq
+     */
+    public function buffer($chunkSize)
+    {
+        return self::from(
+            self::$gen->buffer($this->getIterator(), $chunkSize)
+        );
+    }
+
+    /**
+     * @param int   $chunkSize
+     * @param mixed $padding
+     * @return Ginq
+     */
+    public function bufferWithPadding($chunkSize, $padding)
+    {
+        return self::from(
+            self::$gen->bufferWithPadding($this->getIterator(), $chunkSize, $padding)
+        );
+    }
 
     /**
      * plugin

@@ -1678,6 +1678,67 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $zero);
     }
 
+    /**
+     * testBuffer().
+     */
+    public function testBuffer()
+    {
+        $expected = array(
+            0 => array( 1, 2, 3, 4, 5),
+            1 => array( 6, 7, 8, 9,10),
+            2 => array(11,12,13,14,15),
+            3 => array(16,17,18,19,20),
+        );
+        $actual = Ginq::range(1, 20)->buffer(5)->toList();
+        $this->assertEquals($expected, $actual);
+
+        $expected = array(
+            0 => array( 1, 2, 3, 4, 5),
+            1 => array( 6, 7, 8, 9,10),
+            2 => array(11,12,13,14,15),
+            3 => array(16,17,18),
+        );
+        $actual = Ginq::range(1, 18)->buffer(5)->toList();
+        $this->assertEquals($expected, $actual);
+
+        try {
+            Ginq::range(1, 10)->buffer(0);
+            $this->fail();
+        } catch (InvalidArgumentException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
+    /**
+     * testBufferWithPadding().
+     */
+    public function testBufferWithPadding()
+    {
+        $expected = array(
+            0 => array( 1, 2, 3, 4, 5),
+            1 => array( 6, 7, 8, 9,10),
+            2 => array(11,12,13,14,15),
+            3 => array(16,17,18,19,20),
+        );
+        $actual = Ginq::range(1, 20)->bufferWithPadding(5, 0)->toList();
+        $this->assertEquals($expected, $actual);
+
+        $expected = array(
+            0 => array( 1, 2, 3, 4, 5),
+            1 => array( 6, 7, 8, 9,10),
+            2 => array(11,12,13,14,15),
+            3 => array(16,17,18, 0, 0),
+        );
+        $actual = Ginq::range(1, 18)->bufferWithPadding(5, 0)->toList();
+        $this->assertEquals($expected, $actual);
+
+        try {
+            Ginq::range(1, 10)->bufferWithPadding(0, 0);
+            $this->fail();
+        } catch (InvalidArgumentException $e) {
+            $this->assertTrue(true);
+        }
+    }
  }
 
 class Movie

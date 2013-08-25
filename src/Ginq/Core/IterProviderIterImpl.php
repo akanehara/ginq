@@ -16,6 +16,8 @@
 
 namespace Ginq\Core;
 
+use Ginq\Iterator\BufferIterator;
+use Ginq\Iterator\BufferWithPaddingIterator;
 use Ginq\Iterator\DistinctIterator;
 use Ginq\Iterator\ExceptIterator;
 use Ginq\Iterator\GroupJoinIterator;
@@ -388,6 +390,27 @@ class IterProviderIterImpl implements IterProvider
     public function lazySource($sourceFactory)
     {
         return new LazySourceIterator($sourceFactory);
+    }
+
+    /**
+     * @param array|\Traversable $xs
+     * @param int                $chunkSize
+     * @return \Iterator
+     */
+    public function buffer($xs, $chunkSize)
+    {
+        return new BufferIterator($xs, $chunkSize);
+    }
+
+    /**
+     * @param array|\Traversable $xs
+     * @param int                $chunkSize
+     * @param mixed              $padding
+     * @return \Iterator
+     */
+    public function bufferWithPadding($xs, $chunkSize, $padding)
+    {
+        return new BufferWithPaddingIterator($xs, $chunkSize, $padding);
     }
 }
 
