@@ -96,7 +96,7 @@ $spices = array("time", "basil", "dill");
 
 $xs = Ginq::from($foods)
         ->zip($spices, function($f, $s) {
-            return "$f with $sI";
+            return "$f with $sï¿½I";
         })
         ;
 
@@ -118,22 +118,19 @@ They return the value of the field when the element is an object, or return the 
 So,
 
 ```php
-Ginq::from($xs)->select('name');
+Ginq::from($xs)->select('[key].property');
 ```
 
 The example above is same as two examples below.
 
 ```php
 Ginq::from($xs)->select(
-    function ($v, $k) { return $v['name']; }
+    function ($v, $k) { return $v['key'].property; }
 );
 ```
 
-```php
-Ginq::from($xs)->select(
-    function ($v, $k) { return $v->name; }
-);
-```
+see: Property Access (Symfony)
+http://symfony.com/doc/current/components/property_access/index.html
 
 ## More complex examples
 

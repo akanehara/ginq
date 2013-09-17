@@ -115,34 +115,26 @@ foreach ($xs in $x) { echo "$x\n"; }
 サラダにティル！
 ```
 
-## 述語とセレクタのショートカット
+## セレクタのショートカット
 
-**セレクタ** と **述語** にかぎり、クロージャのかわりに文字列を渡すことができます。
-要素がオブジェクトの場合はフィールドの値を、配列の場合はそのキーに対応する値を返します。
-
-つまり、
+**セレクタ** にかぎり、クロージャのかわりに文字列を渡すことができます。
 
 ```php
-Ginq::from($xs)->select('name');
+Ginq::from($xs)->select('[key].property');
 ```
 
 は、
 
 ```php
 Ginq::from($xs)->select(
-    function ($v, $k) { return $v['name']; }
-);
-```
-
-あるいは
-
-```php
-Ginq::from($xs)->select(
-    function ($v, $k) { return $v->name; }
+    function ($v, $k) { return $v['key']->property; }
 );
 ```
 
 と同じ意味をもちます。
+これはSymfonyのプロパディアクセスの記法に準じます。
+
+http://symfony.com/doc/current/components/property_access/index.html
 
 ## もっと複雑な例
 

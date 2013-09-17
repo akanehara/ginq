@@ -1,7 +1,6 @@
 {
     "name": "ginq/ginq",
     "description": "LINQ to Object inspired DSL for PHP",
-    "version": "0.1.0",
     "license": "MIT",
     "type": "library",
     "keywords": [
@@ -16,7 +15,6 @@
             "email": "akanehara@gmail.com"
         }
     ],
-    "minimum-stability": "alpha",
     "require": {
         "php": ">=5.3.0"
     },
