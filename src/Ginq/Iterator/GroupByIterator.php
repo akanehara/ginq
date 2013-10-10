@@ -16,10 +16,12 @@
 
 namespace Ginq\Iterator;
 
-use Ginq\Core\Lookup;
+use Ginq\Ginq;
 use Ginq\Core\Selector;
 use Ginq\Core\EqualityComparer;
+use Ginq\GroupingGinq;
 use Ginq\Selector\KeySelector;
+use Ginq\Selector\ValueSelector;
 use Ginq\Util\IteratorUtil;
 
 /**
@@ -39,11 +41,6 @@ class GroupByIterator implements \Iterator
     private $elementSelector;
 
     /**
-     * @var Selector
-     */
-    private $groupSelector;
-
-    /**
      * @var \Iterator
      */
     private $it;
@@ -51,70 +48,70 @@ class GroupByIterator implements \Iterator
     /**
      * @var \Iterator
      */
-    private $group;
+    private $groups;
 
-    /**
-     * @var int
-     */
-    private $i;
+    /** @var mixed */
+    private $k;
+
+    /** @var mixed */
+    private $v;
 
     /**
      * @param array|\Traversable $xs
      * @param Selector $groupingKeySelector
      * @param Selector $elementSelector
-     * @param Selector $groupSelector
      * @param EqualityComparer $eqComparer
      */
-    public function __construct($xs, $groupingKeySelector, $elementSelector, $groupSelector, $eqComparer)
+    public function __construct($xs, $groupingKeySelector, $elementSelector, $eqComparer)
     {
         $this->it = IteratorUtil::iterator($xs);
         $this->groupingKeySelector = $groupingKeySelector;
-        $this->elementSelector = $elementSelector;
-        $this->groupSelector   = $groupSelector;
-        $this->eqComparer      = $eqComparer;
+        $this->elementSelector     = $elementSelector;
+        $this->eqComparer          = $eqComparer;
     }
 
     public function current()
     {
-        /**
-         * @var \Ginq\Core\KeyValuePair $pair
-         */
-        $pair = $this->group->current();
-        $group = new SelectIterator($pair->value,
-            $this->elementSelector,
-            KeySelector::getInstance()
-        );
-        return $this->groupSelector->select($group, $pair->key);
+        return $this->v;
     }
 
     public function key()
     {
-        /**
-         * @var \Ginq\Core\KeyValuePair $pair
-         */
-        $pair = $this->group->current();
-        return $pair->key;
+        return $this->k;
     }
 
     public function next()
     {
-        $this->i++;
-        $this->group->next();
+        $this->groups->next();
+        $this->fetch();
     }
 
     public function rewind()
     {
-        $this->i = 0;
-        $this->it->rewind();
-        $this->group = Lookup::from(
-            $this->it,
-            $this->groupingKeySelector,
-            $this->eqComparer
-        )->getIterator();
+        $this->groups = Ginq::from($this->it)
+            ->toLookup(
+                $this->groupingKeySelector,
+                $this->elementSelector,
+                $this->eqComparer
+            )
+            ->getIterator();
+        $this->groups->rewind();
+        if ($this->valid()) {
+            $this->fetch();
+        }
     }
 
     public function valid()
     {
-        return $this->group->valid();
+        return $this->groups->valid();
+    }
+
+    protected function fetch()
+    {
+        /** @var GroupingGinq $gr */
+        $gr = $this->groups->current();
+        $this->k = $gr->key();
+        $this->v = $gr;
     }
 }
+

@@ -17,10 +17,12 @@
 namespace Ginq\Iterator;
 
 use Ginq\Core\EqualityComparer;
-use Ginq\Core\Lookup;
+use Ginq\Ginq;
+use Ginq\LookupGinq;
 use Ginq\Core\Selector;
 use Ginq\Selector\DelegateSelector;
 use Ginq\Core\JoinSelector;
+use Ginq\Selector\ValueSelector;
 use Ginq\Util\IteratorUtil;
 
 class JoinIterator implements \Iterator
@@ -112,7 +114,12 @@ class JoinIterator implements \Iterator
     public function rewind()
     {
         $outerKeySelector = $this->outerKeySelector;
-        $lookup = Lookup::from($this->inner, $this->innerKeySelector, $this->eqComparer);
+        $lookup = Ginq::from($this->inner)
+            ->toLookup(
+                $this->innerKeySelector,
+                ValueSelector::getInstance(),
+                $this->eqComparer
+            );
         $this->it = new SelectManyWithJoinIterator(
             $this->outer,
             new DelegateSelector(

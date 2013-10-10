@@ -89,7 +89,6 @@ class Dictionary implements \IteratorAggregate
         $this->values[$hash] = $value;
     }
 
-
     /**
      * @return \Traversable
      */

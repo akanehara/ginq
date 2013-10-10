@@ -312,13 +312,12 @@ class IterProviderIterImpl implements IterProvider
      * @param array|\Traversable $xs
      * @param Selector $keySelector
      * @param Selector $elementSelector
-     * @param Selector $groupSelector
      * @param EqualityComparer $eqComparer
      * @return \Ginq\Iterator\GroupByIterator
      */
-    public function groupBy($xs, $keySelector, $elementSelector, $groupSelector, $eqComparer)
+    public function groupBy($xs, $keySelector, $elementSelector, $eqComparer)
     {
-        return new GroupByIterator($xs, $keySelector, $elementSelector, $groupSelector, $eqComparer);
+        return new GroupByIterator($xs, $keySelector, $elementSelector, $eqComparer);
     }
 
     /**

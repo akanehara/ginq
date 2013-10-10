@@ -70,6 +70,93 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testToLookup().
+     */
+    public function testToLookup()
+    {
+        $actual = Ginq::range(1,10)
+            ->toLookup(function($x) { return $x % 3; })
+            ->toArrayRec();
+        $expected = array(
+            0 => array(3,6,9),
+            1 => array(1,4,7,10),
+            2 => array(2,5,8),
+        );
+        $this->assertEquals($expected, $actual);
+
+        $actual = Ginq::range(1,10)
+            ->toLookup(
+                function($x) { return $x % 3; },
+                function($v, $k) { return $k; }
+            )
+            ->toArrayRec();
+        $expected = array(
+            0 => array(2,5,8),
+            1 => array(0,3,6,9),
+            2 => array(1,4,7),
+        );
+        $this->assertEquals($expected, $actual);
+
+        $newPhoneBookEntry = function($id, $owner, $phone) {
+            $o = new stdClass;
+            $o->id    = $id;
+            $o->owner = $owner;
+            $o->phone = $phone;
+            return $o;
+        };
+
+        $newOwner = function($id, $name) {
+            $o = new stdClass;
+            $o->id    = $id;
+            $o->name = $name;
+            return $o;
+        };
+
+        $owners = array(
+            $newOwner(1, 'peter'),
+            $newOwner(2, 'john'),
+            $newOwner(3, 'may'),
+        );
+
+        $phones = array(
+             $newPhoneBookEntry(1, $owners[0], '03-1234-5678')
+            ,$newPhoneBookEntry(2, $owners[0], '090-8421-9061')
+            ,$newPhoneBookEntry(3, $owners[1], '050-1198-4458')
+            ,$newPhoneBookEntry(4, $owners[2], '06-1111-3333')
+            ,$newPhoneBookEntry(5, $owners[2], '090-9898-1314')
+            ,$newPhoneBookEntry(6, $owners[2], '050-6667-2231')
+        );
+
+        $actual = Ginq::from($phones)
+            ->toLookup('owner.name')
+            ->toAListRec();
+        $expected = array(
+            array(
+                'peter',
+                array(
+                    array(0, $phones[0]),
+                    array(1, $phones[1])
+                )
+            ),
+            array(
+                'john',
+                array(
+                    array(0, $phones[2])
+                )
+            ),
+            array(
+                'may',
+                array(
+                    array(0, $phones[3]),
+                    array(1, $phones[4]),
+                    array(2, $phones[5])
+                )
+            ),
+        );
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
      * testToAList().
      */
     public function testToAList()

@@ -197,11 +197,10 @@ interface IterProvider
      * @param array|\Traversable $xs
      * @param Selector $compareKeySelector
      * @param Selector $elementSelector
-     * @param Selector $groupSelector
      * @param EqualityComparer $eqComparer
      * @return \Iterator
      */
-    public function groupBy($xs, $compareKeySelector, $elementSelector, $groupSelector, $eqComparer);
+    public function groupBy($xs, $compareKeySelector, $elementSelector, $eqComparer);
 
     /**
      * @param array|\Traversable $xs

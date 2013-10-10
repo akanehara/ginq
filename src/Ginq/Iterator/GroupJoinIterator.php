@@ -17,17 +17,19 @@
 namespace Ginq\Iterator;
 
 use Ginq\Core\EqualityComparer;
-use Ginq\Core\Lookup;
+use Ginq\Ginq;
+use Ginq\LookupGinq;
 use Ginq\Core\Selector;
 use Ginq\GroupingGinq;
 use Ginq\Selector\DelegateSelector;
 use Ginq\Core\JoinSelector;
+use Ginq\Selector\ValueSelector;
 use Ginq\Util\IteratorUtil;
 
 class GroupJoinIterator implements \Iterator
 {
     /**
-     * @var Lookup
+     * @var LookupGinq
      */
     protected $lookup;
 
@@ -124,10 +126,11 @@ class GroupJoinIterator implements \Iterator
     public function rewind()
     {
         $this->outer->rewind();
-        $this->lookup = Lookup::from(
-            $this->inner,
-            $this->innerCompareKeySelector,
-            $this->eqComparer);
+        $this->lookup = Ginq::from($this->inner)
+            ->toLookup(
+                $this->innerCompareKeySelector,
+                ValueSelector::getInstance()
+            );
         $this->fetchIfValid();
     }
 
@@ -137,7 +140,7 @@ class GroupJoinIterator implements \Iterator
             $outerV  = $this->outer->current();
             $outerK  = $this->outer->key();
             $compareKey = $this->outerCompareKeySelector->select($outerV, $outerK);
-            $inners  = $this->lookup->get($compareKey);
+            $inners = $this->lookup->get($compareKey);
             $inners = new GroupingGinq(IteratorUtil::iterator($inners), $compareKey);
             $this->v = $this->resultValueSelector->select($outerV, $inners, $outerK, $compareKey);
             $this->k = $this->outer->key();

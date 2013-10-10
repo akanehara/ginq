@@ -14,9 +14,13 @@
  * @package    Ginq
  */
 
-namespace Ginq\Core;
+namespace Ginq;
 
+use Ginq\Core\Dictionary;
+use Ginq\Core\EqualityComparer;
 use Ginq\Core\Selector;
+use Ginq\Selector\KeySelector;
+use Ginq\Selector\ValueSelector;
 use Ginq\Util\IteratorUtil;
 
 /**
@@ -24,7 +28,7 @@ use Ginq\Util\IteratorUtil;
  *
  * @package Ginq
  */
-class Lookup implements \IteratorAggregate
+class LookupGinq extends Ginq
 {
     /**
      * @var Dictionary
@@ -32,39 +36,38 @@ class Lookup implements \IteratorAggregate
     private $dict;
 
     /**
+     * @var array
+     */
+    private $keys;
+
+    /**
      * @param EqualityComparer $eqComparer
      */
-    protected function __construct($eqComparer)
+    public function __construct($eqComparer)
     {
         $this->dict = new Dictionary($eqComparer);
+        $this->keys = array();
     }
 
     /**
-     * @param array|\Iterator|\IteratorAggregate|\Traversable $xs
-     * @param Selector $keySelector
-     * @param EqualityComparer $eqComparer
-     * @return Lookup
-     */
-    public static function from($xs, $keySelector, $eqComparer)
-    {
-        $lookup = new self($eqComparer);
-        foreach ($xs as $k => $v) {
-            $lookup->put($keySelector->select($v, $k), $v);
-        }
-        return $lookup;
-    }
-
-    /**
-     * @return \Traversable
+     * @return \Iterator
      */
     public function getIterator()
     {
-        return $this->dict->getIterator();
+        $dict = $this->dict;
+        $it = Ginq::from($dict->keys())
+            ->select(
+                function($key) use (&$dict) {
+                    return new GroupingGinq(IteratorUtil::iterator($dict->get($key)), $key);
+                },
+                ValueSelector::getInstance()
+            )->getIterator();
+        return $it;
     }
 
     /**
      * @param mixed $key
-     * @return array
+     * @return GroupingGinq
      */
     public function get($key)
     {
@@ -72,7 +75,7 @@ class Lookup implements \IteratorAggregate
          * @var \ArrayObject $xs
          */
         $xs = $this->dict->get($key, array());
-        return $xs;
+        return new GroupingGinq(IteratorUtil::iterator($xs), $key);
     }
 
     /**
@@ -82,9 +85,7 @@ class Lookup implements \IteratorAggregate
      */
     public function put($key, $value)
     {
-        /**
-         * @var \ArrayObject $xs
-         */
+        /** @var \ArrayObject $xs */
         if (!$this->dict->contains($key)) {
             $this->dict->put($key, new \ArrayObject());
         }

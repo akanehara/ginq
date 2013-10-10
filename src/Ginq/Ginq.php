@@ -134,6 +134,28 @@ class Ginq implements \IteratorAggregate
         }
     }
 
+    /**
+     * @param \Closure|string|Selector $lookupKeySelector (v, k) -> mixed
+     * @param \Closure|string|Selector $elementSelector   (v, k) -> mixed
+     * @param EqualityComparer         $eqComparer
+     * @return LookupGinq
+     */
+    public function toLookup($lookupKeySelector, $elementSelector = null, $eqComparer = null)
+    {
+        $lookupKeySelector = SelectorParser::parse($lookupKeySelector, ValueSelector::getInstance());
+        $elementSelector   = SelectorParser::parse($elementSelector, ValueSelector::getInstance());
+        $lookup = new LookupGinq(
+            EqualityComparerParser::parse($eqComparer, EqualityComparer::getDefault())
+        );
+        $it = $this->getIterator();
+        foreach ($it as $k => $v) {
+            $lookup->put(
+                $lookupKeySelector->select($v, $k),
+                $elementSelector->select($v, $k)
+            );
+        }
+        return $lookup;
+    }
 
     /**
      * @return array
@@ -820,8 +842,8 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|int|Selector      $compareKeySelector (v, k) -> mixed
-     * @param \Closure|string|int|Selector|null $elementSelector (v, k) -> mixed
+     * @param \Closure|string|Selector       $compareKeySelector (v, k) -> mixed
+     * @param \Closure|string|Selector|null  $elementSelector    (v, k) -> mixed
      * @return Ginq
      */
     public function groupBy($compareKeySelector, $elementSelector = null)
@@ -829,9 +851,8 @@ class Ginq implements \IteratorAggregate
         return self::from(self::$gen->groupBy(
             $this->getIterator(),
             SelectorParser::parse($compareKeySelector, ValueSelector::getInstance()),
-            SelectorParser::parse($elementSelector, ValueSelector::getInstance()),
-            new DelegateSelector(function ($xs, $key) { return new GroupingGinq($xs, $key); }),
-            EqualityComparerParser::parse(null, EqualityComparer::getDefault())
+            SelectorParser::parse($elementSelector,    ValueSelector::getInstance()),
+            EqualityComparer::getDefault()
         ));
     }
 
