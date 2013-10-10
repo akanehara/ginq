@@ -39,6 +39,7 @@ class RepeatIterator implements \Iterator
 
     /**
      * @param mixed $x
+     * @param       $count
      */
     public function __construct($x, $count)
     {

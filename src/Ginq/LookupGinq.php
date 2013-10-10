@@ -18,7 +18,6 @@ namespace Ginq;
 
 use Ginq\Core\Dictionary;
 use Ginq\Core\EqualityComparer;
-use Ginq\Core\Selector;
 use Ginq\Selector\KeySelector;
 use Ginq\Selector\ValueSelector;
 use Ginq\Util\IteratorUtil;

@@ -17,7 +17,6 @@
 namespace Ginq\Selector;
 
 use Ginq\Core\Selector;
-use Ginq\Util\FuncUtil;
 
 class SelectorParser
 {

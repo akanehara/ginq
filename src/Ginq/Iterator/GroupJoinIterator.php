@@ -21,7 +21,6 @@ use Ginq\Ginq;
 use Ginq\LookupGinq;
 use Ginq\Core\Selector;
 use Ginq\GroupingGinq;
-use Ginq\Selector\DelegateSelector;
 use Ginq\Core\JoinSelector;
 use Ginq\Selector\ValueSelector;
 use Ginq\Util\IteratorUtil;

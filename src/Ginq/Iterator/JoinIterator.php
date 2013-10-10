@@ -18,7 +18,6 @@ namespace Ginq\Iterator;
 
 use Ginq\Core\EqualityComparer;
 use Ginq\Ginq;
-use Ginq\LookupGinq;
 use Ginq\Core\Selector;
 use Ginq\Selector\DelegateSelector;
 use Ginq\Core\JoinSelector;

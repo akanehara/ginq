@@ -5,7 +5,6 @@ require_once dirname(__DIR__) . "/src/Ginq/Accessor/PropertyAccessor.php";
 require_once dirname(__DIR__) . "/src/Ginq/Accessor/CompositeAccessor.php";
 require_once dirname(__DIR__) . "/src/Ginq/Accessor/AccessorParser.php";
 
-use \Ginq\Accessor\Accessor;
 use \Ginq\Accessor\AccessorParser;
 
 class AccessorTest extends PHPUnit_Framework_TestCase

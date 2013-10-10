@@ -25,7 +25,6 @@ use Ginq\EqualityComparer\EqualityComparerParser;
 use Ginq\JoinSelector\KeyJoinSelector;
 use Ginq\JoinSelector\ValueJoinSelector;
 use Ginq\Selector\KeySelector;
-use Ginq\Selector\DelegateSelector;
 use Ginq\Selector\SelectorParser;
 use Ginq\JoinSelector\JoinSelectorParser;
 use Ginq\Predicate\PredicateParser;
@@ -35,7 +34,6 @@ use Ginq\Util\IteratorUtil;
 use Ginq\Comparer\ReverseComparer;
 use Ginq\Comparer\ProjectionComparer;
 use Ginq\OrderingGinq;
-use Ginq\GroupingGinq;
 
 /**
  * GinqContext

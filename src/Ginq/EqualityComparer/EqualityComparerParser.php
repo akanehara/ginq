@@ -9,7 +9,6 @@
 
 namespace Ginq\EqualityComparer;
 
-use Ginq\Comparer\ProjectionComparer;
 use Ginq\Core\EqualityComparer;
 
 class EqualityComparerParser
