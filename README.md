@@ -8,12 +8,21 @@
 
 Many functions in **Ginq** are evaluated in lazy, and no actions are taken until that time. This features bring you many benefits.
 
-# Usage
+# Install
 
-```php
-require_once('Ginq.php');
+composer.json:
+
+```json
+{
+    "require": {
+        "ginq/ginq": "dev-master"
+    }
+}
 ```
-Import **Ginq**.
+
+see: https://packagist.org/packages/ginq/ginq
+
+# Usage
 
 ```php
 $xs = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))
