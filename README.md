@@ -37,7 +37,7 @@ But **Ginq** do nothing, **Ginq** knows only you want a result of chosen and squ
 Let's execute `foreach` loop with **Ginq** to get the result.
 
 ```php
-foreach ($xs in $x) { echo "$x "; }
+foreach ($xs as $x) { echo "$x "; }
 ```
 The result is 
 ```
@@ -105,11 +105,11 @@ $spices = array("time", "basil", "dill");
 
 $xs = Ginq::from($foods)
         ->zip($spices, function($f, $s) {
-            return "$f with $s�I";
+            return "$f with $s!";
         })
         ;
 
-foreach ($xs in $x) { echo "$x\n"; }
+foreach ($xs as $x) { echo "$x\n"; }
 ```
 
 ```
