@@ -45,7 +45,7 @@ The result is
 ```
 You got the expected result!
 
-Next, you can an array with `toList`.
+Next, you can get an array with `toList`.
 
 ```php
 $xs->toList();
