@@ -190,11 +190,14 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param string|callable $predicate (v, k) -> bool
+     * @param null|string|callable $predicate (v, k) -> bool
      * @return bool
      */
-    public function any($predicate)
+    public function any($predicate = null)
     {
+        if (is_null($predicate)) {
+            $predicate = function($v, $k) { return true; };
+        }
         $p = PredicateParser::parse($predicate);
         foreach ($this->getIterator() as $k => $v) {
             if ($p->predicate($v, $k) == true) {
@@ -205,7 +208,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param string|callable $predicate (v, k) -> bool
+     * @param null|string|callable $predicate (v, k) -> bool
      * @return bool
      */
     public function all($predicate)

@@ -314,6 +314,10 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(
             Ginq::range(1)->any(function($x, $k) { return 5 <= $x; })
         );
+
+        $this->assertTrue(Ginq::from(array(1,2,3,4,5,6,7,8,9,10))->any());
+
+        $this->assertFalse(Ginq::from(array())->any());
     }
 
     /**
