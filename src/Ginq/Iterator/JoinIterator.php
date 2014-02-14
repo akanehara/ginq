@@ -122,7 +122,7 @@ class JoinIterator implements \Iterator
         $this->it = new SelectManyWithJoinIterator(
             $this->outer,
             new DelegateSelector(
-                function ($v, $k) use (&$lookup, $outerKeySelector) {
+                function ($v, $k) use ($lookup, $outerKeySelector) {
                     return $lookup->get($outerKeySelector->select($v, $k));
                 }
             ),
