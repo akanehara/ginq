@@ -685,16 +685,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testUnfold()
     {
+        $called = 0;
         $actual = Ginq::unfold(1,
-            function($x) {
-                if (5 < $x) {
-                    return null;
-                } else {
-                    return array($x, $x + 1);
-                }
-            }
+            function($x) use (&$called) { $called++; return ($x <= 5) ? array($x, $x + 1) : null; }
         )->toList();
         $this->assertEquals(array(1,2,3,4,5), $actual);
+        $this->assertEquals(6, $called);
     }
 
     /**
@@ -702,17 +698,19 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testIterate()
     {
-        $i = 0;
+        $called = 0;
         $actual = Ginq::iterate(1,
-                function($x) use (&$i) {
-                    $i++;
-                    return $x + 1;
-                }
-            )
-            ->take(5)
-            ->toList();
+                function($x) use (&$called) { $called++; return $x + 1; }
+        )->take(5)->toList();
         $this->assertEquals(array(1,2,3,4,5), $actual);
-        $this->assertEquals(4, $i);
+        $this->assertEquals(4, $called);
+
+        $called = 0;
+        $actual = Ginq::iterate(1,
+            function($x) use (&$called) { $called++; return $x + 1; }
+        )->take(1)->toList();
+        $this->assertEquals(array(1), $actual);
+        $this->assertEquals(0, $called);
     }
 
     /**
