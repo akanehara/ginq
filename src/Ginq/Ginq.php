@@ -726,6 +726,19 @@ class Ginq implements \IteratorAggregate
 
     /**
      * @param string|callable $predicate (v, k) -> bool
+     * @return array    [satisfied:Ginq, notSatisfied:Ginq]
+     */
+    public function partition($predicate)
+    {
+        return array(
+            $this->where($predicate),
+            $this->where(function($v, $k) use ($predicate) { return !$predicate($v, $k); })
+        );
+    }
+
+
+    /**
+     * @param string|callable $predicate (v, k) -> bool
      * @return Ginq
      */
     public function where($predicate)

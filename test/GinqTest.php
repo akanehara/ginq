@@ -718,7 +718,14 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testPartition()
     {
-        list() = Ginq::range(1)->partition();
+        $even = function($x) { return $x % 2 == 0; };
+        /**
+         * @var \Ginq $satisfied
+         * @var \Ginq $notSatisfied
+         */
+        list($satisfied, $notSatisfied) = Ginq::range(1)->partition($even);
+        $this->assertEquals(array(2,4,6,8,10), $satisfied->take(5)->toList());
+        $this->assertEquals(array(1,3,5,7,9),  $notSatisfied->take(5)->toList());
     }
 
     /**
@@ -1549,8 +1556,6 @@ class GinqTest extends PHPUnit_Framework_TestCase
             ->thenBy('[score]')
             ->renum()->toArray();
         $this->assertEquals($expected, $xs);
-
-        $xs = Ginq::from($data)->orderBy()->thenBy();
 
         $expected = array(
             array('name'=>'Abe Shinji',     'score'=> 2990, 'born'=>1969),
