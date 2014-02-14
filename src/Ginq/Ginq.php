@@ -490,8 +490,6 @@ class Ginq implements \IteratorAggregate
         );
     }
 
-
-
     /**
      * @param mixed $accumulator
      * @param callable $operator (acc, v, k) -> mixed
@@ -579,6 +577,35 @@ class Ginq implements \IteratorAggregate
     public static function zero()
     {
         return self::from(self::$gen->zero());
+    }
+
+    /**
+     * @param mixed    $seed
+     * @param \Closure $generator seed -> ([v, seed] | null)
+     * @return Ginq
+     */
+    public static function unfold($seed, $generator)
+    {
+        return self::from(self::$gen->unfold($seed, $generator));
+    }
+
+    /**
+     * @param mixed    $initial
+     * @param \Closure $generator v -> v
+     * @return Ginq
+     */
+    public static function iterate($initial, $generator)
+    {
+        return self::unfold(
+            $initial,
+            function($seed) use ($generator) {
+                $v = FuncUtil::force($seed);
+                return array(
+                    $v,
+                    function () use ($v, $generator) { return $generator($v); }
+                );
+            }
+        );
     }
 
     /**
@@ -696,6 +723,19 @@ class Ginq implements \IteratorAggregate
     {
         return $this->where($predicate);
     }
+
+    /**
+     * @param string|callable $predicate (v, k) -> bool
+     * @return array    [satisfied:Ginq, notSatisfied:Ginq]
+     */
+    public function partition($predicate)
+    {
+        return array(
+            $this->where($predicate),
+            $this->where(function($v, $k) use ($predicate) { return !$predicate($v, $k); })
+        );
+    }
+
 
     /**
      * @param string|callable $predicate (v, k) -> bool

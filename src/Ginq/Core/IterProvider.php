@@ -20,6 +20,7 @@ use Ginq\Core\Selector;
 use Ginq\Core\JoinSelector;
 use Ginq\Core\Predicate;
 use Ginq\Core\Comparer;
+use Ginq\Iterator\UnfoldIterator;
 
 /**
  * IterProvider
@@ -31,6 +32,13 @@ interface IterProvider
      * @return \Iterator
      */
     public function zero();
+
+    /**
+     * @param mixed|\Closure $seed
+     * @param \Closure $generator seed -> ([v, seed] | null)
+     * @return \Iterator
+     */
+    public function unfold($seed, $generator);
 
     /**
      * @param int $start
