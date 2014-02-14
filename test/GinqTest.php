@@ -681,6 +681,47 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testUnfold
+     */
+    public function testUnfold()
+    {
+        $called = 0;
+        $actual = Ginq::unfold(1,
+            function($x) use (&$called) { $called++; return ($x <= 5) ? array($x, $x + 1) : null; }
+        )->toList();
+        $this->assertEquals(array(1,2,3,4,5), $actual);
+        $this->assertEquals(6, $called);
+    }
+
+    /**
+     * testIterate
+     */
+    public function testIterate()
+    {
+        $called = 0;
+        $actual = Ginq::iterate(1,
+                function($x) use (&$called) { $called++; return $x + 1; }
+        )->take(5)->toList();
+        $this->assertEquals(array(1,2,3,4,5), $actual);
+        $this->assertEquals(4, $called);
+
+        $called = 0;
+        $actual = Ginq::iterate(1,
+            function($x) use (&$called) { $called++; return $x + 1; }
+        )->take(1)->toList();
+        $this->assertEquals(array(1), $actual);
+        $this->assertEquals(0, $called);
+    }
+
+    /**
+     * testPartition
+     */
+    public function testPartition()
+    {
+        list() = Ginq::range(1)->partition();
+    }
+
+    /**
      * testZero().
      */
     public function testZero()
@@ -903,7 +944,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array('Taro','Atsushi','Junko'), $xs);
 
         // path/to/0
-        $data = [];
+        $data = array();
         for ($i=0; $i<3; $i++) {
             $data[] = array('foo' => array('bar' => array(array('baz' => "qux$i"))));
         }
@@ -926,7 +967,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array('Taro','Atsushi','Junko'), $xs);
 
         // path/to/0
-        $data = [];
+        $data = array();
         for ($i=0; $i<3; $i++) {
             $data[] = array('foo' => array('bar' => array(array('baz' => "qux$i"))));
         }

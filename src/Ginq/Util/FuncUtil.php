@@ -53,5 +53,13 @@ class FuncUtil
     {
         return function($x) use ($g, $f) { return $g($f($x)); };
     }
+
+    /**
+     *
+     */
+    static public function force($x)
+    {
+        return ($x instanceof \Closure) ? $x() : $x;
+    }
 }
 

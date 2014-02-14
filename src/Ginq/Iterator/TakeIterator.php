@@ -62,7 +62,9 @@ class TakeIterator implements \Iterator
     public function next()
     {
         $this->i++;
-        $this->it->next();
+        if ($this->valid()) {
+            $this->it->next();
+        }
     }
 
     public function rewind()
@@ -73,10 +75,6 @@ class TakeIterator implements \Iterator
 
     public function valid()
     {
-        if ($this->i < $this->n) {
-            return $this->it->valid();
-        } else {
-            return false;
-        }
+        return ($this->i < $this->n) && $this->it->valid();
     }
 }

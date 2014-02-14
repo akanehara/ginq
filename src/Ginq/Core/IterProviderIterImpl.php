@@ -24,6 +24,7 @@ use Ginq\Iterator\GroupJoinIterator;
 use Ginq\Iterator\IntersectIterator;
 use Ginq\Iterator\LazyRepeatIterator;
 use Ginq\Iterator\LazySourceIterator;
+use Ginq\Iterator\UnfoldIterator;
 use Ginq\Iterator\UnionIterator;
 use Ginq\Iterator\ZeroIterator;
 use Ginq\Iterator\RangeIterator;
@@ -76,6 +77,16 @@ class IterProviderIterImpl implements IterProvider
     public function zero()
     {
         return new ZeroIterator();
+    }
+
+    /**
+     * @param mixed|\Closure $seed
+     * @param \Closure $generator seed -> ([v, seed] | null)
+     * @return \Ginq\Iterator\UnfoldIterator
+     */
+    public function unfold($seed, $generator)
+    {
+        return new UnfoldIterator($seed, $generator);
     }
 
     /**
