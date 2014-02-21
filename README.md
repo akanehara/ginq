@@ -15,7 +15,7 @@ composer.json:
 ```json
 {
     "require": {
-        "ginq/ginq": "dev-master"
+        "ginq/ginq": "~0.1"
     }
 }
 ```
