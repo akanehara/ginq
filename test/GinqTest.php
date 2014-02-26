@@ -1,5 +1,7 @@
 <?php
 use Ginq\OrderingGinq;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
 
@@ -989,9 +991,16 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         // invalid selector
         try {
-            Ginq::from(array(1,2,3,4,5))->select("//s?");
+            Ginq::from(array(array(1)))->select("//s?")->toList();
             $this->fail();
-        } catch (InvalidArgumentException $e) {
+        } catch (NoSuchPropertyException $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::from(array(1))->select("[0]")->toList();
+            $this->fail();
+        } catch (UnexpectedTypeException $e) {
             $this->assertTrue(true);
         }
     }

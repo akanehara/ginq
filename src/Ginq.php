@@ -14,6 +14,7 @@
  * @package    Ginq
  */
 
+require_once dirname(__DIR__) . "/vendor/autoload.php";
 require_once __DIR__ . "/Ginq/autoload.php";
 
 class Ginq extends Ginq\Ginq { }

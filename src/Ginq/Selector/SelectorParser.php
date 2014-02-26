@@ -33,7 +33,8 @@ class SelectorParser
         }
 
         if (is_string($src)) {
-            return PathSelector::parse($src);
+            # return PathSelector::parse($src);
+            return new PropertySelector($src);
         }
 
         if (is_callable($src)) {
