@@ -23,6 +23,11 @@ class UnfoldIterator implements \Iterator
     /**
      * @var mixed
      */
+    protected $seed0;
+
+    /**
+     * @var mixed
+     */
     protected $seed;
 
     /**
@@ -51,7 +56,7 @@ class UnfoldIterator implements \Iterator
      */
     public function __construct($seed, $generator)
     {
-        $this->seed = $seed;
+        $this->seed0 = $seed;
         $this->gen  = $generator;
     }
 
@@ -79,6 +84,7 @@ class UnfoldIterator implements \Iterator
     public function rewind()
     {
         $this->i = 0;
+        $this->seed = $this->seed0;
         $this->fetch();
     }
 

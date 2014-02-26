@@ -691,6 +691,10 @@ class GinqTest extends PHPUnit_Framework_TestCase
         )->toList();
         $this->assertEquals(array(1,2,3,4,5), $actual);
         $this->assertEquals(6, $called);
+
+        $ns = Ginq::unfold(1, function($x) { return array($x, $x + 1); });
+        $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
+        $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
     }
 
     /**
