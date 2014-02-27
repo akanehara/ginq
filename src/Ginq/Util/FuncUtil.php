@@ -75,15 +75,16 @@ class FuncUtil
     {
         $names = array_map('trim', explode(',', key($fun)));
         $expr = array_shift($fun);
+        $env = $fun;
         $lang = static::getExpressionLanguage();
-        $lang->parse($expr, $names);
-        return function() use ($lang, $names, $expr) {
+        $lang->parse($expr, array_merge($names, array_keys($env)));
+        return function() use ($lang, $names, $expr, $env) {
             $args = func_get_args();
             $params = array(); $i = 0;
             foreach ($names as $name) {
                 $params[$name] = @$args[$i++];
             }
-            return $lang->evaluate($expr, $params);
+            return $lang->evaluate($expr, array_merge($params, $env));
         };
     }
 
