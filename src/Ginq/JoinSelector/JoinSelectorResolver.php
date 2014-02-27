@@ -14,47 +14,39 @@
  * @package    Ginq
  */
 
-namespace Ginq\Selector;
+namespace Ginq\JoinSelector;
 
-use Ginq\Core\Selector;
+use Ginq\Core\JoinSelector;
 use Ginq\Util\FuncUtil;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\Finder\Expression\Expression;
 
-class SelectorParser
+class JoinSelectorResolver
 {
     /**
-     * @param \Closure|string|int|Selector $src
-     * @param Selector $default
+     * @param \Closure|JoinSelector|int $src
+     * @param $default
      * @throws \InvalidArgumentException
-     * @return Selector
+     * @return JoinSelector
      */
-    static public function parse($src, $default)
+    public static function resolve($src, $default)
     {
         if (is_null($src)) {
             return $default;
         }
 
-        if (is_string($src)) {
-            # return PathSelector::parse($src);
-            return new PropertySelector($src);
+        if ($src instanceof \Closure) {
+            return new DelegateJoinSelector($src);
         }
 
         if (is_array($src)) {
-            return new DelegateSelector(FuncUtil::fun($src));
+            return new DelegateJoinSelector(FuncUtil::fun($src));
         }
 
-        if (is_callable($src)) {
-            return new DelegateSelector($src);
-        }
-
-        if ($src instanceof Selector) {
+        if ($src instanceof JoinSelector) {
             return $src;
         }
 
         $type = gettype($src);
         throw new \InvalidArgumentException(
-            "'selector' Closure or string or expected, got $type");
+            "'join selector' Closure expected, got $type");
     }
 }
-

@@ -14,22 +14,32 @@
  * @package    Ginq
  */
 
-namespace Ginq\Predicate;
+namespace Ginq\Comparer;
 
-use Ginq\Util\FuncUtil;
+use Ginq\Core\Comparer;
 
-class PredicateParser
+class ComparerResolver
 {
-    public static function parse($src)
+    /**
+     * @param \Closure|Comparer $src
+     * @param Comparer $default
+     * @throws \InvalidArgumentException
+     * @return \Ginq\Core\Comparer
+     */
+    static public function resolve($src, $default)
     {
-        if ($src instanceof \Closure) {
-            return new DelegatePredicate($src);
+        if (is_null($src)) {
+            return $default;
         }
-        if (is_array($src)) {
-            return new DelegatePredicate(FuncUtil::fun($src));
+        if ($src instanceof \Closure) {
+            return new DelegateComparer($src);
+        }
+        if ($src instanceof Comparer) {
+            return $src;
         }
         $type = gettype($src);
         throw new \InvalidArgumentException(
-            "'predicate' callable expected, got $type");
+            "'comparer' Closure expected, got $type");
     }
 }
+

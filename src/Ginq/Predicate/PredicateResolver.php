@@ -14,13 +14,22 @@
  * @package    Ginq
  */
 
-namespace Ginq\Accessor;
+namespace Ginq\Predicate;
 
-interface Accessor {
-    /**
-     * @param mixed $x
-     * @throws \RuntimeException
-     * @return mixed
-     */
-    public function get($x);
+use Ginq\Util\FuncUtil;
+
+class PredicateResolver
+{
+    public static function resolve($src)
+    {
+        if ($src instanceof \Closure) {
+            return new DelegatePredicate($src);
+        }
+        if (is_array($src)) {
+            return new DelegatePredicate(FuncUtil::fun($src));
+        }
+        $type = gettype($src);
+        throw new \InvalidArgumentException(
+            "'predicate' callable expected, got $type");
+    }
 }

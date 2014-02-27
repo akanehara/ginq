@@ -1938,6 +1938,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
             $this->assertTrue(true);
         }
     }
+
+    public function testFun()
+    {
+        $f = Ginq::fun(array('x,y'=>'x+y+z', 'z'=>4));
+        $this->assertEquals(9, $f(2,3));
+    }
  }
 
 class Movie

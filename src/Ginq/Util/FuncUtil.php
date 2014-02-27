@@ -17,8 +17,7 @@
 namespace Ginq\Util;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
-use Symfony\Component\Finder\Expression\Expression;
+
 
 class FuncUtil
 {
@@ -68,14 +67,14 @@ class FuncUtil
     }
 
     /**
-     * @param $fun
+     * @param array $lambda ex) ['x, y' => 'x + y', 'z' => $z]
      * @return callable
      */
-    static public function fun($fun)
+    static public function fun($lambda)
     {
-        $names = array_map('trim', explode(',', key($fun)));
-        $expr = array_shift($fun);
-        $env = $fun;
+        $names = array_map('trim', explode(',', key($lambda)));
+        $expr = array_shift($lambda);
+        $env = $lambda;
         $lang = static::getExpressionLanguage();
         $lang->parse($expr, array_merge($names, array_keys($env)));
         return function() use ($lang, $names, $expr, $env) {

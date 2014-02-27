@@ -17,7 +17,7 @@ namespace Ginq\Iterator;
 
 use Ginq\Core\Set;
 use Ginq\Core\EqualityComparer;
-use Ginq\Selector\KeySelector;
+
 use Ginq\Util\IteratorUtil;
 
 /**

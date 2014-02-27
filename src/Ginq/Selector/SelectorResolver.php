@@ -14,39 +14,44 @@
  * @package    Ginq
  */
 
-namespace Ginq\JoinSelector;
+namespace Ginq\Selector;
 
-use Ginq\Core\JoinSelector;
+use Ginq\Core\Selector;
 use Ginq\Util\FuncUtil;
 
-class JoinSelectorParser
+class SelectorResolver
 {
     /**
-     * @param \Closure|JoinSelector|int $src
-     * @param $default
+     * @param \Closure|string|int|Selector $src
+     * @param Selector $default
      * @throws \InvalidArgumentException
-     * @return JoinSelector
+     * @return Selector
      */
-    public static function parse($src, $default)
+    static public function resolve($src, $default)
     {
         if (is_null($src)) {
             return $default;
         }
 
-        if ($src instanceof \Closure) {
-            return new DelegateJoinSelector($src);
+        if (is_string($src)) {
+            return new PropertySelector($src);
         }
 
         if (is_array($src)) {
-            return new DelegateJoinSelector(FuncUtil::fun($src));
+            return new DelegateSelector(FuncUtil::fun($src));
         }
 
-        if ($src instanceof JoinSelector) {
+        if (is_callable($src)) {
+            return new DelegateSelector($src);
+        }
+
+        if ($src instanceof Selector) {
             return $src;
         }
 
         $type = gettype($src);
         throw new \InvalidArgumentException(
-            "'join selector' Closure expected, got $type");
+            "'selector' Closure or string or expected, got $type");
     }
 }
+
