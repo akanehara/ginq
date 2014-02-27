@@ -1,5 +1,6 @@
 <?php
 use Ginq\OrderingGinq;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
@@ -989,6 +990,17 @@ class GinqTest extends PHPUnit_Framework_TestCase
             ->toArray();
         $this->assertEquals(array(0=>1,1=>2,4=>3,9=>4,16=>5), $xs);
 
+        /*
+         * expression-language
+         * see http://symfony.com/doc/current/components/expression_language/syntax.html
+         */
+
+        $xs = Ginq::range(1)->select(array('v'=>'v * v'))->take(5)->toList();
+        $this->assertEquals(array(1,4,9,16,25), $xs);
+
+        $xs = Ginq::range(1)->select(array('v, k'=>'v * v'))->take(5)->toList();
+        $this->assertEquals(array(1,4,9,16,25), $xs);
+
         // invalid selector
         try {
             Ginq::from(array(array(1)))->select("//s?")->toList();
@@ -1882,6 +1894,47 @@ class GinqTest extends PHPUnit_Framework_TestCase
             Ginq::range(1, 10)->bufferWithPadding(0, 0);
             $this->fail();
         } catch (InvalidArgumentException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
+    public function testExpression()
+    {
+        // predicate
+        $this->assertTrue(
+            Ginq::range(1,5)->any(array('x'=>'x == 3'))
+        );
+
+        // selector
+        $this->assertFalse(
+            Ginq::range(1,5)->any(array('x'=>'5 < x'))
+        );
+        $this->assertEquals(
+            array(5,5,5),
+            Ginq::range(1,3)->map(array(''=>'5'))->toList()
+        );
+
+        // join selector
+        $actual = Ginq::range(1,3)->selectMany(
+            array('x'=>'[x*10, x*100]'),
+            array('x, y'=>'[x, y]')
+        )->toListRec();
+        $expected = array(
+            array(1,10),
+            array(1,100),
+            array(2,20),
+            array(2,200),
+            array(3,30),
+            array(3,300),
+        );
+        $this->assertEquals($expected, $actual);
+
+
+        // syntax error
+        try {
+            Ginq::range(1,3)->map(array(''=>'foo[/'));
+            $this->fail();
+        } catch (SyntaxError $e) {
             $this->assertTrue(true);
         }
     }

@@ -17,6 +17,7 @@
 namespace Ginq\JoinSelector;
 
 use Ginq\Core\JoinSelector;
+use Ginq\Util\FuncUtil;
 
 class JoinSelectorParser
 {
@@ -34,6 +35,10 @@ class JoinSelectorParser
 
         if ($src instanceof \Closure) {
             return new DelegateJoinSelector($src);
+        }
+
+        if (is_array($src)) {
+            return new DelegateJoinSelector(FuncUtil::fun($src));
         }
 
         if ($src instanceof JoinSelector) {

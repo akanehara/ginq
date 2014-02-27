@@ -16,6 +16,10 @@
 
 namespace Ginq\Util;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
+use Symfony\Component\Finder\Expression\Expression;
+
 class FuncUtil
 {
     /**
@@ -55,11 +59,48 @@ class FuncUtil
     }
 
     /**
-     *
+     * @param mixed|\Closure $x
+     * @return mixed
      */
     static public function force($x)
     {
         return ($x instanceof \Closure) ? $x() : $x;
+    }
+
+    /**
+     * @param $fun
+     * @return callable
+     */
+    static public function fun($fun)
+    {
+        $names = array_map('trim', explode(',', key($fun)));
+        $expr = array_shift($fun);
+        $lang = static::getExpressionLanguage();
+        $lang->parse($expr, $names);
+        return function() use ($lang, $names, $expr) {
+            $args = func_get_args();
+            $params = array(); $i = 0;
+            foreach ($names as $name) {
+                $params[$name] = @$args[$i++];
+            }
+            return $lang->evaluate($expr, $params);
+        };
+    }
+
+    /**
+     * @var ExpressionLanguage
+     */
+    static private $exprLang;
+
+    /**
+     * @return ExpressionLanguage
+     */
+    static private function getExpressionLanguage()
+    {
+        if (is_null(static::$exprLang)) {
+            static::$exprLang = new ExpressionLanguage();
+        }
+        return static::$exprLang;
     }
 }
 

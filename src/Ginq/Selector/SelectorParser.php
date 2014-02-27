@@ -17,6 +17,9 @@
 namespace Ginq\Selector;
 
 use Ginq\Core\Selector;
+use Ginq\Util\FuncUtil;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Finder\Expression\Expression;
 
 class SelectorParser
 {
@@ -35,6 +38,10 @@ class SelectorParser
         if (is_string($src)) {
             # return PathSelector::parse($src);
             return new PropertySelector($src);
+        }
+
+        if (is_array($src)) {
+            return new DelegateSelector(FuncUtil::fun($src));
         }
 
         if (is_callable($src)) {
