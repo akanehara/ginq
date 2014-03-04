@@ -1,6 +1,6 @@
 <?php
+use Ginq\Lambda\SyntaxError;
 use Ginq\OrderingGinq;
-use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
@@ -1929,7 +1929,6 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
         $this->assertEquals($expected, $actual);
 
-
         // syntax error
         try {
             Ginq::range(1,3)->map(array(''=>'foo[/'));
@@ -1943,6 +1942,62 @@ class GinqTest extends PHPUnit_Framework_TestCase
     {
         $f = Ginq::fun(array('x,y'=>'x+y+z', 'z'=>4));
         $this->assertEquals(9, $f(2,3));
+
+        $f = Ginq::fun(array('x, x'=>'x'));
+        $this->assertEquals(4, $f(5,4));
+
+        $f = Ginq::fun(array('x, x'=>'x', 'x'=>3));
+        $this->assertEquals(3, $f(5,4));
+
+        $f = Ginq::fun(array(''=>'z', 'z'=>4));
+        $this->assertEquals(4, $f());
+
+        try {
+            Ginq::fun("");
+            $this->fail();
+        } catch (InvalidArgumentException $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::fun(array());
+            $this->fail();
+        } catch (InvalidArgumentException $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::fun(array(',x,y'=>'x+y'));
+            $this->fail();
+        } catch (SyntaxError $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::fun(array(',x,y'=>'x+y'));
+            $this->fail();
+        } catch (SyntaxError $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::fun(array('x,y,'=>'x+y'));
+            $this->fail();
+        } catch (SyntaxError $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::fun(array('x,y'=>'x+y+z', 'a'=>4));
+            $this->fail();
+        } catch (SyntaxError $e) {
+            $prev = $e->getPrevious();
+            if ($prev instanceof \Symfony\Component\ExpressionLanguage\SyntaxError) {
+                $this->assertTrue(true);
+            } else {
+                $this->fail();
+            }
+        }
     }
  }
 

@@ -66,41 +66,5 @@ class FuncUtil
         return ($x instanceof \Closure) ? $x() : $x;
     }
 
-    /**
-     * @param array $lambda ex) ['x, y' => 'x + y', 'z' => $z]
-     * @return callable
-     */
-    static public function fun($lambda)
-    {
-        $names = array_map('trim', explode(',', key($lambda)));
-        $expr = array_shift($lambda);
-        $env = $lambda;
-        $lang = static::getExpressionLanguage();
-        $lang->parse($expr, array_merge($names, array_keys($env)));
-        return function() use ($lang, $names, $expr, $env) {
-            $args = func_get_args();
-            $params = array(); $i = 0;
-            foreach ($names as $name) {
-                $params[$name] = @$args[$i++];
-            }
-            return $lang->evaluate($expr, array_merge($params, $env));
-        };
-    }
-
-    /**
-     * @var ExpressionLanguage
-     */
-    static private $exprLang;
-
-    /**
-     * @return ExpressionLanguage
-     */
-    static private function getExpressionLanguage()
-    {
-        if (is_null(static::$exprLang)) {
-            static::$exprLang = new ExpressionLanguage();
-        }
-        return static::$exprLang;
-    }
 }
 

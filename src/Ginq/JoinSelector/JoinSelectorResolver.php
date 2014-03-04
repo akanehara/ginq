@@ -17,6 +17,7 @@
 namespace Ginq\JoinSelector;
 
 use Ginq\Core\JoinSelector;
+use Ginq\Lambda\Lambda;
 use Ginq\Util\FuncUtil;
 
 class JoinSelectorResolver
@@ -38,7 +39,7 @@ class JoinSelectorResolver
         }
 
         if (is_array($src)) {
-            return new DelegateJoinSelector(FuncUtil::fun($src));
+            return new DelegateJoinSelector(Lambda::fun($src));
         }
 
         if ($src instanceof JoinSelector) {

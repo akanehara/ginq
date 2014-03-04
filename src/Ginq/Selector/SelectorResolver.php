@@ -17,6 +17,7 @@
 namespace Ginq\Selector;
 
 use Ginq\Core\Selector;
+use Ginq\Lambda\Lambda;
 use Ginq\Util\FuncUtil;
 
 class SelectorResolver
@@ -38,7 +39,7 @@ class SelectorResolver
         }
 
         if (is_array($src)) {
-            return new DelegateSelector(FuncUtil::fun($src));
+            return new DelegateSelector(Lambda::fun($src));
         }
 
         if (is_callable($src)) {

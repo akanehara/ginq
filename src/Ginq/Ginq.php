@@ -24,6 +24,7 @@ use Ginq\Core\EqualityComparer;
 use Ginq\EqualityComparer\EqualityComparerResolver;
 use Ginq\JoinSelector\KeyJoinSelector;
 use Ginq\JoinSelector\ValueJoinSelector;
+use Ginq\Lambda\Lambda;
 use Ginq\Selector\KeySelector;
 use Ginq\Selector\SelectorResolver;
 use Ginq\JoinSelector\JoinSelectorResolver;
@@ -79,7 +80,7 @@ class Ginq implements \IteratorAggregate
      */
     public static function fun($lambda)
     {
-        return FuncUtil::fun($lambda);
+        return Lambda::fun($lambda);
     }
 
     /**
