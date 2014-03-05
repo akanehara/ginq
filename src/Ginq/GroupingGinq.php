@@ -16,8 +16,6 @@
 
 namespace Ginq;
 
-use Ginq\Core\Comparer;
-use Ginq\Util\IteratorUtil;
 
 class GroupingGinq extends Ginq
 {

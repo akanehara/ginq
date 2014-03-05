@@ -16,12 +16,18 @@
 
 namespace Ginq\Predicate;
 
-class PredicateParser
+use Ginq\Lambda\Lambda;
+use Ginq\Util\FuncUtil;
+
+class PredicateResolver
 {
-    public static function parse($src)
+    public static function resolve($src)
     {
         if ($src instanceof \Closure) {
             return new DelegatePredicate($src);
+        }
+        if (is_array($src)) {
+            return new DelegatePredicate(Lambda::fun($src));
         }
         $type = gettype($src);
         throw new \InvalidArgumentException(

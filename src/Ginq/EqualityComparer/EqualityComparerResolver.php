@@ -11,7 +11,7 @@ namespace Ginq\EqualityComparer;
 
 use Ginq\Core\EqualityComparer;
 
-class EqualityComparerParser
+class EqualityComparerResolver
 {
     /**
      * @param \Closure|EqualityComparer $src
@@ -19,7 +19,7 @@ class EqualityComparerParser
      * @throws \InvalidArgumentException
      * @return \Ginq\Core\EqualityComparer
      */
-    static public function parse($src, $default)
+    static public function resolve($src, $default)
     {
         if (is_null($src)) {
             return $default;

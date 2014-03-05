@@ -16,6 +16,9 @@
 
 namespace Ginq\Util;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+
+
 class FuncUtil
 {
     /**
@@ -55,11 +58,13 @@ class FuncUtil
     }
 
     /**
-     *
+     * @param mixed|\Closure $x
+     * @return mixed
      */
     static public function force($x)
     {
         return ($x instanceof \Closure) ? $x() : $x;
     }
+
 }
 

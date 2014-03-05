@@ -16,7 +16,7 @@
 
 namespace Ginq\Iterator;
 
-use Ginq\Util\FuncUtil;
+
 
 class UnfoldIterator implements \Iterator
 {

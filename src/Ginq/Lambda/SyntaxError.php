@@ -14,13 +14,21 @@
  * @package    Ginq
  */
 
-namespace Ginq\Accessor;
+namespace Ginq\Lambda;
 
-interface Accessor {
+/**
+ * Class SyntaxError
+ * @package Ginq\Lambda
+ */
+class SyntaxError extends \LogicException
+{
     /**
-     * @param mixed $x
-     * @throws \RuntimeException
-     * @return mixed
+     * @param string $message
+     * @param \Exception $prev
      */
-    public function get($x);
+    public function __construct($message, $prev = null)
+    {
+        parent::__construct($message, 0, $prev);
+    }
 }
+

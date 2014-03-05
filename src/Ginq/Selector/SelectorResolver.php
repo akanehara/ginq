@@ -14,32 +14,45 @@
  * @package    Ginq
  */
 
-namespace Ginq\Comparer;
+namespace Ginq\Selector;
 
-use Ginq\Core\Comparer;
+use Ginq\Core\Selector;
+use Ginq\Lambda\Lambda;
+use Ginq\Util\FuncUtil;
 
-class ComparerParser
+class SelectorResolver
 {
     /**
-     * @param \Closure|Comparer $src
-     * @param Comparer $default
+     * @param \Closure|string|int|Selector $src
+     * @param Selector $default
      * @throws \InvalidArgumentException
-     * @return \Ginq\Core\Comparer
+     * @return Selector
      */
-    static public function parse($src, $default)
+    static public function resolve($src, $default)
     {
         if (is_null($src)) {
             return $default;
         }
-        if ($src instanceof \Closure) {
-            return new DelegateComparer($src);
+
+        if (is_string($src)) {
+            return new PropertySelector($src);
         }
-        if ($src instanceof Comparer) {
+
+        if (is_array($src)) {
+            return new DelegateSelector(Lambda::fun($src));
+        }
+
+        if (is_callable($src)) {
+            return new DelegateSelector($src);
+        }
+
+        if ($src instanceof Selector) {
             return $src;
         }
+
         $type = gettype($src);
         throw new \InvalidArgumentException(
-            "'comparer' Closure expected, got $type");
+            "'selector' Closure or string or expected, got $type");
     }
 }
 
