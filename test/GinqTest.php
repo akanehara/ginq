@@ -1,6 +1,7 @@
 <?php
 use Ginq\Lambda\SyntaxError;
 use Ginq\OrderingGinq;
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
@@ -1005,20 +1006,6 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $xs = Ginq::range(1)->select(array('v, k'=>'v * v'))->take(5)->toList();
         $this->assertEquals(array(1,4,9,16,25), $xs);
 
-        // invalid selector
-        try {
-            Ginq::from(array(array(1)))->select("//s?")->toList();
-            $this->fail();
-        } catch (NoSuchPropertyException $e) {
-            $this->assertTrue(true);
-        }
-
-        try {
-            Ginq::from(array(1))->select("[0]")->toList();
-            $this->fail();
-        } catch (UnexpectedTypeException $e) {
-            $this->assertTrue(true);
-        }
     }
 
     /**
@@ -1902,6 +1889,29 @@ class GinqTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * testProperty().
+     */
+    public function testProperty()
+    {
+        try {
+            Ginq::range(1,5)->select('.broken[path');
+            $this->fail();
+        } catch (InvalidPropertyPathException $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::range(1,5)->select('[foo]')->toList();
+            $this->fail();
+        } catch (UnexpectedTypeException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
+    /**
+     * testExpression().
+     */
     public function testExpression()
     {
         // predicate
@@ -1935,7 +1945,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         // syntax error
         try {
-            Ginq::range(1,3)->map(array(''=>'foo[/'));
+            Ginq::range(1,3)->map(array(''=>'bro[ken/'));
             $this->fail();
         } catch (SyntaxError $e) {
             $this->assertTrue(true);
