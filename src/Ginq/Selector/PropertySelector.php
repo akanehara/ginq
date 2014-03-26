@@ -47,7 +47,6 @@ class PropertySelector implements Selector
 
     /**
      * @param string $path
-     * @internal param array $names
      */
     public function __construct($path)
     {
