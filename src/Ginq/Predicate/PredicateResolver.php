@@ -17,20 +17,22 @@
 namespace Ginq\Predicate;
 
 use Ginq\Lambda\Lambda;
-use Ginq\Util\FuncUtil;
 
 class PredicateResolver
 {
     public static function resolve($src)
     {
-        if ($src instanceof \Closure) {
+        if (is_callable($src)) {
             return new DelegatePredicate($src);
+        }
+        if (is_string($src)) {
+            return new PropertyPredicate($src);
         }
         if (is_array($src)) {
             return new DelegatePredicate(Lambda::fun($src));
         }
         $type = gettype($src);
         throw new \InvalidArgumentException(
-            "'predicate' callable expected, got $type");
+            "Invalid predicate, got $type");
     }
 }

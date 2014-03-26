@@ -33,21 +33,17 @@ class JoinSelectorResolver
         if (is_null($src)) {
             return $default;
         }
-
-        if ($src instanceof \Closure) {
+        if (is_callable($src)) {
             return new DelegateJoinSelector($src);
         }
-
         if (is_array($src)) {
             return new DelegateJoinSelector(Lambda::fun($src));
         }
-
         if ($src instanceof JoinSelector) {
             return $src;
         }
-
         $type = gettype($src);
         throw new \InvalidArgumentException(
-            "'join selector' Closure expected, got $type");
+            "Invalid selector, got $type");
     }
 }

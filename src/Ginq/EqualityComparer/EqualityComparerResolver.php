@@ -9,12 +9,13 @@
 
 namespace Ginq\EqualityComparer;
 
+use Ginq\Comparer\DelegateComparer;
 use Ginq\Core\EqualityComparer;
 
 class EqualityComparerResolver
 {
     /**
-     * @param \Closure|EqualityComparer $src
+     * @param callable|EqualityComparer $src
      * @param EqualityComparer $default
      * @throws \InvalidArgumentException
      * @return \Ginq\Core\EqualityComparer
@@ -24,11 +25,14 @@ class EqualityComparerResolver
         if (is_null($src)) {
             return $default;
         }
+        if (is_callable($src)) {
+            return new DelegateComparer($src);
+        }
         if ($src instanceof EqualityComparer) {
             return $src;
         }
         $type = gettype($src);
         throw new \InvalidArgumentException(
-            "'equality comparer' EqualityComparer expected, got $type");
+            "Invalid equality comparer, got $type");
     }
 }
