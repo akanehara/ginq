@@ -1212,7 +1212,7 @@ class Ginq implements \IteratorAggregate
     public function __call($name, $args)
     {
         if (isset(self::$registeredFunctions[$name])) {
-            call_user_func_array(
+            return call_user_func_array(
                 self::$registeredFunctions[$name],
                 array_merge(array($this), $args)
             );
