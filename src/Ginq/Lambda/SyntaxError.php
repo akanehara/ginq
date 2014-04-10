@@ -14,17 +14,21 @@
  * @package    Ginq
  */
 
-namespace Ginq\Predicate;
+namespace Ginq\Lambda;
 
-class PredicateParser
+/**
+ * Class SyntaxError
+ * @package Ginq\Lambda
+ */
+class SyntaxError extends \LogicException
 {
-    public static function parse($src)
+    /**
+     * @param string $message
+     * @param \Exception $prev
+     */
+    public function __construct($message, $prev = null)
     {
-        if ($src instanceof \Closure) {
-            return new DelegatePredicate($src);
-        }
-        $type = gettype($src);
-        throw new \InvalidArgumentException(
-            "'predicate' callable expected, got $type");
+        parent::__construct($message, 0, $prev);
     }
 }
+

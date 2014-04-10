@@ -1,5 +1,9 @@
 <?php
+use Ginq\Lambda\SyntaxError;
 use Ginq\OrderingGinq;
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
 
@@ -991,13 +995,17 @@ class GinqTest extends PHPUnit_Framework_TestCase
             ->toArray();
         $this->assertEquals(array(0=>1,1=>2,4=>3,9=>4,16=>5), $xs);
 
-        // invalid selector
-        try {
-            Ginq::from(array(1,2,3,4,5))->select("//s?");
-            $this->fail();
-        } catch (InvalidArgumentException $e) {
-            $this->assertTrue(true);
-        }
+        /*
+         * expression-language
+         * see http://symfony.com/doc/current/components/expression_language/syntax.html
+         */
+
+        $xs = Ginq::range(1)->select(array('v'=>'v * v'))->take(5)->toList();
+        $this->assertEquals(array(1,4,9,16,25), $xs);
+
+        $xs = Ginq::range(1)->select(array('v, k'=>'v * v'))->take(5)->toList();
+        $this->assertEquals(array(1,4,9,16,25), $xs);
+
     }
 
     /**
@@ -1878,6 +1886,131 @@ class GinqTest extends PHPUnit_Framework_TestCase
             $this->fail();
         } catch (InvalidArgumentException $e) {
             $this->assertTrue(true);
+        }
+    }
+
+    /**
+     * testProperty().
+     */
+    public function testProperty()
+    {
+        try {
+            Ginq::range(1,5)->select('.broken[path');
+            $this->fail();
+        } catch (InvalidPropertyPathException $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::range(1,5)->select('[foo]')->toList();
+            $this->fail();
+        } catch (UnexpectedTypeException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
+    /**
+     * testExpression().
+     */
+    public function testExpression()
+    {
+        // predicate
+        $this->assertTrue(
+            Ginq::range(1,5)->any(array('x'=>'x == 3'))
+        );
+
+        // selector
+        $this->assertFalse(
+            Ginq::range(1,5)->any(array('x'=>'5 < x'))
+        );
+        $this->assertEquals(
+            array(5,5,5),
+            Ginq::range(1,3)->map(array(''=>'5'))->toList()
+        );
+
+        // join selector
+        $actual = Ginq::range(1,3)->selectMany(
+            array('x'=>'[x*10, x*100]'),
+            array('x, y'=>'[x, y]')
+        )->toListRec();
+        $expected = array(
+            array(1,10),
+            array(1,100),
+            array(2,20),
+            array(2,200),
+            array(3,30),
+            array(3,300),
+        );
+        $this->assertEquals($expected, $actual);
+
+        // syntax error
+        try {
+            Ginq::range(1,3)->map(array(''=>'bro[ken/'));
+            $this->fail();
+        } catch (SyntaxError $e) {
+            $this->assertTrue(true);
+        }
+    }
+
+    public function testFun()
+    {
+        $f = Ginq::fun(array('x,y'=>'x+y+z', 'z'=>4));
+        $this->assertEquals(9, $f(2,3));
+
+        $f = Ginq::fun(array('x, x'=>'x'));
+        $this->assertEquals(4, $f(5,4));
+
+        $f = Ginq::fun(array('x, x'=>'x', 'x'=>3));
+        $this->assertEquals(3, $f(5,4));
+
+        $f = Ginq::fun(array(''=>'z', 'z'=>4));
+        $this->assertEquals(4, $f());
+
+        try {
+            Ginq::fun("");
+            $this->fail();
+        } catch (InvalidArgumentException $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::fun(array());
+            $this->fail();
+        } catch (InvalidArgumentException $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::fun(array(',x,y'=>'x+y'));
+            $this->fail();
+        } catch (SyntaxError $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::fun(array(',x,y'=>'x+y'));
+            $this->fail();
+        } catch (SyntaxError $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::fun(array('x,y,'=>'x+y'));
+            $this->fail();
+        } catch (SyntaxError $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            Ginq::fun(array('x,y'=>'x+y+z', 'a'=>4));
+            $this->fail();
+        } catch (SyntaxError $e) {
+            $prev = $e->getPrevious();
+            if ($prev instanceof \Symfony\Component\ExpressionLanguage\SyntaxError) {
+                $this->assertTrue(true);
+            } else {
+                $this->fail();
+            }
         }
     }
  }

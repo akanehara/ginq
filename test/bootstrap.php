@@ -14,13 +14,8 @@
  * @package    Ginq
  */
 
-namespace Ginq\Accessor;
-
-interface Accessor {
-    /**
-     * @param mixed $x
-     * @throws \RuntimeException
-     * @return mixed
-     */
-    public function get($x);
+if (!is_file(dirname(__DIR__).'/vendor/autoload.php')) {
+    throw new RuntimeException('Install dependencies to run test suite.');
 }
+
+$loader = require dirname(__DIR__).'/vendor/autoload.php';

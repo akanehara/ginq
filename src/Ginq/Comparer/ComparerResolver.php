@@ -14,34 +14,32 @@
  * @package    Ginq
  */
 
-namespace Ginq\JoinSelector;
+namespace Ginq\Comparer;
 
-use Ginq\Core\JoinSelector;
+use Ginq\Core\Comparer;
 
-class JoinSelectorParser
+class ComparerResolver
 {
     /**
-     * @param \Closure|JoinSelector|int $src
-     * @param $default
+     * @param \Closure|Comparer $src
+     * @param Comparer $default
      * @throws \InvalidArgumentException
-     * @return JoinSelector
+     * @return \Ginq\Core\Comparer
      */
-    public static function parse($src, $default)
+    static public function resolve($src, $default)
     {
         if (is_null($src)) {
             return $default;
         }
-
-        if ($src instanceof \Closure) {
-            return new DelegateJoinSelector($src);
+        if (is_callable($src)) {
+            return new DelegateComparer($src);
         }
-
-        if ($src instanceof JoinSelector) {
+        if ($src instanceof Comparer) {
             return $src;
         }
-
         $type = gettype($src);
         throw new \InvalidArgumentException(
-            "'join selector' Closure expected, got $type");
+            "'comparer' Closure expected, got $type");
     }
 }
+

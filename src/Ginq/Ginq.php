@@ -17,23 +17,24 @@
 namespace Ginq;
 
 use Ginq\Core\Selector;
-use Ginq\Comparer\ComparerParser;
+use Ginq\Comparer\ComparerResolver;
 use Ginq\Core\JoinSelector;
 use Ginq\Core\Comparer;
 use Ginq\Core\EqualityComparer;
-use Ginq\EqualityComparer\EqualityComparerParser;
+use Ginq\EqualityComparer\EqualityComparerResolver;
 use Ginq\JoinSelector\KeyJoinSelector;
 use Ginq\JoinSelector\ValueJoinSelector;
+use Ginq\Lambda\Lambda;
 use Ginq\Selector\KeySelector;
-use Ginq\Selector\SelectorParser;
-use Ginq\JoinSelector\JoinSelectorParser;
-use Ginq\Predicate\PredicateParser;
+use Ginq\Selector\SelectorResolver;
+use Ginq\JoinSelector\JoinSelectorResolver;
+use Ginq\Predicate\PredicateResolver;
 use Ginq\Selector\ValueSelector;
 use Ginq\Util\FuncUtil;
 use Ginq\Util\IteratorUtil;
 use Ginq\Comparer\ReverseComparer;
 use Ginq\Comparer\ProjectionComparer;
-use Ginq\OrderingGinq;
+
 
 /**
  * GinqContext
@@ -60,11 +61,26 @@ class Ginq implements \IteratorAggregate
     /**
      * Constructor
      *
-     * @param array|\Iterator $it  Any traversable variable
+     * @param array|\Iterator $it  Any traversabl->tariable
      */
     protected function __construct($it)
     {
         $this->it = $it;
+    }
+
+    /**
+     * Short lambda expression
+     * ex:
+     *   ['x,y'=>'x+y+z', 'z'=>$z]
+     * it means
+     *   function ($x,$y) use ($z) {return $x+$y+$z;}
+     * @see http://symfony.com/doc/current/components/expression_language/syntax.html
+     * @param array $lambda
+     * @return callable
+     */
+    public static function fun($lambda)
+    {
+        return Lambda::fun($lambda);
     }
 
     /**
@@ -106,7 +122,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param callable|null  $combiner (existV, v, k) -> mixed
+     * @param callable|null $combiner (existV, v, k) -> v
      * @return array
      */
     public function toArray($combiner = null)
@@ -119,8 +135,8 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param int|null       $depth
-     * @param callable|null  $combiner (existV, v, k) -> mixed
+     * @param int|null      $depth
+     * @param callable|null $combiner (existV, v, k) -> v
      * @return array
      */
     public function toArrayRec($depth = null, $combiner = null)
@@ -133,17 +149,17 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|Selector $lookupKeySelector (v, k) -> mixed
-     * @param \Closure|string|Selector $elementSelector   (v, k) -> mixed
-     * @param EqualityComparer         $eqComparer
+     * @param callable|array|string       $lookupKeySelector (v, k) -> v
+     * @param callable|array|string|null  $elementSelector   (v, k) -> v
+     * @param callable|null               $eqComparer        (v1, v2, [k1, k2]) -> bool
      * @return LookupGinq
      */
     public function toLookup($lookupKeySelector, $elementSelector = null, $eqComparer = null)
     {
-        $lookupKeySelector = SelectorParser::parse($lookupKeySelector, ValueSelector::getInstance());
-        $elementSelector   = SelectorParser::parse($elementSelector, ValueSelector::getInstance());
+        $lookupKeySelector = SelectorResolver::resolve($lookupKeySelector, ValueSelector::getInstance());
+        $elementSelector   = SelectorResolver::resolve($elementSelector, ValueSelector::getInstance());
         $lookup = new LookupGinq(
-            EqualityComparerParser::parse($eqComparer, EqualityComparer::getDefault())
+            EqualityComparerResolver::resolve($eqComparer, EqualityComparer::getDefault())
         );
         $it = $this->getIterator();
         foreach ($it as $k => $v) {
@@ -164,7 +180,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param null|int $depth
+     * @param int|null $depth
      * @return array
      */
     public function toListRec($depth = null)
@@ -181,7 +197,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param null|int $depth
+     * @param int|null $depth
      * @return array
      */
     public function toAListRec($depth = null)
@@ -190,7 +206,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param null|string|callable $predicate (v, k) -> bool
+     * @param callable|array|string|null $predicate (v, k) -> bool
      * @return bool
      */
     public function any($predicate = null)
@@ -198,7 +214,7 @@ class Ginq implements \IteratorAggregate
         if (is_null($predicate)) {
             $predicate = function($v, $k) { return true; };
         }
-        $p = PredicateParser::parse($predicate);
+        $p = PredicateResolver::resolve($predicate);
         foreach ($this->getIterator() as $k => $v) {
             if ($p->predicate($v, $k) == true) {
                 return true;
@@ -208,12 +224,12 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param null|string|callable $predicate (v, k) -> bool
+     * @param callable|array|string  $predicate (v, k) -> bool
      * @return bool
      */
     public function all($predicate)
     {
-        $p = PredicateParser::parse($predicate);
+        $p = PredicateResolver::resolve($predicate);
         foreach ($this->getIterator() as $k => $v) {
             if ($p->predicate($v, $k) == false) {
                 return false;
@@ -223,7 +239,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|null $predicate (v, k) -> bool
+     * @param callable|string|array|null $predicate (v, k) -> bool
      * @return int
      */
     public function count($predicate = null)
@@ -231,7 +247,7 @@ class Ginq implements \IteratorAggregate
         if (is_null($predicate)) {
             return $this->foldLeft(0, function ($acc) { return $acc + 1; });
         } else {
-            $p = PredicateParser::parse($predicate);
+            $p = PredicateResolver::resolve($predicate);
             return $this->foldLeft(0,
                 function ($acc, $v, $k) use ($p) {
                     return ($p->predicate($v, $k)) ? ($acc + 1) : $acc;
@@ -241,12 +257,12 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|null $selector (v, k) -> int
+     * @param callable|array|string|null $selector (v, k) -> int
      * @return int
      */
     public function sum($selector = null)
     {
-        $s = SelectorParser::parse($selector, ValueSelector::getInstance());
+        $s = SelectorResolver::resolve($selector, ValueSelector::getInstance());
         return $this->foldLeft(0,
             function ($acc, $v, $k) use($s) {
                 return $acc + $s->select($v, $k);
@@ -255,7 +271,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|null $selector (v, k) -> number
+     * @param callable|array|string|null $selector (v, k) -> number
      * @throws \RuntimeException
      * @return float
      */
@@ -265,7 +281,7 @@ class Ginq implements \IteratorAggregate
         if (!$it->valid()) {
             throw new \RuntimeException("Sequence is empty");
         }
-        $selector = SelectorParser::parse($selector, ValueSelector::getInstance());
+        $selector = SelectorResolver::resolve($selector, ValueSelector::getInstance());
         $sum   = 0;
         $count = 0;
         foreach ($this as $k => $v) {
@@ -276,7 +292,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|null $selector (v, k) -> comparable
+     * @param callable|array|string|null $selector (v, k) -> v:comparable
      * @throws \RuntimeException
      * @return mixed
      */
@@ -287,7 +303,7 @@ class Ginq implements \IteratorAggregate
             throw new \RuntimeException("Sequence is empty");
         }
         $comparer = Comparer::getDefault();
-        $selector = SelectorParser::parse($selector, ValueSelector::getInstance());
+        $selector = SelectorResolver::resolve($selector, ValueSelector::getInstance());
         $min = $selector->select($it->current(), $it->key());
         $it->next();
         while ($it->valid()) {
@@ -299,7 +315,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|null $selector (v, k) -> comparable
+     * @param callable|array|string|null $selector (v, k) -> v:comparable
      * @throws \RuntimeException
      * @return mixed
      */
@@ -310,7 +326,7 @@ class Ginq implements \IteratorAggregate
             throw new \RuntimeException("Sequence is empty");
         }
         $comparer = Comparer::getDefault();
-        $selector = SelectorParser::parse($selector, ValueSelector::getInstance());
+        $selector = SelectorResolver::resolve($selector, ValueSelector::getInstance());
         $max = $selector->select($it->current(), $it->key());
         $it->next();
         while ($it->valid()) {
@@ -322,9 +338,9 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param callable|null $predicate (v, k) -> bool
-     * @return mixed
+     * @param callable|array|string|null $predicate (v, k) -> bool
      * @throws \RuntimeException
+     * @return mixed
      */
     public function first($predicate = null)
     {
@@ -337,8 +353,9 @@ class Ginq implements \IteratorAggregate
                 throw new \RuntimeException("Sequence is empty");
             }
         } else {
+            $p = PredicateResolver::resolve($predicate);
             foreach ($this->getIterator() as $k => $v) {
-                if ($predicate($v, $k)) {
+                if ($p->predicate($v, $k)) {
                     return $v;
                 }
             }
@@ -347,8 +364,8 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param mixed|\Closure $default
-     * @param callable|null  $predicate (v, k) -> bool
+     * @param mixed|callable $default
+     * @param callable|array|string|null  $predicate (v, k) -> bool
      * @return mixed
      */
     public function firstOrElse($default, $predicate = null)
@@ -362,8 +379,9 @@ class Ginq implements \IteratorAggregate
                 return FuncUtil::applyOrItself($default);
             }
         } else {
+            $p = PredicateResolver::resolve($predicate);
             foreach ($this->getIterator() as $k => $v) {
-                if ($predicate($v, $k)) {
+                if ($p->predicate($v, $k)) {
                     return $v;
                 }
             }
@@ -372,7 +390,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param mixed|\Closure $default
+     * @param mixed|callable $default
      * @return Ginq
      */
     public function elseIfZero($default)
@@ -382,7 +400,7 @@ class Ginq implements \IteratorAggregate
         if ($it->valid()) {
             return $this;
         } else {
-            if ($default instanceof \Closure) {
+            if (is_callable($default)) {
                 return self::from(self::$gen->lazyRepeat($default, 1));
             } else {
                 return self::from(self::$gen->repeat($default, 1));
@@ -391,7 +409,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param callable|null $predicate (v, k) -> bool
+     * @param callable|array|string|null $predicate (v, k) -> bool
      * @return mixed
      * @throws \RuntimeException
      */
@@ -412,8 +430,9 @@ class Ginq implements \IteratorAggregate
         } else {
             $last  = null;
             $found = false;
+            $p = PredicateResolver::resolve($predicate);
             foreach ($this->getIterator() as $k => $v) {
-                if ($predicate($v, $k)) {
+                if ($p->predicate($v, $k)) {
                     $last = $v;
                     $found = true;
                 }
@@ -427,8 +446,8 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param mixed|\Closure $default
-     * @param callable|null  $predicate (v, k) -> bool
+     * @param mixed|callable $default
+     * @param callable|array|string|null  $predicate (v, k) -> bool
      * @return mixed
      */
     public function lastOrElse($default, $predicate = null)
@@ -448,8 +467,9 @@ class Ginq implements \IteratorAggregate
         } else {
             $last  = null;
             $found = false;
+            $p = PredicateResolver::resolve($predicate);
             foreach ($this->getIterator() as $k => $v) {
-                if ($predicate($v, $k)) {
+                if ($p->predicate($v, $k)) {
                     $last = $v;
                     $found = true;
                 }
@@ -492,7 +512,7 @@ class Ginq implements \IteratorAggregate
 
     /**
      * @param mixed $accumulator
-     * @param callable $operator (acc, v, k) -> mixed
+     * @param callable $operator (acc, v, k) -> acc
      * @return mixed
      */
     public function aggregate($accumulator, $operator)
@@ -502,7 +522,7 @@ class Ginq implements \IteratorAggregate
 
     /**
      * @param mixed $accumulator
-     * @param callable $operator (acc, v, k) -> mixed
+     * @param callable $operator (acc, v, k) -> acc
      * @return mixed
      */
     public function foldLeft($accumulator, $operator)
@@ -516,7 +536,7 @@ class Ginq implements \IteratorAggregate
 
     /**
      * @param mixed $accumulator
-     * @param callable $operator (acc, v, k) -> mixed
+     * @param callable $operator (acc, v, k) -> acc
      * @return mixed
      */
     public function foldRight($accumulator, $operator)
@@ -529,7 +549,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure $operator (acc, v, k) -> mixed
+     * @param callable $operator (acc, v, k) -> acc
      * @return mixed
      * @throws \LengthException
      */
@@ -550,7 +570,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure $operator (acc, v, k) -> mixed
+     * @param \Closure $operator (acc, v, k) -> acc
      * @return mixed
      * @throws \LengthException
      */
@@ -581,7 +601,7 @@ class Ginq implements \IteratorAggregate
 
     /**
      * @param mixed    $seed
-     * @param \Closure $generator seed -> ([v, seed] | null)
+     * @param callable $generator seed -> ([v, seed] | null)
      * @return Ginq
      */
     public static function unfold($seed, $generator)
@@ -591,7 +611,7 @@ class Ginq implements \IteratorAggregate
 
     /**
      * @param mixed    $initial
-     * @param \Closure $generator v -> v
+     * @param callable $generator v -> v
      * @return Ginq
      */
     public static function iterate($initial, $generator)
@@ -661,7 +681,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure $sourceFactory
+     * @param callable $sourceFactory
      * @throws \InvalidArgumentException
      * @return Ginq
      */
@@ -672,6 +692,14 @@ class Ginq implements \IteratorAggregate
         } else {
             throw new \InvalidArgumentException('$sourceFactory is not callable');
         }
+    }
+
+    /**
+     * @return Ginq
+     */
+    public function resequence()
+    {
+        return self::renum();
     }
 
     /**
@@ -692,8 +720,8 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|int|Selector|null $valueSelector (v, k) -> mixed
-     * @param \Closure|string|int|Selector|null $keySelector   (v, k) -> mixed
+     * @param callable|array|string|null $valueSelector (v, k) -> v
+     * @param callable|array|string|null $keySelector   (v, k) -> k
      * @return Ginq
      */
     public function map($valueSelector = null, $keySelector = null)
@@ -702,16 +730,16 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|int|Selector|null $valueSelector (v, k) -> mixed
-     * @param \Closure|string|int|Selector|null $keySelector   (v, k) -> mixed
+     * @param callable|array|string|null $valueSelector (v, k) -> v
+     * @param callable|array|string|null $keySelector   (v, k) -> k
      * @return Ginq
      */
     public function select($valueSelector = null, $keySelector = null)
     {
         return self::from(self::$gen->select(
             $this->getIterator(),
-            SelectorParser::parse($valueSelector, ValueSelector::getInstance()),
-            SelectorParser::parse($keySelector, KeySelector::getInstance())
+            SelectorResolver::resolve($valueSelector, ValueSelector::getInstance()),
+            SelectorResolver::resolve($keySelector, KeySelector::getInstance())
         ));
     }
 
@@ -725,7 +753,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param string|callable $predicate (v, k) -> bool
+     * @param callable|array|string $predicate (v, k) -> bool
      * @return array    [satisfied:Ginq, notSatisfied:Ginq]
      */
     public function partition($predicate)
@@ -738,14 +766,14 @@ class Ginq implements \IteratorAggregate
 
 
     /**
-     * @param string|callable $predicate (v, k) -> bool
+     * @param callable|array|string $predicate (v, k) -> bool
      * @return Ginq
      */
     public function where($predicate)
     {
         return self::from(self::$gen->where(
             $this->getIterator(),
-            PredicateParser::parse($predicate)
+            PredicateResolver::resolve($predicate)
         ));
     }
 
@@ -776,25 +804,25 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param string|callable $predicate (v, k) -> bool
+     * @param callable|array|string $predicate (v, k) -> bool
      * @return Ginq
      */
     public function takeWhile($predicate)
     {
         return self::from(self::$gen->takeWhile(
             $this->getIterator(),
-            PredicateParser::parse($predicate)
+            PredicateResolver::resolve($predicate)
         ));
     }
 
     /**
-     * @param string|callable $predicate (v, k) -> bool
+     * @param callable|array|string $predicate (v, k) -> bool
      * @return Ginq
      */
     public function dropWhile($predicate)
     {
         return self::from(self::$gen->dropWhile(
-            $this->getIterator(), PredicateParser::parse($predicate)
+            $this->getIterator(), PredicateResolver::resolve($predicate)
         ));
     }
 
@@ -811,9 +839,9 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|Selector     $manySelector (v, k) -> array|Traversable
-     * @param \Closure|JoinSelector|null   $resultValueSelector (v0, v1, k0, k1) -> mixed
-     * @param \Closure|JoinSelector|null   $resultKeySelector (v0, v1, k0, k1) -> mixed
+     * @param callable|array|string        $manySelector (v, k) -> IteratorAggregate|Iterator|array
+     * @param callable|array|string|null   $resultValueSelector (v0, v1, k0, k1) -> v
+     * @param callable|array|string|null   $resultKeySelector   (v0, v1, k0, k1) -> k
      * @return Ginq
      */
     public function flatMap($manySelector, $resultValueSelector = null, $resultKeySelector = null)
@@ -822,9 +850,9 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure|string|Selector     $manySelector (v, k) -> array|Traversable
-     * @param \Closure|JoinSelector|null   $resultValueSelector (v0, v1, k0, k1) -> mixed
-     * @param \Closure|JoinSelector|null   $resultKeySelector (v0, v1, k0, k1) -> mixed
+     * @param callable|array|string        $manySelector (v, k) -> IteratorAggregate|Iterator|array
+     * @param callable|array|null   $resultValueSelector (v0, v1, k0, k1) -> v
+     * @param callable|array|null   $resultKeySelector   (v0, v1, k0, k1) -> k
      * @return Ginq
      */
     public function selectMany($manySelector, $resultValueSelector = null, $resultKeySelector = null)
@@ -832,23 +860,23 @@ class Ginq implements \IteratorAggregate
         if (is_null($resultValueSelector) && is_null($resultKeySelector)) {
             return self::from(self::$gen->selectMany(
                 $this->getIterator(),
-                SelectorParser::parse($manySelector, ValueSelector::getInstance())));
+                SelectorResolver::resolve($manySelector, ValueSelector::getInstance())));
         } else {
             return self::from(self::$gen->selectManyWithJoin(
                 $this->getIterator(),
-                SelectorParser::parse($manySelector, ValueSelector::getInstance()),
-                JoinSelectorParser::parse($resultValueSelector, ValueJoinSelector::getInstance()),
-                JoinSelectorParser::parse($resultKeySelector, KeyJoinSelector::getInstance())
+                SelectorResolver::resolve($manySelector, ValueSelector::getInstance()),
+                JoinSelectorResolver::resolve($resultValueSelector, ValueJoinSelector::getInstance()),
+                JoinSelectorResolver::resolve($resultKeySelector, KeyJoinSelector::getInstance())
             ));
         }
     }
 
     /**
      * @param array|\Iterator|\IteratorAggregate $inner
-     * @param \Closure|string|int|Selector   $outerCompareKeySelector (v, k) -> comparable
-     * @param \Closure|string|int|Selector   $innerCompareKeySelector (v, k) -> comparable
-     * @param \Closure|JoinSelector|int      $resultValueSelector (v0, v1, k0, k1) -> mixedd
-     * @param \Closure|JoinSelector|int|null $resultKeySelector (v0, v1, k0, k1) -> mixedd
+     * @param callable|array|string  $outerCompareKeySelector (v, k) -> comparable
+     * @param callable|array|string  $innerCompareKeySelector (v, k) -> comparable
+     * @param callable|array         $resultValueSelector (v0, v1, k0, k1) -> v
+     * @param callable|array|null    $resultKeySelector   (v0, v1, k0, k1) -> k
      * @return Ginq
      */
     public function join($inner,
@@ -858,18 +886,18 @@ class Ginq implements \IteratorAggregate
         return self::from(self::$gen->join(
             $this->getIterator(),
             IteratorUtil::iterator($inner),
-            SelectorParser::parse($outerCompareKeySelector, ValueSelector::getInstance()),
-            SelectorParser::parse($innerCompareKeySelector, ValueSelector::getInstance()),
-            JoinSelectorParser::parse($resultValueSelector, ValueJoinSelector::getInstance()),
-            JoinSelectorParser::parse($resultKeySelector,   KeyJoinSelector::getInstance()),
-            EqualityComparerParser::parse(null, EqualityComparer::getDefault())
+            SelectorResolver::resolve($outerCompareKeySelector, ValueSelector::getInstance()),
+            SelectorResolver::resolve($innerCompareKeySelector, ValueSelector::getInstance()),
+            JoinSelectorResolver::resolve($resultValueSelector, ValueJoinSelector::getInstance()),
+            JoinSelectorResolver::resolve($resultKeySelector,   KeyJoinSelector::getInstance()),
+            EqualityComparerResolver::resolve(null, EqualityComparer::getDefault())
         ));
     }
 
     /**
      * @param array|\Iterator|\IteratorAggregate    $rhs
-     * @param \Closure|JoinSelector|int      $resultValueSelector (v0, v1, k0, k1) -> mixed
-     * @param \Closure|JoinSelector|int|null $resultKeySelector (v0, v1, k0, k1) -> mixed
+     * @param callable|array      $resultValueSelector (v0, v1, k0, k1) -> v
+     * @param callable|array|null $resultKeySelector   (v0, v1, k0, k1) -> k
      * @return Ginq
      */
     public function zip($rhs, $resultValueSelector, $resultKeySelector = null)
@@ -877,32 +905,32 @@ class Ginq implements \IteratorAggregate
         return self::from(self::$gen->zip(
             $this->getIterator(),
             IteratorUtil::iterator($rhs),
-            JoinSelectorParser::parse($resultValueSelector, ValueJoinSelector::getInstance()),
-            JoinSelectorParser::parse($resultKeySelector,   KeyJoinSelector::getInstance())
+            JoinSelectorResolver::resolve($resultValueSelector, ValueJoinSelector::getInstance()),
+            JoinSelectorResolver::resolve($resultKeySelector,   KeyJoinSelector::getInstance())
         ));
     }
 
     /**
-     * @param \Closure|string|Selector       $compareKeySelector (v, k) -> mixed
-     * @param \Closure|string|Selector|null  $elementSelector    (v, k) -> mixed
+     * @param callable|array|string      $compareKeySelector (v, k) -> v:comparable
+     * @param callable|array|string|null $elementSelector    (v, k) -> v
      * @return Ginq
      */
     public function groupBy($compareKeySelector, $elementSelector = null)
     {
         return self::from(self::$gen->groupBy(
             $this->getIterator(),
-            SelectorParser::parse($compareKeySelector, ValueSelector::getInstance()),
-            SelectorParser::parse($elementSelector,    ValueSelector::getInstance()),
+            SelectorResolver::resolve($compareKeySelector, ValueSelector::getInstance()),
+            SelectorResolver::resolve($elementSelector,    ValueSelector::getInstance()),
             EqualityComparer::getDefault()
         ));
     }
 
     /**
      * @param array|\Iterator|\IteratorAggregate $inner
-     * @param \Closure|string|int|Selector   $outerCompareKeySelector (v, k) -> comparable
-     * @param \Closure|string|int|Selector   $innerCompareKeySelector (v, k) -> comparable
-     * @param \Closure|JoinSelector|int      $resultValueSelector (outer, inners, outerKey, innerKey) -> mixed
-     * @param \Closure|JoinSelector|int|null $resultKeySelector   (outer, ineers, outerKey, innerKey) -> mixed
+     * @param callable|array|string              $outerCompareKeySelector (v, k) -> v:comparable
+     * @param callable|array|string              $innerCompareKeySelector (v, k) -> v:comparable
+     * @param callable|array                     $resultValueSelector (outerV, inners:GroupingGinq, outerK, compareKey) -> v
+     * @param callable|array|null                $resultKeySelector   (outerV, ineers:GroupingGinq, outerK, compareKey) -> k
      * @return Ginq
      */
     public function groupJoin($inner,
@@ -912,34 +940,34 @@ class Ginq implements \IteratorAggregate
         return self::from(self::$gen->groupJoin(
             $this->getIterator(),
             IteratorUtil::iterator($inner),
-            SelectorParser::parse($outerCompareKeySelector, ValueSelector::getInstance()),
-            SelectorParser::parse($innerCompareKeySelector, ValueSelector::getInstance()),
-            JoinSelectorParser::parse($resultValueSelector, ValueJoinSelector::getInstance()),
-            JoinSelectorParser::parse($resultKeySelector,   KeyJoinSelector::getInstance()),
-            EqualityComparerParser::parse(null, EqualityComparer::getDefault())
+            SelectorResolver::resolve($outerCompareKeySelector, ValueSelector::getInstance()),
+            SelectorResolver::resolve($innerCompareKeySelector, ValueSelector::getInstance()),
+            JoinSelectorResolver::resolve($resultValueSelector, ValueJoinSelector::getInstance()),
+            JoinSelectorResolver::resolve($resultKeySelector,   KeyJoinSelector::getInstance()),
+            EqualityComparerResolver::resolve(null, EqualityComparer::getDefault())
         ));
     }
 
     /**
-     * @param \Closure|string|int|Selector|null $compareKeySelector (v, k) -> comparable
+     * @param callable|array|string|null $compareKeySelector (v, k) -> v:comparable
      * @return OrderingGinq
      */
     public function orderBy($compareKeySelector = null)
     {
-        $compareKeySelector = SelectorParser::parse($compareKeySelector, ValueSelector::getInstance());
-        $comparer = ComparerParser::parse(null, Comparer::getDefault());
+        $compareKeySelector = SelectorResolver::resolve($compareKeySelector, ValueSelector::getInstance());
+        $comparer = ComparerResolver::resolve(null, Comparer::getDefault());
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         return new OrderingGinq($this->getIterator(), $comparer);
     }
 
     /**
-     * @param \Closure|string|int|Selector|null $compareKeySelector (v, k) -> comparable
+     * @param callable|array|string|null $compareKeySelector (v, k) -> v:comparable
      * @return OrderingGinq
      */
     public function orderByDesc($compareKeySelector = null)
     {
-        $compareKeySelector = SelectorParser::parse($compareKeySelector, ValueSelector::getInstance());
-        $comparer = ComparerParser::parse(null, Comparer::getDefault());
+        $compareKeySelector = SelectorResolver::resolve($compareKeySelector, ValueSelector::getInstance());
+        $comparer = ComparerResolver::resolve(null, Comparer::getDefault());
         $comparer = new ProjectionComparer($compareKeySelector, $comparer);
         $comparer = new ReverseComparer($comparer);
         return new OrderingGinq($this->getIterator(), $comparer);
@@ -952,7 +980,7 @@ class Ginq implements \IteratorAggregate
     {
         return self::from(
             self::$gen->distinct($this->getIterator(),
-                EqualityComparerParser::parse(null, EqualityComparer::getDefault())
+                EqualityComparerResolver::resolve(null, EqualityComparer::getDefault())
             ));
     }
 
@@ -966,7 +994,7 @@ class Ginq implements \IteratorAggregate
             self::$gen->union(
                 $this->getIterator(),
                 $rhs,
-                EqualityComparerParser::parse(null, EqualityComparer::getDefault())
+                EqualityComparerResolver::resolve(null, EqualityComparer::getDefault())
             ));
     }
 
@@ -980,7 +1008,7 @@ class Ginq implements \IteratorAggregate
             self::$gen->intersect(
                 $this->getIterator(),
                 $rhs,
-                EqualityComparerParser::parse(null, EqualityComparer::getDefault())
+                EqualityComparerResolver::resolve(null, EqualityComparer::getDefault())
             ));
     }
 
@@ -994,7 +1022,7 @@ class Ginq implements \IteratorAggregate
             self::$gen->except(
                 $this->getIterator(),
                 $rhs,
-                EqualityComparerParser::parse(null, EqualityComparer::getDefault())
+                EqualityComparerResolver::resolve(null, EqualityComparer::getDefault())
             ));
     }
 
@@ -1004,7 +1032,7 @@ class Ginq implements \IteratorAggregate
      */
     public function sequenceEquals($rhs)
     {
-        $eqComparer = EqualityComparerParser::parse(null, EqualityComparer::getDefault());
+        $eqComparer = EqualityComparerResolver::resolve(null, EqualityComparer::getDefault());
         $lhs = $this->getIterator();
         $rhs = IteratorUtil::iterator($rhs);
         if ($lhs instanceof \Countable && $rhs instanceof \Countable) {
@@ -1196,7 +1224,7 @@ class Ginq implements \IteratorAggregate
     public function __call($name, $args)
     {
         if (isset(self::$registeredFunctions[$name])) {
-            call_user_func_array(
+            return call_user_func_array(
                 self::$registeredFunctions[$name],
                 array_merge(array($this), $args)
             );

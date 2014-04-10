@@ -16,11 +16,6 @@
 
 namespace Ginq\Core;
 
-use Ginq\Core\Selector;
-use Ginq\Core\JoinSelector;
-use Ginq\Core\Predicate;
-use Ginq\Core\Comparer;
-use Ginq\Iterator\UnfoldIterator;
 
 /**
  * IterProvider

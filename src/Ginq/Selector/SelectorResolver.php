@@ -17,8 +17,9 @@
 namespace Ginq\Selector;
 
 use Ginq\Core\Selector;
+use Ginq\Lambda\Lambda;
 
-class SelectorParser
+class SelectorResolver
 {
     /**
      * @param \Closure|string|int|Selector $src
@@ -26,27 +27,26 @@ class SelectorParser
      * @throws \InvalidArgumentException
      * @return Selector
      */
-    static public function parse($src, $default)
+    static public function resolve($src, $default)
     {
         if (is_null($src)) {
             return $default;
         }
-
-        if (is_string($src)) {
-            return PathSelector::parse($src);
-        }
-
         if (is_callable($src)) {
             return new DelegateSelector($src);
         }
-
+        if (is_string($src)) {
+            return new PropertySelector($src);
+        }
+        if (is_array($src)) {
+            return new DelegateSelector(Lambda::fun($src));
+        }
         if ($src instanceof Selector) {
             return $src;
         }
-
         $type = gettype($src);
         throw new \InvalidArgumentException(
-            "'selector' Closure or string or expected, got $type");
+            "Invalid selector, got '$type''.");
     }
 }
 
