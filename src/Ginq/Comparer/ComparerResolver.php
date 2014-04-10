@@ -31,7 +31,7 @@ class ComparerResolver
         if (is_null($src)) {
             return $default;
         }
-        if ($src instanceof \Closure) {
+        if (is_callable($src)) {
             return new DelegateComparer($src);
         }
         if ($src instanceof Comparer) {
