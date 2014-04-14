@@ -82,6 +82,26 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
+     * @param mixed|\Closure $x
+     * @return callable
+     */
+    public static function k($x)
+    {
+        return self::constant($x);
+    }
+
+    /**
+     * @param mixed|\Closure $x
+     * @return callable
+     */
+    public static function constant($x)
+    {
+        return function() use ($x) {
+            return FuncUtil::applyOrItself($x);
+        };
+    }
+
+    /**
      * default compare function
      * @param mixed $x
      * @param mixed $y

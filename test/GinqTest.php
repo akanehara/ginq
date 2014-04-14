@@ -2013,6 +2013,21 @@ class GinqTest extends PHPUnit_Framework_TestCase
             }
         }
     }
+
+    /**
+     * testConstant().
+     */
+    public function testConstant()
+    {
+        $f = Ginq::constant(99);
+        $this->assertEquals(99, $f());
+
+        $created = false;
+        $g = Ginq::constant(function()use(&$created){ $created=true; return 999; });
+        $this->assertEquals(false, $created);
+        $this->assertEquals(999, $g());
+        $this->assertEquals(true, $created);
+    }
  }
 
 class Movie
