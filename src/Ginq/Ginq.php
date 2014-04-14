@@ -16,9 +16,7 @@
 
 namespace Ginq;
 
-use Ginq\Core\Selector;
 use Ginq\Comparer\ComparerResolver;
-use Ginq\Core\JoinSelector;
 use Ginq\Core\Comparer;
 use Ginq\Core\EqualityComparer;
 use Ginq\EqualityComparer\EqualityComparerResolver;
@@ -84,12 +82,33 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
+     * @param mixed|\Closure $x
+     * @return callable
+     */
+    public static function k($x)
+    {
+        return self::constant($x);
+    }
+
+    /**
+     * @param mixed|\Closure $x
+     * @return callable
+     */
+    public static function constant($x)
+    {
+        return function() use ($x) {
+            return FuncUtil::applyOrItself($x);
+        };
+    }
+
+    /**
      * default compare function
      * @param mixed $x
      * @param mixed $y
      * @return int
      */
-    public static function compare($x, $y) {
+    public static function compare($x, $y)
+    {
         return Comparer::getDefault()->compare($x, $y);
     }
 
@@ -99,7 +118,8 @@ class Ginq implements \IteratorAggregate
      * @param mixed $y
      * @return bool
      */
-    public static function equals($x, $y) {
+    public static function equals($x, $y)
+    {
         return EqualityComparer::getDefault()->equals($x, $y);
     }
 
@@ -108,7 +128,8 @@ class Ginq implements \IteratorAggregate
      * @param mixed $x
      * @return string
      */
-    public static function hash($x) {
+    public static function hash($x)
+    {
         return EqualityComparer::getDefault()->hash($x);
     }
 
@@ -364,7 +385,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param mixed|callable $default
+     * @param mixed|\Closure $default
      * @param callable|array|string|null  $predicate (v, k) -> bool
      * @return mixed
      */
@@ -390,7 +411,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param mixed|callable $default
+     * @param mixed|\Closure $default
      * @return Ginq
      */
     public function elseIfZero($default)
@@ -400,7 +421,7 @@ class Ginq implements \IteratorAggregate
         if ($it->valid()) {
             return $this;
         } else {
-            if (is_callable($default)) {
+            if ($default instanceof \Closure) {
                 return self::from(self::$gen->lazyRepeat($default, 1));
             } else {
                 return self::from(self::$gen->repeat($default, 1));
@@ -446,7 +467,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param mixed|callable $default
+     * @param mixed|\Closure $default
      * @param callable|array|string|null  $predicate (v, k) -> bool
      * @return mixed
      */
@@ -570,7 +591,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure $operator (acc, v, k) -> acc
+     * @param callable $operator (acc, v, k) -> acc
      * @return mixed
      * @throws \LengthException
      */
@@ -711,7 +732,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param \Closure $fn
+     * @param callable $fn
      * @return Ginq
      */
     public function each($fn)
