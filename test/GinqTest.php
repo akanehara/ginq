@@ -5,6 +5,7 @@ use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
+require_once dirname(__DIR__) . "/vendor/autoload.php";
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
 
 class Person
