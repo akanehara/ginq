@@ -668,6 +668,9 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testReduceLeft()
     {
+        $actual = Ginq::range(0, 10)->reduceLeft(array('acc,v,k'=>'acc - v'));
+        $this->assertEquals(-55, $actual);
+
         $actual = Ginq::range(0, 10)->reduceLeft(function($acc, $v, $k) {
             return $acc - $v;
         });
@@ -679,9 +682,10 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testReduceRight()
     {
-        $actual = Ginq::range(1, 10)->reduceRight(function($acc, $v, $k) {
-            return $v - $acc;
-        });
+        $actual = Ginq::range(1, 10)->reduceRight(array('acc,v,k'=>'v - acc'));
+        $this->assertEquals(-5, $actual);
+
+        $actual = Ginq::range(1, 10)->reduceRight(function($acc, $v, $k) { return $v - $acc; });
         $this->assertEquals(-5, $actual);
     }
 
@@ -700,6 +704,10 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $ns = Ginq::unfold(1, function($x) { return array($x, $x + 1); });
         $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
         $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
+
+        $ns = Ginq::unfold(1, array('x'=>'[x, x+1]'));
+        $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
+        $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
     }
 
     /**
@@ -707,6 +715,9 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testIterate()
     {
+        $actual = Ginq::iterate(1, array('x'=>'x+1'))->take(5)->toList();
+        $this->assertEquals(array(1,2,3,4,5), $actual);
+
         $called = 0;
         $actual = Ginq::iterate(1,
                 function($x) use (&$called) { $called++; return $x + 1; }
