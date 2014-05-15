@@ -16,10 +16,16 @@
 
 namespace Ginq\Predicate;
 
+use Ginq\Core\Predicate;
 use Ginq\Lambda\Lambda;
 
 class PredicateResolver
 {
+    /**
+     * @param callable|string|array|Predicate $src
+     * @throws \InvalidArgumentException
+     * @return Predicate
+     */
     public static function resolve($src)
     {
         if (is_callable($src)) {
@@ -30,6 +36,9 @@ class PredicateResolver
         }
         if (is_array($src)) {
             return new DelegatePredicate(Lambda::fun($src));
+        }
+        if ($src instanceof Predicate) {
+            return $src;
         }
         $type = gettype($src);
         throw new \InvalidArgumentException(
