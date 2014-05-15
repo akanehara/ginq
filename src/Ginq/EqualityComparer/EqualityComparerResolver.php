@@ -25,9 +25,6 @@ class EqualityComparerResolver
         if (is_null($src)) {
             return $default;
         }
-        if (is_callable($src)) {
-            return new DelegateComparer($src);
-        }
         if ($src instanceof EqualityComparer) {
             return $src;
         }

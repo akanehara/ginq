@@ -73,11 +73,14 @@ class Ginq implements \IteratorAggregate
      * it means
      *   function ($x,$y) use ($z) {return $x+$y+$z;}
      * @see http://symfony.com/doc/current/components/expression_language/syntax.html
-     * @param array $lambda
+     * @param callable|array $lambda
      * @return callable
      */
     public static function fun($lambda)
     {
+        if (is_callable($lambda)) {
+            return $lambda;
+        }
         return Lambda::fun($lambda);
     }
 
@@ -143,7 +146,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param callable|null $combiner (existV, v, k) -> v
+     * @param callable|array|null $combiner (existV, v, k) -> v
      * @return array
      */
     public function toArray($combiner = null)
@@ -151,13 +154,13 @@ class Ginq implements \IteratorAggregate
         if (is_null($combiner)) {
             return IteratorUtil::toArray($this->getIterator());
         } else {
-            return IteratorUtil::toArrayWithCombine($this->getIterator(), $combiner);
+            return IteratorUtil::toArrayWithCombine($this->getIterator(), Ginq::fun($combiner));
         }
     }
 
     /**
      * @param int|null      $depth
-     * @param callable|null $combiner (existV, v, k) -> v
+     * @param callable|array|null $combiner (existV, v, k) -> v
      * @return array
      */
     public function toArrayRec($depth = null, $combiner = null)
@@ -165,14 +168,14 @@ class Ginq implements \IteratorAggregate
         if (is_null($combiner)) {
             return IteratorUtil::toArrayRec($this->getIterator(), $depth);
         } else {
-            return IteratorUtil::toArrayRecWithCombine($this->getIterator(), $depth, $combiner);
+            return IteratorUtil::toArrayRecWithCombine($this->getIterator(), $depth, Ginq::fun($combiner));
         }
     }
 
     /**
      * @param callable|array|string       $lookupKeySelector (v, k) -> v
      * @param callable|array|string|null  $elementSelector   (v, k) -> v
-     * @param callable|null               $eqComparer        (v1, v2, [k1, k2]) -> bool
+     * @param EqualityComparer|null       $eqComparer
      * @return LookupGinq
      */
     public function toLookup($lookupKeySelector, $elementSelector = null, $eqComparer = null)
@@ -533,24 +536,25 @@ class Ginq implements \IteratorAggregate
 
     /**
      * @param mixed $accumulator
-     * @param callable $operator (acc, v, k) -> acc
+     * @param callable|array $operator (acc, v, k) -> acc
      * @return mixed
      */
     public function aggregate($accumulator, $operator)
     {
-        return $this->foldLeft($accumulator, $operator);
+        return $this->foldLeft($accumulator, Ginq::fun($operator));
     }
 
     /**
      * @param mixed $accumulator
-     * @param callable $operator (acc, v, k) -> acc
+     * @param callable|array $operator (acc, v, k) -> acc
      * @return mixed
      */
     public function foldLeft($accumulator, $operator)
     {
         $acc = $accumulator;
+        $op = Ginq::fun($operator);
         foreach ($this as $k => $v) {
-            $acc = $operator($acc, $v, $k);
+            $acc = $op($acc, $v, $k);
         }
         return $acc;
     }
@@ -563,8 +567,9 @@ class Ginq implements \IteratorAggregate
     public function foldRight($accumulator, $operator)
     {
         $acc = $accumulator;
+        $op = Ginq::fun($operator);
         foreach ($this->reverse() as $k => $v) {
-            $acc = $operator($acc, $v, $k);
+            $acc = $op($acc, $v, $k);
         }
         return $acc;
     }
@@ -583,8 +588,9 @@ class Ginq implements \IteratorAggregate
         }
         $acc = $it->current();
         $it->next();
+        $op = Ginq::fun($operator);
         while ($it->valid()) {
-            $acc = $operator($acc, $it->current(), $it->key());
+            $acc = $op($acc, $it->current(), $it->key());
             $it->next();
         }
         return $acc;
@@ -604,8 +610,9 @@ class Ginq implements \IteratorAggregate
         }
         $acc = $it->current();
         $it->next();
+        $op = Ginq::fun($operator);
         while ($it->valid()) {
-            $acc = $operator($acc, $it->current(), $it->key());
+            $acc = $op($acc, $it->current(), $it->key());
             $it->next();
         }
         return $acc;
@@ -627,23 +634,24 @@ class Ginq implements \IteratorAggregate
      */
     public static function unfold($seed, $generator)
     {
-        return self::from(self::$gen->unfold($seed, $generator));
+        return self::from(self::$gen->unfold($seed, Ginq::fun($generator)));
     }
 
     /**
-     * @param mixed    $initial
-     * @param callable $generator v -> v
+     * @param mixed          $initial
+     * @param callable|array $generator v -> v
      * @return Ginq
      */
     public static function iterate($initial, $generator)
     {
+        $gen = Ginq::fun($generator);
         return self::unfold(
             $initial,
-            function($seed) use ($generator) {
+            function($seed) use ($gen) {
                 $v = FuncUtil::force($seed);
                 return array(
                     $v,
-                    function () use ($v, $generator) { return $generator($v); }
+                    function () use ($v, $gen) { return $gen($v); }
                 );
             }
         );
