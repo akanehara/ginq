@@ -172,7 +172,7 @@ class Ginq implements \IteratorAggregate
     /**
      * @param callable|array|string       $lookupKeySelector (v, k) -> v
      * @param callable|array|string|null  $elementSelector   (v, k) -> v
-     * @param callable|null               $eqComparer        (v1, v2, [k1, k2]) -> bool
+     * @param EqualityComparer|null       $eqComparer
      * @return LookupGinq
      */
     public function toLookup($lookupKeySelector, $elementSelector = null, $eqComparer = null)
