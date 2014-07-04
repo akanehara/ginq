@@ -50,9 +50,6 @@ class BufferIterator implements \Iterator
      */
     public function __construct($xs, $chunkSize)
     {
-        if ($chunkSize < 1) {
-            throw new \InvalidArgumentException("chunkSize must be greater than 0");
-        }
         $this->it = IteratorUtil::iterator($xs);
         $this->chunkSize = $chunkSize;
     }

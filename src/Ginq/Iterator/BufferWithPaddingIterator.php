@@ -56,9 +56,6 @@ class BufferWithPaddingIterator implements \Iterator
      */
     public function __construct($xs, $chunkSize, $padding)
     {
-        if ($chunkSize < 1) {
-            throw new \InvalidArgumentException("chunkSize must be greater than 0");
-        }
         $this->it = IteratorUtil::iterator($xs);
         $this->chunkSize = $chunkSize;
         $this->padding   = $padding;

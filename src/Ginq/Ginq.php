@@ -19,6 +19,7 @@ namespace Ginq;
 use Ginq\Comparer\ComparerResolver;
 use Ginq\Core\Comparer;
 use Ginq\Core\EqualityComparer;
+use Ginq\Core\RewindableGenerator;
 use Ginq\EqualityComparer\EqualityComparerResolver;
 use Ginq\JoinSelector\KeyJoinSelector;
 use Ginq\JoinSelector\ValueJoinSelector;
@@ -54,6 +55,11 @@ class Ginq implements \IteratorAggregate
     public static function useIterator()
     {
         self::$gen = Core\IterProviderIterImpl::getInstance();
+    }
+
+    public static function useGenerator()
+    {
+        self::$gen = Core\IterProviderGeneratorImpl::getInstance();
     }
 
     /**
@@ -787,9 +793,10 @@ class Ginq implements \IteratorAggregate
      */
     public function partition($predicate)
     {
+        $memoized = $this->memoize();
         return array(
-            $this->where($predicate),
-            $this->where(function($v, $k) use ($predicate) { return !$predicate($v, $k); })
+            $memoized->where($predicate),
+            $memoized->where(function($v, $k) use ($predicate) { return !$predicate($v, $k); })
         );
     }
 
@@ -1229,6 +1236,9 @@ class Ginq implements \IteratorAggregate
      */
     public function buffer($chunkSize)
     {
+        if ($chunkSize < 1) {
+            throw new \InvalidArgumentException("chunkSize must be greater than 0");
+        }
         return self::from(
             self::$gen->buffer($this->getIterator(), $chunkSize)
         );
@@ -1241,6 +1251,9 @@ class Ginq implements \IteratorAggregate
      */
     public function bufferWithPadding($chunkSize, $padding)
     {
+        if ($chunkSize < 1) {
+            throw new \InvalidArgumentException("chunkSize must be greater than 0");
+        }
         return self::from(
             self::$gen->bufferWithPadding($this->getIterator(), $chunkSize, $padding)
         );
@@ -1265,8 +1278,6 @@ class Ginq implements \IteratorAggregate
     public static function register($className)
     {
         $ref = new \ReflectionClass($className);
-
-        //echo "$className";
 
         $funcNames = Ginq::from($ref->getMethods(\ReflectionMethod::IS_STATIC))
             ->where(function ($m) {
@@ -1299,6 +1310,9 @@ class Ginq implements \IteratorAggregate
     }
 }
 
-Ginq::useIterator();
-
+if (class_exists("Generator")) {
+    Ginq::useGenerator();
+} else {
+    Ginq::useIterator();
+}
 

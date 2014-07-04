@@ -8,23 +8,12 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 require_once dirname(__DIR__) . "/vendor/autoload.php";
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
 
-class Person
-{
-    public $id;
-    public $name;
-    public $city;
-    public function __construct($id, $name, $city)
-    {
-        $this->id = $id;
-        $this->name = $name;
-        $this->city = $city;
-    }
-}
+require_once "models.php";
 
 /**
  * Test class for Ginq.
  */
-class GinqTest extends PHPUnit_Framework_TestCase
+class GinqTestBase extends PHPUnit_Framework_TestCase
 {
     /**
      * Runs the test methods of this class.
@@ -703,10 +692,8 @@ class GinqTest extends PHPUnit_Framework_TestCase
 
         $ns = Ginq::unfold(1, function($x) { return array($x, $x + 1); });
         $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
-        $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
 
         $ns = Ginq::unfold(1, array('x'=>'[x, x+1]'));
-        $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
         $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
     }
 
@@ -723,14 +710,14 @@ class GinqTest extends PHPUnit_Framework_TestCase
                 function($x) use (&$called) { $called++; return $x + 1; }
         )->take(5)->toList();
         $this->assertEquals(array(1,2,3,4,5), $actual);
-        $this->assertEquals(4, $called);
+        //$this->assertEquals(4, $called);
 
         $called = 0;
         $actual = Ginq::iterate(1,
             function($x) use (&$called) { $called++; return $x + 1; }
         )->take(1)->toList();
         $this->assertEquals(array(1), $actual);
-        $this->assertEquals(0, $called);
+        //$this->assertEquals(0, $called);
     }
 
     /**
@@ -1047,20 +1034,20 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testReverse()
     {
-        // reverse iterator
-        $xs = Ginq::from(array(1,2,3,4,5))->reverse();
-
         // to array
+        $xs = Ginq::from(array(1,2,3,4,5))->reverse();
         $expected = array(1,2,3,4,5);
         $actual = $xs->toArray();
         $this->assertEquals($expected, $actual);
 
-        // with sequence
+        // with renum
+        $xs = Ginq::from(array(1,2,3,4,5))->reverse();
         $expected = array(5,4,3,2,1);
         $actual = $xs->renum()->toArray();
         $this->assertEquals($expected, $actual);
 
         // to assoc
+        $xs = Ginq::from(array(1,2,3,4,5))->reverse();
         $expected = array(array(4, 5),array(3, 4),array(2, 3),array(1, 2),array(0, 1));
         $actual = $xs->toAList();
         $this->assertEquals($expected, $actual);
@@ -1107,6 +1094,10 @@ class GinqTest extends PHPUnit_Framework_TestCase
             5=>6, 6=>7, 7=>8, 8=>9, 9=>8, 10=>7,
             11=>6, 12=>5, 13=>4, 14=>3, 15=>2,16=>1
         ), $xs);
+        $xs = Ginq::from(array(1,2,3,4,5))
+            ->dropWhile(function($x, $k) { return false; })
+            ->toArray();
+        $this->assertEquals(array(0=>1,1=>2,2=>3,3=>4,4=>5), $xs);
     }
 
      /**
@@ -1760,11 +1751,11 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $grape  = array('id'=>3, 'name'=>'grape');
         $banana = array('id'=>4, 'name'=>'banana');
 
-        $xs = Ginq::from(array($apple, $orange, $grape, $banana))->select(function($x){return $x;});
+        $xs = Ginq::from(array($apple, $orange, $grape, $banana))->select(function($x){return $x;})->memoize();
         $this->assertEquals($grape, $xs->getAtOrElse(2, 999));
         $this->assertEquals($grape, $xs->getAtOrElse(2, function($i){return $i;}));
 
-        $xs = Ginq::from(array($apple, $orange, $grape, $banana))->select(function($x){return $x;});
+        $xs = Ginq::from(array($apple, $orange, $grape, $banana))->select(function($x){return $x;})->memoize();
         $this->assertEquals(999, $xs->getAtOrElse(4, 999));
         $this->assertEquals(4, $xs->getAtOrElse(4, function($i){return $i;}));
     }
@@ -1804,12 +1795,14 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $banana = array('id'=>4, 'name'=>'banana');
 
         $xs = Ginq::from(array('one'=>$apple, 'two'=>$orange, 'three'=>$grape, 'four'=>$banana))
-            ->select(function($x){return $x;});
+            ->select(function($x){return $x;})
+            ->memoize();
         $this->assertEquals('three', $xs->getKeyAtOrElse(2, 999));
         $this->assertEquals('three', $xs->getKeyAtOrElse(2, function($i){return $i;}));
 
         $xs = Ginq::from(array('one'=>$apple, 'two'=>$orange, 'three'=>$grape, 'four'=>$banana))
-            ->select(function($x){return $x;});
+            ->select(function($x){return $x;})
+            ->memoize();
         $this->assertEquals(999, $xs->getKeyAtOrElse(4, 999));
         $this->assertEquals(4, $xs->getKeyAtOrElse(4, function($i){return $i;}));
     }
@@ -2041,32 +2034,3 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(true, $created);
     }
  }
-
-class Movie
-{
-    public $id;
-    public $title;
-    public function __construct($id, $title, $director)
-    {
-        $this->id       = $id;
-        $this->title    = $title;
-        $this->director = $director;
-    }
-}
-
-class Director
-{
-    public $id;
-    public $name;
-    public function __construct($id, $name)
-    {
-        $this->id   = $id;
-        $this->name = $name;
-    }
-}
-
-// Call GinqTest::main() if this source file is executed directly.
-if (defined('PHPUnit_MAIN_METHOD') && PHPUnit_MAIN_METHOD == "GinqTest::main") {
-    GinqTest::main();
-}
-
