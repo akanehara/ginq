@@ -417,6 +417,19 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
         $actual = Ginq::from($data)->min('[score]');
         $this->assertEquals(680, $actual);
+
+        // custom comparer
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))
+            ->min(null, function($v1,$v2){return Ginq::compare($v1,$v2);});
+        $this->assertEquals(1, $actual);
+
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))
+            ->min(null, array('v1,v2'=>'v1 - v2'));
+        $this->assertEquals(1, $actual);
+
+        $actual = Ginq::from($data)
+            ->min('[score]', function($v1,$v2){return Ginq::compare($v1,$v2);});
+        $this->assertEquals(680, $actual);
     }
 
     /**
@@ -438,6 +451,18 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array('name'=>'Muraoka Kouhei', 'score'=> 1950),
         );
         $actual = Ginq::from($data)->max('[score]');
+        $this->assertEquals(10200, $actual);
+
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))
+            ->max(null, function($v1,$v2){return Ginq::compare($v1,$v2);});
+        $this->assertEquals(9, $actual);
+
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))
+            ->max(null, array('v1,v2'=>'v1 - v2'));
+        $this->assertEquals(9, $actual);
+
+        $actual = Ginq::from($data)
+            ->max('[score]', function($v1,$v2){return Ginq::compare($v1,$v2);});
         $this->assertEquals(10200, $actual);
     }
 
@@ -1624,13 +1649,16 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array('name'=>'Suzuka Youichi', 'score'=> 6780, 'born'=>1990),
             array('name'=>'Muraoka Kouhei', 'score'=> 1950, 'born'=>1978),
         );
-        $cmp = function ($x, $y) {
-            if ($x === $y) return 0;
-            return ($x < $y) ? -1 : 1;
-        };
+
         $xs = Ginq::from($data)
-            ->orderBy(function($v, $k) { return strlen($v['name']); }, $cmp)
-            ->thenByDesc(function($v, $k) { return $v['score']; }, $cmp)
+            ->orderWith(function($v1, $v2) { return strlen($v1['name']) -  strlen($v2['name']); })
+            ->thenWithDesc(function($v1, $v2) { return $v1['score'] - $v2['score']; })
+            ->renum()->toArray();
+        $this->assertEquals($expected, $xs);
+
+        $xs = Ginq::from($data)
+            ->orderWithDesc(function($v1, $v2) { return strlen($v2['name']) -  strlen($v1['name']); })
+            ->thenWith(function($v1, $v2) { return $v2['score'] - $v1['score']; })
             ->renum()->toArray();
         $this->assertEquals($expected, $xs);
     }

@@ -17,6 +17,7 @@
 namespace Ginq\Comparer;
 
 use Ginq\Core\Comparer;
+use Ginq\Lambda\Lambda;
 
 class ComparerResolver
 {
@@ -33,6 +34,9 @@ class ComparerResolver
         }
         if (is_callable($src)) {
             return new DelegateComparer($src);
+        }
+        if (is_array($src)) {
+            return new DelegateComparer(Lambda::fun($src));
         }
         if ($src instanceof Comparer) {
             return $src;
