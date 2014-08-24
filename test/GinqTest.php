@@ -420,6 +420,28 @@ class GinqTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * testMinWith().
+     */
+    public function testMinWith()
+    {
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))->minWith();
+        $this->assertEquals(1, $actual);
+
+        $data = array(
+            array('name'=>'Abe Shinji',     'score'=> 2990),
+            array('name'=>'Suzuki Taro',    'score'=>10200),
+            array('name'=>'Yamada Taro',    'score'=>  680),
+            array('name'=>'Tamura Akira',   'score'=> 5840),
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950),
+            array('name'=>'Yamada Rindai',  'score'=> 6680),
+            array('name'=>'Suzuka Youichi', 'score'=> 6780),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950),
+        );
+        $actual = Ginq::from($data)->minWith(array('v1,v2'=>'v1["score"]-v2["score"]'));
+        $this->assertEquals(array('name'=>'Yamada Taro', 'score'=> 680), $actual);
+    }
+
+    /**
      * testMax().
      */
     public function testMax()
@@ -439,6 +461,40 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
         $actual = Ginq::from($data)->max('[score]');
         $this->assertEquals(10200, $actual);
+
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))
+            ->max(null, function($v1,$v2){return Ginq::compare($v1,$v2);});
+        $this->assertEquals(9, $actual);
+
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))
+            ->max(null, array('v1,v2'=>'v1 - v2'));
+        $this->assertEquals(9, $actual);
+
+        $actual = Ginq::from($data)
+            ->max('[score]', function($v1,$v2){return Ginq::compare($v1,$v2);});
+        $this->assertEquals(10200, $actual);
+    }
+
+    /**
+     * testMaxWith().
+     */
+    public function testMaxWith()
+    {
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))->maxWith();
+        $this->assertEquals(9, $actual);
+
+        $data = array(
+            array('name'=>'Abe Shinji',     'score'=> 2990),
+            array('name'=>'Suzuki Taro',    'score'=>10200),
+            array('name'=>'Yamada Taro',    'score'=>  680),
+            array('name'=>'Tamura Akira',   'score'=> 5840),
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950),
+            array('name'=>'Yamada Rindai',  'score'=> 6680),
+            array('name'=>'Suzuka Youichi', 'score'=> 6780),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950),
+        );
+        $actual = Ginq::from($data)->maxWith(array('v1,v2'=>'v1["score"]-v2["score"]'));
+        $this->assertEquals(array('name'=>'Suzuki Taro', 'score'=>10200), $actual);
     }
 
     /**
@@ -668,6 +724,9 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testReduceLeft()
     {
+        $actual = Ginq::range(0, 10)->reduceLeft(array('acc,v,k'=>'acc - v'));
+        $this->assertEquals(-55, $actual);
+
         $actual = Ginq::range(0, 10)->reduceLeft(function($acc, $v, $k) {
             return $acc - $v;
         });
@@ -679,9 +738,10 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testReduceRight()
     {
-        $actual = Ginq::range(1, 10)->reduceRight(function($acc, $v, $k) {
-            return $v - $acc;
-        });
+        $actual = Ginq::range(1, 10)->reduceRight(array('acc,v,k'=>'v - acc'));
+        $this->assertEquals(-5, $actual);
+
+        $actual = Ginq::range(1, 10)->reduceRight(function($acc, $v, $k) { return $v - $acc; });
         $this->assertEquals(-5, $actual);
     }
 
@@ -700,6 +760,10 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $ns = Ginq::unfold(1, function($x) { return array($x, $x + 1); });
         $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
         $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
+
+        $ns = Ginq::unfold(1, array('x'=>'[x, x+1]'));
+        $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
+        $this->assertEquals(array(1,2,3,4,5), $ns->take(5)->toList());
     }
 
     /**
@@ -707,6 +771,9 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testIterate()
     {
+        $actual = Ginq::iterate(1, array('x'=>'x+1'))->take(5)->toList();
+        $this->assertEquals(array(1,2,3,4,5), $actual);
+
         $called = 0;
         $actual = Ginq::iterate(1,
                 function($x) use (&$called) { $called++; return $x + 1; }
@@ -1613,13 +1680,16 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array('name'=>'Suzuka Youichi', 'score'=> 6780, 'born'=>1990),
             array('name'=>'Muraoka Kouhei', 'score'=> 1950, 'born'=>1978),
         );
-        $cmp = function ($x, $y) {
-            if ($x === $y) return 0;
-            return ($x < $y) ? -1 : 1;
-        };
+
         $xs = Ginq::from($data)
-            ->orderBy(function($v, $k) { return strlen($v['name']); }, $cmp)
-            ->thenByDesc(function($v, $k) { return $v['score']; }, $cmp)
+            ->orderWith(function($v1, $v2) { return strlen($v1['name']) -  strlen($v2['name']); })
+            ->thenWithDesc(function($v1, $v2) { return $v1['score'] - $v2['score']; })
+            ->renum()->toArray();
+        $this->assertEquals($expected, $xs);
+
+        $xs = Ginq::from($data)
+            ->orderWithDesc(function($v1, $v2) { return strlen($v2['name']) -  strlen($v1['name']); })
+            ->thenWith(function($v1, $v2) { return $v2['score'] - $v1['score']; })
             ->renum()->toArray();
         $this->assertEquals($expected, $xs);
     }
