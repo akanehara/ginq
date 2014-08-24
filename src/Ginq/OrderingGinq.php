@@ -78,5 +78,28 @@ class OrderingGinq extends Ginq
         $comparer = new CompoundComparer($this->comparer, $comparer);
         return new OrderingGinq($this->it, $comparer);
     }
+
+    /**
+     * @param callable|array $comparer (v1, v2, k1?, k2?) -> int
+     * @return OrderingGinq
+     */
+    public function thenWith($comparer)
+    {
+        $comparer = ComparerResolver::resolve($comparer, Comparer::getDefault());
+        $comparer = new CompoundComparer($this->comparer, $comparer);
+        return new OrderingGinq($this->it, $comparer);
+    }
+
+    /**
+     * @param callable|array $comparer (v1, v2, k1?, k2?) -> int
+     * @return OrderingGinq
+     */
+    public function thenWithDesc($comparer)
+    {
+        $comparer = ComparerResolver::resolve($comparer, Comparer::getDefault());
+        $comparer = new ReverseComparer($comparer);
+        $comparer = new CompoundComparer($this->comparer, $comparer);
+        return new OrderingGinq($this->it, $comparer);
+    }
 }
 
