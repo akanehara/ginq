@@ -318,17 +318,16 @@ class Ginq implements \IteratorAggregate
 
     /**
      * @param callable|array|string|null $selector (v, k) -> v:comparable
-     * @param callable|array $comparer
      * @throws \RuntimeException
      * @return mixed
      */
-    public function min($selector = null, $comparer = null)
+    public function min($selector = null)
     {
         $it = $this->getIterator();
         if (!$it->valid()) {
             throw new \RuntimeException("Sequence is empty");
         }
-        $comparer = ComparerResolver::resolve($comparer, Comparer::getDefault());
+        $comparer = Comparer::getDefault();
         $selector = SelectorResolver::resolve($selector, ValueSelector::getInstance());
         $minK = $it->key();
         $minV = $selector->select($it->current(), $minK);
@@ -343,18 +342,41 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param callable|array|string|null $selector (v, k) -> v:comparable
-     * @param callable|array $comparer
+     * @param callable|array $comparer (v1, v2, k1?, k2?) -> int
      * @throws \RuntimeException
      * @return mixed
      */
-    public function max($selector = null, $comparer = null)
+    public function minWith($comparer = null)
     {
         $it = $this->getIterator();
         if (!$it->valid()) {
             throw new \RuntimeException("Sequence is empty");
         }
         $comparer = ComparerResolver::resolve($comparer, Comparer::getDefault());
+        $minK = $it->key();
+        $minV = $it->current();
+        $it->next();
+        while ($it->valid()) {
+            $k = $it->key();
+            $v = $it->current();
+            if ($comparer->compare($v, $minV, $k, $minK) < 0) $minV = $v;
+            $it->next();
+        }
+        return $minV;
+    }
+
+    /**
+     * @param callable|array|string|null $selector (v, k) -> v:comparable
+     * @throws \RuntimeException
+     * @return mixed
+     */
+    public function max($selector = null)
+    {
+        $it = $this->getIterator();
+        if (!$it->valid()) {
+            throw new \RuntimeException("Sequence is empty");
+        }
+        $comparer = Comparer::getDefault();
         $selector = SelectorResolver::resolve($selector, ValueSelector::getInstance());
         $maxK = $it->key();
         $maxV = $selector->select($it->current(), $maxK);
@@ -362,6 +384,30 @@ class Ginq implements \IteratorAggregate
         while ($it->valid()) {
             $k = $it->key();
             $v = $selector->select($it->current(), $k);
+            if (0 < $comparer->compare($v, $maxV, $k, $maxK)) $maxV = $v;
+            $it->next();
+        }
+        return $maxV;
+    }
+
+    /**
+     * @param callable|array $comparer (v1, v2, k1?, k2?) -> int
+     * @throws \RuntimeException
+     * @return mixed
+     */
+    public function maxWith($comparer = null)
+    {
+        $it = $this->getIterator();
+        if (!$it->valid()) {
+            throw new \RuntimeException("Sequence is empty");
+        }
+        $comparer = ComparerResolver::resolve($comparer, Comparer::getDefault());
+        $maxK = $it->key();
+        $maxV = $it->current();
+        $it->next();
+        while ($it->valid()) {
+            $k = $it->key();
+            $v = $it->current();
             if (0 < $comparer->compare($v, $maxV, $k, $maxK)) $maxV = $v;
             $it->next();
         }
@@ -997,7 +1043,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param callable|array $comparer
+     * @param callable|array $comparer (v1, v2, k1?, k2?) -> int
      * @return OrderingGinq
      */
     public function orderWith($comparer)
@@ -1020,7 +1066,7 @@ class Ginq implements \IteratorAggregate
     }
 
     /**
-     * @param callable|array $comparer
+     * @param callable|array $comparer (v1, v2, k1?, k2?) -> int
      * @return OrderingGinq
      */
     public function orderWithDesc($comparer = null)

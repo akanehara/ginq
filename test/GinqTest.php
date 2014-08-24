@@ -417,19 +417,28 @@ class GinqTest extends PHPUnit_Framework_TestCase
         );
         $actual = Ginq::from($data)->min('[score]');
         $this->assertEquals(680, $actual);
+    }
 
-        // custom comparer
-        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))
-            ->min(null, function($v1,$v2){return Ginq::compare($v1,$v2);});
+    /**
+     * testMinWith().
+     */
+    public function testMinWith()
+    {
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))->minWith();
         $this->assertEquals(1, $actual);
 
-        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))
-            ->min(null, array('v1,v2'=>'v1 - v2'));
-        $this->assertEquals(1, $actual);
-
-        $actual = Ginq::from($data)
-            ->min('[score]', function($v1,$v2){return Ginq::compare($v1,$v2);});
-        $this->assertEquals(680, $actual);
+        $data = array(
+            array('name'=>'Abe Shinji',     'score'=> 2990),
+            array('name'=>'Suzuki Taro',    'score'=>10200),
+            array('name'=>'Yamada Taro',    'score'=>  680),
+            array('name'=>'Tamura Akira',   'score'=> 5840),
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950),
+            array('name'=>'Yamada Rindai',  'score'=> 6680),
+            array('name'=>'Suzuka Youichi', 'score'=> 6780),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950),
+        );
+        $actual = Ginq::from($data)->minWith(array('v1,v2'=>'v1["score"]-v2["score"]'));
+        $this->assertEquals(array('name'=>'Yamada Taro', 'score'=> 680), $actual);
     }
 
     /**
@@ -464,6 +473,28 @@ class GinqTest extends PHPUnit_Framework_TestCase
         $actual = Ginq::from($data)
             ->max('[score]', function($v1,$v2){return Ginq::compare($v1,$v2);});
         $this->assertEquals(10200, $actual);
+    }
+
+    /**
+     * testMaxWith().
+     */
+    public function testMaxWith()
+    {
+        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))->maxWith();
+        $this->assertEquals(9, $actual);
+
+        $data = array(
+            array('name'=>'Abe Shinji',     'score'=> 2990),
+            array('name'=>'Suzuki Taro',    'score'=>10200),
+            array('name'=>'Yamada Taro',    'score'=>  680),
+            array('name'=>'Tamura Akira',   'score'=> 5840),
+            array('name'=>'Tanaka Ichiro',  'score'=> 8950),
+            array('name'=>'Yamada Rindai',  'score'=> 6680),
+            array('name'=>'Suzuka Youichi', 'score'=> 6780),
+            array('name'=>'Muraoka Kouhei', 'score'=> 1950),
+        );
+        $actual = Ginq::from($data)->maxWith(array('v1,v2'=>'v1["score"]-v2["score"]'));
+        $this->assertEquals(array('name'=>'Suzuki Taro', 'score'=>10200), $actual);
     }
 
     /**

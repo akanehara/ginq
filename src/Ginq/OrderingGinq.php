@@ -80,7 +80,7 @@ class OrderingGinq extends Ginq
     }
 
     /**
-     * @param callable|array $comparer
+     * @param callable|array $comparer (v1, v2, k1?, k2?) -> int
      * @return OrderingGinq
      */
     public function thenWith($comparer)
@@ -91,7 +91,7 @@ class OrderingGinq extends Ginq
     }
 
     /**
-     * @param callable|array $comparer
+     * @param callable|array $comparer (v1, v2, k1?, k2?) -> int
      * @return OrderingGinq
      */
     public function thenWithDesc($comparer)
