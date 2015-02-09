@@ -303,6 +303,7 @@ class Ginq implements \IteratorAggregate
     public function average($selector = null)
     {
         $it = $this->getIterator();
+        $it->rewind();
         if (!$it->valid()) {
             throw new \RuntimeException("Sequence is empty");
         }
@@ -324,6 +325,7 @@ class Ginq implements \IteratorAggregate
     public function min($selector = null)
     {
         $it = $this->getIterator();
+        $it->rewind();
         if (!$it->valid()) {
             throw new \RuntimeException("Sequence is empty");
         }
@@ -349,6 +351,7 @@ class Ginq implements \IteratorAggregate
     public function minWith($comparer = null)
     {
         $it = $this->getIterator();
+        $it->rewind();
         if (!$it->valid()) {
             throw new \RuntimeException("Sequence is empty");
         }
@@ -373,6 +376,7 @@ class Ginq implements \IteratorAggregate
     public function max($selector = null)
     {
         $it = $this->getIterator();
+        $it->rewind();
         if (!$it->valid()) {
             throw new \RuntimeException("Sequence is empty");
         }
@@ -398,6 +402,7 @@ class Ginq implements \IteratorAggregate
     public function maxWith($comparer = null)
     {
         $it = $this->getIterator();
+        $it->rewind();
         if (!$it->valid()) {
             throw new \RuntimeException("Sequence is empty");
         }

@@ -385,7 +385,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testAverage()
     {
-        $actual = Ginq::from(array(1,2,3,4,5,6,7,8,9,10))->average();
+        $data = array(1,2,3,4,5,6,7,8,9,10);
+        $actual = Ginq::from($data)->average();
+        $this->assertEquals(5.5, $actual);
+
+        $data = new \IteratorIterator(new \ArrayIterator($data));
+        $actual = Ginq::from($data)->average();
         $this->assertEquals(5.5, $actual);
 
         $actual = Ginq::from(array("apple", "orange", "grape"))
@@ -402,7 +407,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testMin()
     {
-        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))->min();
+        $data = array(4,2,7,9,1,3,6,5,8);
+        $actual = Ginq::from($data)->min();
+        $this->assertEquals(1, $actual);
+
+        $data = new \IteratorIterator(new \ArrayIterator($data));
+        $actual = Ginq::from($data)->min();
         $this->assertEquals(1, $actual);
 
         $data = array(
@@ -424,7 +434,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testMinWith()
     {
-        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))->minWith();
+        $data = array(4,2,7,9,1,3,6,5,8);
+        $actual = Ginq::from($data)->minWith();
+        $this->assertEquals(1, $actual);
+
+        $data = new \IteratorIterator(new \ArrayIterator($data));
+        $actual = Ginq::from($data)->minWith();
         $this->assertEquals(1, $actual);
 
         $data = array(
@@ -446,7 +461,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testMax()
     {
-        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))->max();
+        $data = array(4,2,7,9,1,3,6,5,8);
+        $actual = Ginq::from($data)->max();
+        $this->assertEquals(9, $actual);
+
+        $data = new \IteratorIterator(new \ArrayIterator($data));
+        $actual = Ginq::from($data)->max();
         $this->assertEquals(9, $actual);
 
         $data = array(
@@ -480,7 +500,12 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public function testMaxWith()
     {
-        $actual = Ginq::from(array(4,2,7,9,1,3,6,5,8))->maxWith();
+        $data = array(4,2,7,9,1,3,6,5,8);
+        $actual = Ginq::from($data)->maxWith();
+        $this->assertEquals(9, $actual);
+
+        $data = new \IteratorIterator(new \ArrayIterator($data));
+        $actual = Ginq::from($data)->maxWith();
         $this->assertEquals(9, $actual);
 
         $data = array(
