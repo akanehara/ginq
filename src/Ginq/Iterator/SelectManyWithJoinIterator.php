@@ -98,9 +98,12 @@ class SelectManyWithJoinIterator implements \Iterator
     public function next()
     {
         $this->inner->next();
-        if (!$this->inner->valid()) {
+        while (!$this->inner->valid()) {
             $this->outer->next();
             $this->fetchOuter();
+            if ($this->inner === null) {
+                break;
+            }
         }
         $this->fetchInner();
     }
