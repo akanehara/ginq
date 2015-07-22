@@ -1357,6 +1357,56 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array('Junko-1',   '090-9898-1314'),
             array('Junko-2',   '050-6667-2231')
         ), $phones);
+
+        $phoneBook = array(
+            array(
+                'name'   => 'Taro',
+                'phones' => array(
+                    '03-1234-5678',
+                    '090-8421-9061'
+                )
+            ),
+            array(
+                'name'   => 'Hiroshi',
+                'phones' => array(
+                    // empty
+                )
+            ),
+            array(
+                'name'   => 'Junko',
+                'phones' => array(
+                    '06-1111-3333',
+                    '090-9898-1314',
+                    '050-6667-2231'
+                )
+            )
+        );
+
+        // bug #58: empty list
+        $phones = Ginq::from($phoneBook)->selectMany('[phones]')->toAList();
+        $this->assertEquals(array(
+            // Taro
+            array(0, '03-1234-5678'),
+            array(1, '090-8421-9061'),
+            // Junko
+            array(0, '06-1111-3333'),
+            array(1, '090-9898-1314'),
+            array(2, '050-6667-2231')
+        ), $phones);
+
+        // bug #58: empty list (with result selector)
+        $phones = Ginq::from($phoneBook)
+            ->selectMany(
+                '[phones]',
+                array('v0, v1' => 'v0["name"]~" : "~v1')
+            )->toAList();
+        $this->assertEquals(array(
+            array(0, 'Taro : 03-1234-5678'),
+            array(1, 'Taro : 090-8421-9061'),
+            array(0, 'Junko : 06-1111-3333'),
+            array(1, 'Junko : 090-9898-1314'),
+            array(2, 'Junko : 050-6667-2231')
+        ), $phones);
     }
 
     /**
