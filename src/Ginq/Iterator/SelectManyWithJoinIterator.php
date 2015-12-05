@@ -98,13 +98,7 @@ class SelectManyWithJoinIterator implements \Iterator
     public function next()
     {
         $this->inner->next();
-        while (!$this->inner->valid()) {
-            $this->outer->next();
-            $this->fetchOuter();
-            if ($this->inner === null) {
-                break;
-            }
-        }
+        $this->skipEmpty();
         $this->fetchInner();
     }
 
@@ -112,6 +106,7 @@ class SelectManyWithJoinIterator implements \Iterator
     {
         $this->outer->rewind();
         $this->fetchOuter();
+        $this->skipEmpty();
         $this->fetchInner();
     }
 
@@ -150,6 +145,14 @@ class SelectManyWithJoinIterator implements \Iterator
                 $this->outerV, $innerV,
                 $this->outerK, $innerK
             );
+        }
+    }
+
+    private function skipEmpty()
+    {
+        while (!is_null($this->inner) && !$this->inner->valid()) {
+            $this->outer->next();
+            $this->fetchOuter();
         }
     }
 }
