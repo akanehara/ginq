@@ -83,13 +83,7 @@ class SelectManyIterator implements \Iterator
     public function next()
     {
         $this->inner->next();
-        while (!$this->inner->valid()) {
-            $this->outer->next();
-            $this->fetchOuter();
-            if ($this->inner === null) {
-                break;
-            }
-        }
+        $this->skipEmpty();
         $this->fetchInner();
     }
 
@@ -97,6 +91,7 @@ class SelectManyIterator implements \Iterator
     {
         $this->outer->rewind();
         $this->fetchOuter();
+        $this->skipEmpty();
         $this->fetchInner();
     }
 
@@ -127,6 +122,14 @@ class SelectManyIterator implements \Iterator
         if ($this->valid()) {
             $this->v = $this->inner->current();
             $this->k = $this->inner->key();
+        }
+    }
+
+    private function skipEmpty()
+    {
+        while (!is_null($this->inner) && !$this->inner->valid()) {
+            $this->outer->next();
+            $this->fetchOuter();
         }
     }
 }

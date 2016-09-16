@@ -1407,6 +1407,50 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array(1, 'Junko : 090-9898-1314'),
             array(2, 'Junko : 050-6667-2231')
         ), $phones);
+
+        $phoneBook = array(
+            array(
+                'name'   => 'Hiroshi',
+                'phones' => array(
+                    // empty
+                )
+            ),
+            array(
+                'name'   => 'Taro',
+                'phones' => array(
+                    '03-1234-5678',
+                    '090-8421-9061'
+                )
+            ),
+            array(
+                'name'   => 'Atsushi',
+                'phones' => array(
+                    '050-1198-4458'
+                )
+            )
+        );
+
+        // bug #63: first empty list
+        $phones = Ginq::from($phoneBook)->selectMany('[phones]')->toAList();
+        $this->assertEquals(array(
+            // Taro
+            array(0, '03-1234-5678'),
+            array(1, '090-8421-9061'),
+            // Atsushi
+            array(0, '050-1198-4458'),
+        ), $phones);
+
+        // bug #63: first empty list (with result selector)
+        $phones = Ginq::from($phoneBook)
+            ->selectMany(
+                '[phones]',
+                array('v0, v1' => 'v0["name"]~" : "~v1')
+            )->toAList();
+        $this->assertEquals(array(
+            array(0, 'Taro : 03-1234-5678'),
+            array(1, 'Taro : 090-8421-9061'),
+            array(0, 'Atsushi : 050-1198-4458'),
+        ), $phones);
     }
 
     /**
