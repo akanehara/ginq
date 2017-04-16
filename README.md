@@ -56,14 +56,14 @@ array(1,9,25,49,81);
 
 **Ginq** has functions, well-known in SQL, such as `join()`, `orderBy()`, and `groupBy()` other than `select()`, `where()` listed above.
 
-##Selector and Predicate
+## Selector and Predicate
 Most of methods in **Ginq** receive a closure as a argument.
 
 You may not be familiar with closures, but it is very simple things.
 There are just three types of closures in **Ginq**, you can remember simply.
 These are predicate, selector, and connection selector.
 
-###Predicate
+### Predicate
 A closure that passed to a method that do select, such as `where()` is called **predicate**.
 
 Predicate is a closure that receive a pair of key and values in the elements and return boolean value.
@@ -74,7 +74,7 @@ function ($v, [$k]) { return $v % 2 == 0; }
 You get even numbers when you pass this closure to `where()`.
 You can skip second argument when you don't need it in the process. 
 
-###Selector
+### Selector
 A closure that passed to a method that do projection, such as `select()` is called **selector**.
 
 Selector is a closure that receive a pair of key and value in the elements and create a new value or key, and then return it.
@@ -87,7 +87,7 @@ You get squared numbers of original when you pass this closure to `select()`.
 
 This function is used to specify the key of grouping with `groupBy()`, the key of sorting with `groupBy()`. 
 
-###Connection Selector
+### Connection Selector
 **Connection Selector** is one of the selector that combine two elements into one, is used with `join()`, `zip()`.
 
 ```php
