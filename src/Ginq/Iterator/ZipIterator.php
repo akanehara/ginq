@@ -100,12 +100,14 @@ class ZipIterator implements \Iterator
 
     protected function fetch()
     {
-        $v0 = $this->it0->current();
-        $v1 = $this->it1->current();
-        $k0 = $this->it0->key();
-        $k1 = $this->it1->key();
-        $this->v = $this->valueJoinSelector->select($v0, $v1, $k0, $k1);
-        $this->k = $this->keyJoinSelector->select($v0, $v1, $k0, $k1);
+        if ($this->valid()) {
+            $v0 = $this->it0->current();
+            $v1 = $this->it1->current();
+            $k0 = $this->it0->key();
+            $k1 = $this->it1->key();
+            $this->v = $this->valueJoinSelector->select($v0, $v1, $k0, $k1);
+            $this->k = $this->keyJoinSelector->select($v0, $v1, $k0, $k1);
+        }
     }
 }
 
