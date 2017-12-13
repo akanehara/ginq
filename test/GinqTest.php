@@ -1598,6 +1598,10 @@ class GinqTest extends PHPUnit_Framework_TestCase
             array(6, "7 - red"),
             array(7, "8 - green")
         ), $xs);
+
+        // should't call selector if empty.
+        $actual = Ginq::zero()->zip(Ginq::zero(), function ($v0, $v1) { $this->assertTrue(false); })->count();
+        $this->assertEquals(0, $actual);
     }
 
     /**
