@@ -1,6 +1,9 @@
 <?php
 use Ginq\Lambda\SyntaxError;
 use Ginq\OrderingGinq;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
 use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
@@ -24,7 +27,7 @@ class Person
 /**
  * Test class for Ginq.
  */
-class GinqTest extends PHPUnit_Framework_TestCase
+class GinqTest extends TestCase
 {
     /**
      * Runs the test methods of this class.
@@ -34,8 +37,8 @@ class GinqTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("GinqTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite  = new TestSuite("GinqTest");
+        $result = TestRunner::run($suite);
     }
 
     /**
@@ -44,7 +47,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
      *
      * @access protected
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         //Ginq::useIterator();
         //Ginq::useGenerator();
@@ -56,7 +59,7 @@ class GinqTest extends PHPUnit_Framework_TestCase
      *
      * @access protected
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
     }
 

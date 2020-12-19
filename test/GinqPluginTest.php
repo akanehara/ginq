@@ -3,8 +3,11 @@
 require_once dirname(dirname(__FILE__)) . "/src/Ginq.php";
 
 use Ginq\Ginq;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
 
-class GinqPluginTest extends PHPUnit_Framework_TestCase
+class GinqPluginTest extends TestCase
 {
     /**
      * Runs the test methods of this class.
@@ -14,8 +17,8 @@ class GinqPluginTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite = new PHPUnit_Framework_TestSuite("GinqPluginTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("GinqPluginTest");
+        $result = TestRunner::run($suite);
     }
 
     public function testResiterPlugin()

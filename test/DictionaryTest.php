@@ -3,8 +3,11 @@ require_once dirname(dirname(__FILE__)) . "/src/Ginq/Core/Dictionary.php";
 require_once dirname(dirname(__FILE__)) . "/src/Ginq/Core/EqualityComparer.php";
 
 use \Ginq\Core\Dictionary;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\TestRunner;
 
-class DictionaryTest extends PHPUnit_Framework_TestCase
+class DictionaryTest extends TestCase
 {
     /**
      * Runs the test methods of this class.
@@ -14,8 +17,8 @@ class DictionaryTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite = new PHPUnit_Framework_TestSuite("DictionaryTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
+        $suite = new TestSuite("DictionaryTest");
+        $result = TestRunner::run($suite);
     }
 
     public function testScalarKeys()
