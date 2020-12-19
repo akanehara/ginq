@@ -15,7 +15,7 @@ composer.json:
 ```json
 {
     "require": {
-        "ginq/ginq": "~0.2.3"
+        "ginq/ginq": "dev-master"
     }
 }
 ```
@@ -145,3 +145,20 @@ http://symfony.com/doc/current/components/property_access/index.html
 
 ## References
 
+
+# Development 
+
+## PreRequirements
+- `Docker` installed.
+- `Docker Compose` installed.
+
+## How to start development (Run test)
+- cd docker
+- docker-compose up -d
+- docker-compose exec php ash
+- (in php container)
+    - composer install
+    - vendor/bin/phpunit
+
+## Note
+- You can use [illuminate/support](https://github.com/illuminate/support) library. (Laravel `Collection`, ...)
