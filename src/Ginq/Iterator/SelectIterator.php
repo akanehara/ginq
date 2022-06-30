@@ -62,29 +62,29 @@ class SelectIterator implements \Iterator
         $this->keySelector = $keySelector;
     }
 
-    public function current()
+    public function current(): mixed
     {
         return $this->v;
     }
 
-    public function key() 
+    public function key(): mixed
     {
         return $this->k;
     }
 
-    public function next()
+    public function next(): void
     {
         $this->it->next();
         $this->fetch();
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->it->rewind();
         $this->fetch();
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return $this->it->valid();
     }
