@@ -33,6 +33,7 @@ use Ginq\Util\FuncUtil;
 use Ginq\Util\IteratorUtil;
 use Ginq\Comparer\ReverseComparer;
 use Ginq\Comparer\ProjectionComparer;
+use Traversable;
 
 
 /**
@@ -141,7 +142,7 @@ class Ginq implements \IteratorAggregate
      * Overridden interface of IteratorAggregate.
      * @return \Iterator
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return $this->it;
     }
